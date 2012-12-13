@@ -1,0 +1,5 @@
+# This directory contains the android support libraries.
+# These should not be committed but kept locally to build.
+*
+# Except this file
+!.gitignore
