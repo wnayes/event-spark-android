@@ -4,6 +4,7 @@
     <string name="app_name">AppChallengeAndroid</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_create_event">Create Event</string>
     <string name="title_activity_event_viewer">EventViewer</string>
 
 </resources>
