@@ -7,6 +7,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -18,9 +19,9 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 
- // This shows how to create a simple activity with a map and a marker on the map.
- // Notice how we deal with the possibility that the Google Play services APK is not
- // installed/enabled/updated on a user's device.
+/**
+ * Displays a user's location and surrounding events.
+ */
 public class EventViewer extends SherlockFragmentActivity implements LocationListener, LocationSource {
     // Note that this may be null if the Google Play services APK is not available.
     private GoogleMap mMap;
@@ -74,7 +75,19 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         inflater.inflate(R.menu.activity_event_viewer, menu);
         return true;
     }
+    
+    @Override
+    public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+        switch (item.getItemId()) {
+	        case R.id.menu_create_event:
+	        	// Launch the wizard for creating a new event.
+	        	Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
+	        	startActivity(createEvent);
+	        	return true;
+        }
 
+        return super.onOptionsItemSelected(item);
+    }
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
