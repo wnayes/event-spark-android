@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView style="?android:textAppearanceLarge"
+        android:text="@string/event_time_page_title"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+    
+    <!-- Set event length controls -->
+    <TextView style="?android:textAppearanceMedium"
+        android:lineSpacingMultiplier="1.2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/event_time_length_info" />
+    <EditText android:id="@+id/event_length"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginBottom="32dp"
+	    android:hint="@string/event_time_hint"
+	    android:inputType="number" />
+
+    <!-- Set event delay controls -->
+    <TextView style="?android:textAppearanceMedium"
+        android:lineSpacingMultiplier="1.2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/event_time_delay_info" />
+    <EditText android:id="@+id/event_delay"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:hint="@string/event_time_hint"
+	    android:inputType="number" />
+
+</LinearLayout>

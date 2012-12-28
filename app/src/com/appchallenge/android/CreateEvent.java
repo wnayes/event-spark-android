@@ -18,11 +18,6 @@ import com.actionbarsherlock.view.MenuItem;
  */
 public class CreateEvent extends SherlockFragmentActivity {
     /**
-     * The number of pages (wizard steps) to show.
-     */
-    private static final int NUM_PAGES = 5;
-
-    /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
      */
@@ -95,21 +90,28 @@ public class CreateEvent extends SherlockFragmentActivity {
     }
 
     /**
-     * A pager adapter that represents 5 sequential {@link CreateEventPageFragment} objects.
+     * A pager adapter that represents the wizard pages sequentially.
      */
     private class CreateEventPagerAdapter extends FragmentStatePagerAdapter {
+    	// Instances of each wizard page, in order.
+    	private Fragment[] wizardPages = new Fragment[] {
+            new CreateEventPage1EventName(),
+            new CreateEventPage2EventTime(),
+            new CreateEventPage3EventLocation()
+    	};
+
         public CreateEventPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 
         @Override
         public Fragment getItem(int position) {
-            return CreateEventPageFragment.create(position);
+            return wizardPages[position];
         }
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
+            return wizardPages.length;
         }
     }
 }
