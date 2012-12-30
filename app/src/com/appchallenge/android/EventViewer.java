@@ -6,12 +6,15 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -26,9 +29,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     // Note that this may be null if the Google Play services APK is not available.
     private GoogleMap mMap;
 
-    private LocationManager locationManager;
     private OnLocationChangedListener mListener;
-    private String provider;
     private LatLng currentLocation = new LatLng(0,0);
     private float currentZoom = 12;
 
@@ -37,35 +38,22 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
 
-        // Handle location detection on startup.
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria locationCriteria = new Criteria();
-        locationCriteria.setAccuracy(Criteria.ACCURACY_FINE);
-        provider = locationManager.getBestProvider(locationCriteria, true);
-
-        // Set current location
-        Location location = locationManager.getLastKnownLocation(provider);
-        if (location != null)
-          currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
-        // Move the camera if the new location is greater than 5km (arbitrary)
-        locationManager.requestLocationUpdates(provider, 1000, 5, this);
-
         setUpMapIfNeeded();
+        
+        // Grab the latest location information.
+        LocationFinder locationFinder = new LocationFinder();
+        locationFinder.getLocation(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-        if(locationManager != null)
-            mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(true);
     }
     
     @Override
     protected void onPause() {
-    	if(locationManager != null)
-            locationManager.removeUpdates(this);
     	super.onPause();
     }
     
@@ -126,38 +114,30 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	//mMap.getUiSettings().setZoomControlsEnabled(false);
     	mMap.setMyLocationEnabled(true);
     	mMap.moveCamera(CameraUpdateFactory.zoomTo(currentZoom));
+    	
     }
 
 	@Override
 	public void onLocationChanged(Location location) {
-		if( mListener != null ) {
+		// Feed the map listener the location to update the location indicator.
+		if (mListener != null)
 	        mListener.onLocationChanged(location);
 
-	        currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-	        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));	        
-	    }
+		// Act based on the new location.
+        if (location != null) {
+        	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+	        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
+        }
 
 //		// Keep the user's zoom if they have changed it.
 //		if (Math.abs(currentZoom - mMap.getCameraPosition().zoom) > 0.2)
 //			currentZoom = mMap.getCameraPosition().zoom;
-
-//		Toast.makeText(this, "Received significant LatLng change", Toast.LENGTH_SHORT).show();
 	}
 
-	@Override
-	public void onProviderDisabled(String provider) {
-		Toast.makeText(this, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onProviderEnabled(String provider) {
-		Toast.makeText(this, "Enabled new provider " + provider, Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-	}
+	// Methods required (besides onLocationChanged()) for LocationListener.
+	public void onProviderDisabled(String provider) {}
+	public void onProviderEnabled(String provider) {}
+	public void onStatusChanged(String provider, int status, Bundle extras) {}
 	
 	// Returns the distance in km between two LatLng objects.
 	// Maybe needed sooner or later.
