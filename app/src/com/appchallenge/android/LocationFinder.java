@@ -7,6 +7,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 /**
@@ -112,28 +114,40 @@ public class LocationFinder {
             if (lastGPSLocation != null && lastNetworkLocation!=null) {
                 if (lastGPSLocation.getTime() > lastNetworkLocation.getTime()) {
                 	Log.d(this.getClass().getName(), "Selecting (old) GPS location.");
-                	listener.onLocationChanged(lastGPSLocation);
+                	timeoutLocation = lastGPSLocation;
                 } else {
                 	Log.d(this.getClass().getName(), "Selecting (old) Network location.");
-                	listener.onLocationChanged(lastNetworkLocation);
+                	timeoutLocation = lastNetworkLocation;
                 }
+                timerHandler.sendEmptyMessage(0);
                 return;
             }
 
             if (lastGPSLocation != null) {
             	Log.d(this.getClass().getName(), "Selecting (old) GPS location.");
-            	listener.onLocationChanged(lastGPSLocation);
+            	timeoutLocation = lastGPSLocation;
+            	timerHandler.sendEmptyMessage(0);
                 return;
             }
 
             if (lastNetworkLocation != null) {
             	Log.d(this.getClass().getName(), "Selecting (old) Network location.");
-                listener.onLocationChanged(lastNetworkLocation);
+            	timeoutLocation = lastNetworkLocation;
+            	timerHandler.sendEmptyMessage(0);
                 return;
             }
             
             Log.d(this.getClass().getName(), "Returning null location!");
-            listener.onLocationChanged(null);
+            timeoutLocation = null;
+            timerHandler.sendEmptyMessage(0);
         }
     }
+    
+    // Use a Handler to send the location to the UI from the Timer.
+    private Location timeoutLocation;
+    private final Handler timerHandler = new Handler() {
+        public void handleMessage(Message msg) {
+        	listener.onLocationChanged(timeoutLocation);
+        }
+    };
 }

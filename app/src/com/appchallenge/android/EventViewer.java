@@ -15,12 +15,14 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.Window;
 
 /**
  * Displays a user's location and surrounding events.
@@ -39,7 +41,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         setContentView(R.layout.activity_event_viewer);
 
         setUpMapIfNeeded();
-        
+
         // Grab the latest location information.
         LocationFinder locationFinder = new LocationFinder();
         locationFinder.getLocation(this);
@@ -68,14 +70,23 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
         switch (item.getItemId()) {
 	        case R.id.menu_create_event:
-	        	// Launch the wizard for creating a new event.
-	        	Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
-	        	startActivity(createEvent);
+            	// Launch the wizard for creating a new event.
+            	Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
+            	startActivity(createEvent);
+            	return true;
+	        case R.id.menu_refresh_events:
+	        	// Refresh the event listing.
+	            //LocationFinder locationFinder = new LocationFinder();
+	            //locationFinder.getLocation(this);
+	        	
+	        	// Call the API for new event markers.
+	        	new EventAPICaller().execute();
 	        	return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
@@ -119,6 +130,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
 	@Override
 	public void onLocationChanged(Location location) {
+		setProgressBarVisibility(false);
+
 		// Feed the map listener the location to update the location indicator.
 		if (mListener != null)
 	        mListener.onLocationChanged(location);
@@ -161,5 +174,28 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	@Override
 	public void deactivate() {
 		mListener = null;
+	}
+	
+	/**
+	 * Performs an asynchronous API call to find nearby events.
+	 */
+	private class EventAPICaller extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected void onPreExecute() {
+			// Set up some progress indication?
+		}
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			//return APICalls.getEventsNearLocation( ... );
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			// Remove progress UI.
+		}
+		
 	}
 }
