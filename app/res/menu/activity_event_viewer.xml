@@ -9,12 +9,12 @@
     <item android:id="@+id/menu_create_event"
           android:icon="@drawable/ic_action_new"
           android:title="@string/menu_create_event"
-          android:showAsAction="ifRoom|withText" />
+          android:showAsAction="ifRoom" />
     
     <!-- Refresh location and event listing. -->
     <item android:id="@+id/menu_refresh_events"
           android:icon="@drawable/refresh"
           android:title="@string/menu_refresh_events"
-          android:showAsAction="ifRoom|withText" />
+          android:showAsAction="ifRoom" />
 
 </menu>

@@ -9,10 +9,8 @@ import com.google.android.gms.maps.model.LatLng;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -22,29 +20,82 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.Window;
 
 /**
  * Displays a user's location and surrounding events.
  */
 public class EventViewer extends SherlockFragmentActivity implements LocationListener, LocationSource {
-    // Note that this may be null if the Google Play services APK is not available.
+    /**
+     * Object representing the Google Map display of our Events.
+     * Note that this may be null if the Google Play services APK is not available.
+     */
     private GoogleMap mMap;
 
+    /**
+     * Listener for the Google Map user location.
+     */
     private OnLocationChangedListener mListener;
-    private LatLng currentLocation = new LatLng(0,0);
-    private float currentZoom = 12;
+    
+    /**
+     * Store the current location and zoom of the user.
+     * Currently defaulted to Minneapolis, MN.
+     */
+    private LatLng currentLocation;
+
+    /**
+     * Values saving the current location and zoom of the Map.
+     */
+    private LatLng currentMapLocation = new LatLng(44.9764164, -93.2323474);
+    private float currentMapZoom = 12;
+    
+    /**
+     * Array of Events we have downloaded for the user.
+     */
+    private Event[] currentEvents;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
+        
+        // We may be reloading due to a configuration change.
+        // Load any available information from the previous instance.
+        if (savedInstanceState != null) {
+            currentMapLocation = new LatLng(savedInstanceState.getDouble("currentMapLatitude"),
+                                            savedInstanceState.getDouble("currentMapLongitude"));
+            currentMapZoom = savedInstanceState.getFloat("currentMapZoom");
+
+            String[] JSONEvents = savedInstanceState.getStringArray("currentEvents");
+            if (JSONEvents != null) {
+            	this.currentEvents = new Event[JSONEvents.length];
+                for (int i = 0; i < JSONEvents.length; ++i) {
+            	    this.currentEvents[i] = new Event(JSONEvents[i]);
+                }
+            }
+        }
 
         setUpMapIfNeeded();
+        
+        if (savedInstanceState != null) {
+        	// Feed the map listener it's previous to restore the location indicator.
+        	if (savedInstanceState.containsKey("currentLatitude") &&
+                savedInstanceState.containsKey("currentLongitude")) {
+        		Location oldLoc = new Location("savedState");
+	            oldLoc.setLatitude(savedInstanceState.getDouble("currentLatitude"));
+	            oldLoc.setLongitude(savedInstanceState.getDouble("currentLongitude"));
+
+	            currentLocation = new LatLng(oldLoc.getLatitude(), oldLoc.getLongitude());
+
+                if (mListener != null)
+	                mListener.onLocationChanged(oldLoc);
+        	}
+        }
 
         // Grab the latest location information.
-        LocationFinder locationFinder = new LocationFinder();
-        locationFinder.getLocation(this);
+        if (savedInstanceState == null) {
+            LocationFinder locationFinder = new LocationFinder();
+            locationFinder.getLocation(this);
+        }
     }
 
     @Override
@@ -56,7 +107,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     
     @Override
     protected void onPause() {
-    	super.onPause();
+        super.onPause();
     }
     
     @Override
@@ -76,15 +127,38 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             	return true;
 	        case R.id.menu_refresh_events:
 	        	// Refresh the event listing.
-	            //LocationFinder locationFinder = new LocationFinder();
-	            //locationFinder.getLocation(this);
-	        	
-	        	// Call the API for new event markers.
-	        	new EventAPICaller().execute();
+	        	new getEventsNearLocationAPICaller().execute();
 	        	return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    
+    /**
+     * Android can arbitrarily reload our Activity, especially during screen rotations,
+     * keyboard opening/closing, etc. When this happens, the full onCreate, onResume, etc.
+     * sequence takes place. To avoid losing data (our Events in particular), the basic
+     * way to preserve state is to override this function and store primitive types in
+     * the savedInstanceState Bundle.
+     */
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+    	savedInstanceState.putDouble("currentMapLatitude", mMap.getCameraPosition().target.latitude);
+    	savedInstanceState.putDouble("currentMapLongitude",  mMap.getCameraPosition().target.longitude);
+    	savedInstanceState.putFloat("currentMapZoom", mMap.getCameraPosition().zoom);
+    	if (currentLocation != null) {
+    	    savedInstanceState.putDouble("currentLatitude", currentLocation.latitude);
+    	    savedInstanceState.putDouble("currentLongitude", currentLocation.longitude);
+    	}
+    	// Our Events cannot be directly put into the Bundle, but
+    	// they can be stringified back into JSON first.
+    	if (this.currentEvents == null)
+            return;
+
+        String[] JSONEvents = new String[this.currentEvents.length];
+        for (int i = 0; i < this.currentEvents.length; ++i) {
+    		JSONEvents[i] = this.currentEvents[i].toJSON();
+        }
+        savedInstanceState.putStringArray("currentEvents", JSONEvents);
     }
 
     /**
@@ -124,16 +198,13 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     private void setUpMap() {
     	//mMap.getUiSettings().setZoomControlsEnabled(false);
     	mMap.setMyLocationEnabled(true);
-    	mMap.moveCamera(CameraUpdateFactory.zoomTo(currentZoom));
-    	
+    	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapLocation, currentMapZoom));    	
     }
 
 	@Override
 	public void onLocationChanged(Location location) {
-		setProgressBarVisibility(false);
-
 		// Feed the map listener the location to update the location indicator.
-		if (mListener != null)
+		if (mListener != null && location != null)
 	        mListener.onLocationChanged(location);
 
 		// Act based on the new location.
@@ -151,20 +222,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	public void onProviderDisabled(String provider) {}
 	public void onProviderEnabled(String provider) {}
 	public void onStatusChanged(String provider, int status, Bundle extras) {}
-	
-	// Returns the distance in km between two LatLng objects.
-	// Maybe needed sooner or later.
-	private double getDistanceBetweenLatLngs(LatLng location1, LatLng location2) {
-		double latitudeDif = Math.toRadians(location2.latitude - location1.latitude);
-		double longitudeDif = Math.toRadians(location2.longitude - location1.longitude);
-		
-		// Perform Haversine formula.
-		double a = Math.sin(latitudeDif / 2) * Math.sin(latitudeDif / 2)
-				 + Math.cos(Math.toRadians(location1.latitude)) * Math.cos(Math.toRadians(location2.latitude))
-				 + Math.sin(longitudeDif / 2) * Math.sin(longitudeDif / 2);
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return 6371.0 * c;
-	}
 
 	@Override
 	public void activate(OnLocationChangedListener listener) {
@@ -179,7 +236,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	/**
 	 * Performs an asynchronous API call to find nearby events.
 	 */
-	private class EventAPICaller extends AsyncTask<Void, Void, Void> {
+	private class getEventsNearLocationAPICaller extends AsyncTask<Void, Void, Void> {
 
 		@Override
 		protected void onPreExecute() {
