@@ -1,6 +1,12 @@
 package com.appchallenge.android;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,6 +14,13 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -27,10 +40,20 @@ public class CreateEvent extends SherlockFragmentActivity {
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter mPagerAdapter;
+    
+    private String name = "empty";
+    private String type = "tempty";
+    private String desc = "dempty";
+    
+    
+    public void onCheckboxClicked(View view) {
+    	
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_Sherlock);
         setContentView(R.layout.activity_create_event);
 
         // Instantiate a ViewPager and a PagerAdapter.
@@ -67,24 +90,94 @@ public class CreateEvent extends SherlockFragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // See http://developer.android.com/design/patterns/navigation.html for more.
-                NavUtils.navigateUpTo(this, new Intent(this, EventViewer.class));
-                return true;
-
-            case R.id.action_back:
-                // Go to the previous step in the wizard. If there is no previous step,
-                // setCurrentItem will do nothing.
-                mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-                return true;
-
-            case R.id.action_next:
-                // Advance to the next step in the wizard. If there is no next step, setCurrentItem
-                // will do nothing.
-                mPager.setCurrentItem(mPager.getCurrentItem() + 1);
-                return true;
-        }
+    	Context context = getApplicationContext();
+    	int duration = Toast.LENGTH_SHORT;
+    	Toast toast = Toast.makeText(context, "test", duration);
+    	
+        if (item.getItemId() == android.R.id.home) {
+			// See http://developer.android.com/design/patterns/navigation.html for more.
+			NavUtils.navigateUpTo(this, new Intent(this, EventViewer.class));
+        	return true;
+        	
+		} else if (item.getItemId() == R.id.action_back) {
+			// Go to the previous step in the wizard. If there is no previous step,
+			// setCurrentItem will do nothing.
+			mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+			return true;
+		
+		} else if ((item.getItemId() == R.id.action_next) && !(item.getTitle().toString().equals("Submit"))) {
+			// Advance to the next step in the wizard. If there is no next step, setCurrentItem
+			// will do nothing.
+			
+			/**
+			 * This if statement is used to save the data from the first wizard page to be 
+			 * accessed by the constructor below.  For reasons I am currently uncertain about
+			 * When trying to access event_name from the 3rd wizard page (or trying to access
+			 * and field on the first page from the 3rd page) the findViewById returned null
+			 * So by putting the call here and using it only when switching from the first page
+			 * we can save the values to some local variables and use them in future calls
+			 */
+			if (mPager.getCurrentItem() == 0){
+			name = ((EditText) findViewById(R.id.event_name)).getText().toString();
+			type = ((Spinner) findViewById(R.id.spinner1)).getSelectedItem().toString();
+			desc = ((EditText) findViewById(R.id.event_description)).getText().toString();
+			}
+			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+			return true;
+		
+		} else if (item.getItemId() == R.id.action_next && item.getTitle().toString().equals("Submit")) {
+			//This is the code that extracts the data from the wizard
+			//Cannot get data from first page see above.
+			//It will then make a JSONObject and Post it returning a toast about success or failure
+			
+			
+			/**
+			 * Creates Time of the form HHMMAAHHMMAA where the first HH is the start time the second
+			 * HH is the end time and the same things for minutes.  The AA is for setting am versus pm.
+			 * 01 is am and 02 is pm.
+			 * TODO Update web script to accept new time input
+			**/
+			String am_pm_start = ((Spinner) findViewById(R.id.spinner_am_pm_start)).getSelectedItem().toString();
+			String am_pm_end = ((Spinner) findViewById(R.id.spinner_am_pm_end)).getSelectedItem().toString();
+			am_pm_start = (am_pm_start.equals("am")) ? "01" : (am_pm_start.equals("pm")) ? "02" : null;
+			am_pm_end = (am_pm_end.equals("am")) ? "01" : (am_pm_end.equals("pm")) ? "02": null;
+			
+			String time = ((Spinner) findViewById(R.id.spinner_hours_start)).getSelectedItem().toString()
+					+ ((Spinner) findViewById(R.id.spinner_minutes_start)).getSelectedItem().toString()
+					+ am_pm_start
+					+ ((Spinner) findViewById(R.id.spinner_hours_end)).getSelectedItem().toString()
+					+ ((Spinner) findViewById(R.id.spinner_minutes_end)).getSelectedItem().toString()
+					+ am_pm_end;
+			
+			
+			LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+			String loc = LocationManager.GPS_PROVIDER;
+			Location lastKnownLocation = locationManager.getLastKnownLocation(loc);
+			JSONObject object = new JSONObject();
+			
+			try {
+				object.put("title", name);
+				object.put("description", desc);
+				object.put("time", time);
+				object.put("type", type);
+				object.put("latitude", lastKnownLocation.getLatitude());
+				object.put("longitude", lastKnownLocation.getLongitude());
+				String object_2 = object.toString();
+				toast = Toast.makeText(context, object_2, duration);
+				
+				//This toast verifies that the data is being passed correctly
+				//Remove after done debugging
+				toast.show();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			// TODO Add the actual Call to the database
+			
+			
+			return true;
+		}
 
         return super.onOptionsItemSelected(item);
     }
@@ -92,14 +185,14 @@ public class CreateEvent extends SherlockFragmentActivity {
     /**
      * A pager adapter that represents the wizard pages sequentially.
      */
-    private class CreateEventPagerAdapter extends FragmentStatePagerAdapter {
+    public class CreateEventPagerAdapter extends FragmentStatePagerAdapter {
     	// Instances of each wizard page, in order.
-    	private Fragment[] wizardPages = new Fragment[] {
+    	public Fragment[] wizardPages = new Fragment[] {
             new CreateEventPage1EventName(),
             new CreateEventPage2EventTime(),
             new CreateEventPage3EventLocation()
     	};
-
+    	
         public CreateEventPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }

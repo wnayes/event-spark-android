@@ -14,7 +14,7 @@
   limitations under the License.
   -->
 
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         These action bar item IDs (menu item IDs) are defined here for
@@ -25,5 +25,6 @@
     -->
     <item type="id" name="action_next" />
     <item type="id" name="action_flip" />
+    <item type="id" name="action_finish" />
 
 </resources>

@@ -8,17 +8,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-        
-        
-        <TextView android:id="@+id/create_event_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="@string/title_activity_create_event"
-        android:textSize="30sp" 
-        android:layout_marginBottom="25dp" />
 
-        <TextView style="?android:textAppearanceLarge"
+        <TextView android:id="@+id/create_event_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="@string/title_activity_create_event"
+            android:textSize="30sp" 
+            android:layout_marginBottom="25dp" />
+        
+        <TextView android:textSize="20sp"
             android:text="@string/event_time_page_title"
             android:textStyle="bold"
             android:layout_width="match_parent"
@@ -34,49 +33,19 @@
             android:onClick="onCheckboxClicked"
             android:layout_marginBottom="16dp"/>
         
-        
-        <TextView style="?android:textAppearanceMedium"
-            android:lineSpacingMultiplier="1.2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/event_time_length_info" />
-        
-        <Spinner
-            android:id="@+id/spinner_hours_start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:entries="@array/time_array_hours"
-            android:prompt="@string/event_select_hours" />
-
-        <Spinner
-            android:id="@+id/spinner_minutes_start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:entries="@array/time_array_minutes"
-            android:prompt="@string/event_select_minutes" />
-
-        <Spinner
-            android:id="@+id/spinner_am_pm_start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:entries="@array/am_pm"
-            android:prompt="@string/event_select_am_pm" />
-
-        <!-- Set event delay controls -->
+        <!-- Set event end -->
         <TextView android:textSize="20sp"
             android:lineSpacingMultiplier="1.2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/event_time_delay_info" />
         
-        <TextView android:textSize="15sp"
+        <TextView style="?android:textAppearanceMedium"
             android:lineSpacingMultiplier="1.2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:textSize="15sp"
             android:text="@string/event_time_unknown" />
         
         <Spinner
@@ -105,8 +74,3 @@
 
     </LinearLayout>
 </ScrollView>
-
-
-
-
-

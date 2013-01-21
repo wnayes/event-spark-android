@@ -56,6 +56,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_Sherlock);
         setContentView(R.layout.activity_event_viewer);
         
         // We may be reloading due to a configuration change.
@@ -119,17 +120,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
-        switch (item.getItemId()) {
-	        case R.id.menu_create_event:
-            	// Launch the wizard for creating a new event.
-            	Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
-            	startActivity(createEvent);
-            	return true;
-	        case R.id.menu_refresh_events:
-	        	// Refresh the event listing.
-	        	new getEventsNearLocationAPICaller().execute();
-	        	return true;
-        }
+        if (item.getItemId() == R.id.menu_create_event) {
+			// Launch the wizard for creating a new event.
+			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
+			startActivity(createEvent);
+			return true;
+		} else if (item.getItemId() == R.id.menu_refresh_events) {
+			// Refresh the event listing.
+			new getEventsNearLocationAPICaller().execute();
+			return true;
+		}
 
         return super.onOptionsItemSelected(item);
     }

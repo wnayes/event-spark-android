@@ -64,6 +64,8 @@ public class APICalls {
 
         client.AddParam("name", newEvent.getName());
         client.AddParam("description", newEvent.getDescription());
+        client.AddParam("type", newEvent.getType());
+        client.AddParam("time", newEvent.getTime());
         LatLng location = newEvent.getLocation();
         client.AddParam("latitude", ((Double)location.latitude).toString());
         client.AddParam("longitude", ((Double)location.longitude).toString());

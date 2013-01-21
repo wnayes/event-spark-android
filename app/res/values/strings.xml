@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AppChallengeAndroid</string>
+    <string name="app_name">AppChallenge</string>
 
     <!-- Event Viewer -->
     <string name="title_activity_event_viewer">EventViewer</string>
@@ -14,17 +14,82 @@
     <string name="title_activity_create_event">Create Event</string>
     <string name="title_template_step">Step: Lorem Ipsum</string>
     
-    <string name="event_name_page_title">Event Name</string>
-    <string name="event_name_hint">What is happening?</string>
+    <string name="event_name_page_title">Tell us about your event:</string>
+    <string name="event_name_hint">Give It a Name</string>
     
+    
+    <string name="event_description_title">Event Description:</string>
+    <string name="event_description_hint">Describe the Event</string>
+    
+    
+    <string name="event_time_selector">Is this Event Currently Happening?</string>
     <string name="event_time_page_title">Event Time</string>
-    <string name="event_time_length_info">How long is the event?</string>
-    <string name="event_time_delay_info">Is there a delay before this event begins?</string>
-    <string name="event_time_hint">Enter time in minutes.</string>
-
+    <string name="event_select_hours">Select Hours</string>
+    <string name="event_select_minutes">Select Minutes</string>
+    <string name="event_select_am_pm">Select am or pm</string>
+    <string name="event_time_unknown">Leave Blank if Unknown</string>
+    <string name="event_time_length_info">Enter the Start Time:</string>
+    <string name="event_time_delay_info">Enter the End Time:</string>
+    
     <string name="action_back">Back</string>
     <string name="action_next">Next</string>
-    <string name="action_finish">Finish</string>
+    <string name="action_finish">Submit</string>
+    
+    <!-- Strings and Arrays for the types spinner -->
+    <string name="event_select_type">Select Type</string>
+    <string name="event_spinner_title">Select Type of Event:</string>
+    <string-array name="type_array">
+    
+        <item>Concert</item>
+        <item>Party</item>
+        <item>Sport</item>
+        <item>Study</item>
+        <item>Other</item>
+        
+    </string-array>
+    
+    <!-- Arrays for Selecting the Time -->
+    <string-array name="am_pm">
+        
+        <item>am</item>
+        <item>pm</item>
+        
+    </string-array>        
+    
+    <string-array name="time_array_hours">
+    
+        <item>00</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
+        <item>07</item>
+        <item>08</item>
+        <item>09</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+              
+    </string-array>
+    
+    <string-array name="time_array_minutes">
+    
+        <item>00</item><item>01</item><item>02</item><item>03</item><item>04</item><item>05</item>
+        <item>06</item><item>07</item><item>08</item><item>09</item><item>10</item><item>11</item>
+        <item>12</item><item>13</item><item>14</item><item>15</item><item>16</item><item>17</item>
+        <item>18</item><item>19</item><item>20</item><item>21</item><item>22</item><item>23</item>
+        <item>24</item><item>25</item><item>26</item><item>27</item><item>28</item><item>29</item>
+        <item>30</item><item>31</item><item>32</item><item>33</item><item>34</item><item>35</item>
+        <item>36</item><item>37</item><item>38</item><item>39</item><item>40</item><item>41</item>
+        <item>42</item><item>43</item><item>44</item><item>45</item><item>46</item><item>47</item>
+        <item>48</item><item>49</item><item>50</item><item>51</item><item>52</item><item>53</item>
+        <item>54</item><item>55</item><item>56</item><item>57</item><item>58</item><item>59</item>
+           
+    </string-array>
+    
+    
 
     <!-- Other strings -->
     <string name="lorem_ipsum"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et magna ut erat elementum cursus in quis ipsum. Nam faucibus ultrices eros, vel tempor leo semper sit amet. Duis magna quam, congue vitae interdum nec, condimentum ut lectus. Sed commodo venenatis eros a dignissim. Nunc adipiscing turpis nec magna venenatis at ultricies ipsum bibendum. Sed volutpat urna quis nisi vulputate egestas. Etiam eu dui a enim lacinia dapibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.\n\nPhasellus orci mi, eleifend nec congue id, volutpat at neque. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer semper velit vel leo rutrum sed fermentum elit porta.]]></string>

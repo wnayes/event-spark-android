@@ -17,6 +17,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class Event {
     private String name;
     private String description;
+    private String type;
+    private String time;
     private LatLng location;
 
     /**
@@ -27,6 +29,8 @@ public class Event {
         	JSONObject jsonObject = new JSONObject(eventJSON);
 			this.name = jsonObject.get("name").toString();
 			this.description = jsonObject.getString("description").toString();
+			this.type = jsonObject.getString("type").toString();
+			this.time = jsonObject.getString("time").toString();
 			double lat = jsonObject.getJSONObject("location").getDouble("latitude");
 			double lng = jsonObject.getJSONObject("location").getDouble("longitude");
 			this.location = new LatLng(lat, lng);
@@ -40,12 +44,16 @@ public class Event {
      * Create a new Event object from details.
      * @param name
      * @param description
+     * @param time
+     * @param type
      * @param location
      */
-    public Event(String name, String description, LatLng location) {
+    public Event(String name, String description, String time, String type, LatLng location) {
         this.name = name;
         this.description = description;
         this.location = location;
+        this.type = type;
+        this.time = time;
     }
     
     /**
@@ -70,6 +78,20 @@ public class Event {
     }
     
     /**
+     * @return The type of the Event
+     */
+    public String getType() {
+    	return this.type;
+    }
+    
+    /**
+     *  @return The time of event in format: HHMMSS
+     */
+    public String getTime() {
+    	return this.time;
+    }
+    
+    /**
      * @return The Event stringified into a JSON object.
      */
     public String toJSON() {
@@ -77,6 +99,8 @@ public class Event {
     	try {
 			event.put("name", this.name);
 			event.put("description", this.description);
+			event.put("type", this.type);
+			event.put("time", this.time);
 			JSONObject locationObj = new JSONObject();
 			locationObj.put("latitude", this.location.latitude);
 			locationObj.put("longitude", this.location.longitude);
