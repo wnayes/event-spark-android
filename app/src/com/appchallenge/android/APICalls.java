@@ -55,11 +55,13 @@ public class APICalls {
         return (Event[])events.toArray();
     }
     
+    
+    
     /**
      * Sends information to the REST API for creation of a new event.
      */
-    public static Event createEvent(Event newEvent) {
-        String createEventUrl = "http://www.OUR-SERVER-API-URL.com/";
+    public static boolean createEvent(Event newEvent) {
+        String createEventUrl = "http://www.OUR-SERVER-API-URL.com";
         RestClient client = new RestClient(createEventUrl);
 
         client.AddParam("name", newEvent.getName());
@@ -76,6 +78,35 @@ public class APICalls {
             e.printStackTrace();
         }
 
-        return new Event(client.getResponse());
+        //return new Event(client.getResponse());
+        /** 
+         * We should return true or false if it worked or fail accordingly.
+         **/
+        boolean bool = false;
+        JSONObject jsonObject;
+        String name = null, name2 = null;
+		try {
+			jsonObject = new JSONObject(client.getResponse());
+			name = jsonObject.get("text").toString();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			Log.e(APICalls.class.toString(), "Error Parsing Return Value from text");
+			e.printStackTrace();
+		}
+		try {
+			jsonObject = new JSONObject(client.getResponse());
+			name2 = jsonObject.get("bool").toString();
+		} catch (JSONException e) {
+			Log.e(APICalls.class.toString(), "Error Parsing Return Value from bool");
+			e.printStackTrace();
+		}
+		 
+		if(name2 != null){
+			bool = true;
+		}
+		if(name != null){
+			bool = false;			
+		}
+        return bool; 
     }
 }

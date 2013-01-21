@@ -15,6 +15,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -25,6 +26,9 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.gms.maps.model.LatLng;
+
+import com.appchallenge.android.APICalls;
 
 /**
  * Wizard activity for creating new events.
@@ -130,13 +134,22 @@ public class CreateEvent extends SherlockFragmentActivity {
 			//Cannot get data from first page see above.
 			//It will then make a JSONObject and Post it returning a toast about success or failure
 			
-			
 			/**
-			 * Creates Time of the form HHMMAAHHMMAA where the first HH is the start time the second
+			 * Basic Checking for making sure requirements are met.
+			 */
+			if (name.length() > 250 || desc.length() > 1000){
+				toast = Toast.makeText(context, "Your Title or Lenght Exceed Maximum Limits" +
+						"Max Title: 250 Characters, Max Description: 1000 Characters", duration);
+				toast.show();
+				return true;
+			}
+			
+		    /**
+		     * Creates Time of the form HHMMAAHHMMAA where the first HH is the start time the second
 			 * HH is the end time and the same things for minutes.  The AA is for setting am versus pm.
 			 * 01 is am and 02 is pm.
 			 * TODO Update web script to accept new time input
-			**/
+			 **/
 			String am_pm_start = ((Spinner) findViewById(R.id.spinner_am_pm_start)).getSelectedItem().toString();
 			String am_pm_end = ((Spinner) findViewById(R.id.spinner_am_pm_end)).getSelectedItem().toString();
 			am_pm_start = (am_pm_start.equals("am")) ? "01" : (am_pm_start.equals("pm")) ? "02" : null;
@@ -153,36 +166,43 @@ public class CreateEvent extends SherlockFragmentActivity {
 			LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 			String loc = LocationManager.GPS_PROVIDER;
 			Location lastKnownLocation = locationManager.getLastKnownLocation(loc);
+			LatLng location = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
 			JSONObject object = new JSONObject();
+			Event newEvent = new Event(name, desc, time, type, location);
 			
 			try {
-				object.put("title", name);
-				object.put("description", desc);
-				object.put("time", time);
-				object.put("type", type);
-				object.put("latitude", lastKnownLocation.getLatitude());
-				object.put("longitude", lastKnownLocation.getLongitude());
-				String object_2 = object.toString();
-				toast = Toast.makeText(context, object_2, duration);
+                object.put("title", name);
+                object.put("description", desc);
+                object.put("time", time);
+                object.put("type", type);
+                object.put("latitude", lastKnownLocation.getLatitude());
+                object.put("longitude", lastKnownLocation.getLongitude());
+                String object_2 = object.toString();
+                toast = Toast.makeText(context, object_2, duration);
 				
 				//This toast verifies that the data is being passed correctly
 				//Remove after done debugging
-				toast.show();
+				//toast.show();
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			   	Log.e(CreateEvent.class.toString(), "Error creating JSON Object in Create Event");
+			    e.printStackTrace();
 			}
-			
-			// TODO Add the actual Call to the database
-			
-			
+			boolean returnedEvent = APICalls.createEvent(newEvent);
+			String text = "false";
+			if(returnedEvent){
+			    text = "true";
+			}
+			toast = Toast.makeText(context, text, duration);
+			toast.show();
+			    // TODO Add the actual Call to the database
+	
 			return true;
 		}
 
         return super.onOptionsItemSelected(item);
     }
 
-    /**
+	/**
      * A pager adapter that represents the wizard pages sequentially.
      */
     public class CreateEventPagerAdapter extends FragmentStatePagerAdapter {
