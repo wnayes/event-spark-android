@@ -8,29 +8,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <TextView android:id="@+id/create_event_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="@string/title_activity_create_event"
-            android:textSize="30sp" 
-            android:layout_marginBottom="25dp" />
-        
-        <TextView android:textSize="20sp"
-            android:text="@string/event_time_page_title"
-            android:textStyle="bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
     
         <!-- Set event length controls -->
         
-        <CheckBox android:id="@+id/checkbox_time"
+        <CheckBox android:id="@+id/checkbox_currently_happening"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/event_time_selector"
-            android:onClick="onCheckboxClicked"
+            android:text="@string/event_currently_happening"
             android:layout_marginBottom="16dp"/>
         
         <!-- Set event end -->

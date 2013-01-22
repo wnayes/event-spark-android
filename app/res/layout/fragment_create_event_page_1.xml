@@ -8,14 +8,6 @@
       android:layout_height="wrap_content"
       android:orientation="vertical"
       android:padding="16dp">
-    
-      <TextView android:id="@+id/create_event_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="@string/title_activity_create_event"
-        android:textSize="30sp" 
-        android:layout_marginBottom="25dp" />
 
       <TextView android:id="@+id/event_name_page_title"
         android:textSize="20sp"

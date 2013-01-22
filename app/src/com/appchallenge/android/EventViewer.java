@@ -56,7 +56,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.Theme_Sherlock);
         setContentView(R.layout.activity_event_viewer);
         
         // We may be reloading due to a configuration change.

@@ -8,15 +8,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-        
-        
-        <TextView android:id="@+id/create_event_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="@string/title_activity_create_event"
-        android:textSize="30sp" 
-        android:layout_marginBottom="25dp" />
 
         <TextView style="?android:textAppearanceLarge"
             android:text="@string/event_time_page_title"
@@ -24,23 +15,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
-    
+
         <!-- Set event length controls -->
-        
-        <CheckBox android:id="@+id/checkbox_time"
+
+        <CheckBox android:id="@+id/checkbox_currently_happening"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/event_time_selector"
-            android:onClick="onCheckboxClicked"
+            android:text="@string/event_currently_happening"
             android:layout_marginBottom="16dp"/>
-        
-        
+
         <TextView style="?android:textAppearanceMedium"
             android:lineSpacingMultiplier="1.2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/event_time_length_info" />
-        
+
         <Spinner
             android:id="@+id/spinner_hours_start"
             android:layout_width="match_parent"
@@ -71,14 +60,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/event_time_delay_info" />
-        
+
         <TextView android:textSize="15sp"
             android:lineSpacingMultiplier="1.2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/event_time_unknown" />
-        
+
         <Spinner
             android:id="@+id/spinner_hours_end"
             android:layout_width="match_parent"

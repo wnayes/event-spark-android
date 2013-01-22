@@ -14,10 +14,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -45,19 +43,15 @@ public class CreateEvent extends SherlockFragmentActivity {
      */
     private PagerAdapter mPagerAdapter;
     
+    // TODO http://developer.android.com/training/basics/fragments/communicating.html
     private String name = "empty";
     private String type = "tempty";
     private String desc = "dempty";
     
-    
-    public void onCheckboxClicked(View view) {
-    	
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.Theme_Sherlock);
         setContentView(R.layout.activity_create_event);
 
         // Instantiate a ViewPager and a PagerAdapter.
@@ -108,35 +102,31 @@ public class CreateEvent extends SherlockFragmentActivity {
 			// setCurrentItem will do nothing.
 			mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 			return true;
-		
-		} else if ((item.getItemId() == R.id.action_next) && !(item.getTitle().toString().equals("Submit"))) {
+
+		} else if (item.getItemId() == R.id.action_next) {
 			// Advance to the next step in the wizard. If there is no next step, setCurrentItem
 			// will do nothing.
 			
-			/**
-			 * This if statement is used to save the data from the first wizard page to be 
-			 * accessed by the constructor below.  For reasons I am currently uncertain about
-			 * When trying to access event_name from the 3rd wizard page (or trying to access
-			 * and field on the first page from the 3rd page) the findViewById returned null
-			 * So by putting the call here and using it only when switching from the first page
-			 * we can save the values to some local variables and use them in future calls
-			 */
-			if (mPager.getCurrentItem() == 0){
-			name = ((EditText) findViewById(R.id.event_name)).getText().toString();
-			type = ((Spinner) findViewById(R.id.spinner1)).getSelectedItem().toString();
-			desc = ((EditText) findViewById(R.id.event_description)).getText().toString();
+			// This if statement is used to save the data from the first wizard page to be 
+			// accessed by the constructor below.  For reasons I am currently uncertain about
+			// When trying to access event_name from the 3rd wizard page (or trying to access
+			// and field on the first page from the 3rd page) the findViewById returned null
+			// So by putting the call here and using it only when switching from the first page
+			// we can save the values to some local variables and use them in future calls
+			if (mPager.getCurrentItem() == 0) {
+				name = ((EditText)findViewById(R.id.event_name)).getText().toString();
+				type = ((Spinner)findViewById(R.id.spinner1)).getSelectedItem().toString();
+				desc = ((EditText)findViewById(R.id.event_description)).getText().toString();
 			}
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		
-		} else if (item.getItemId() == R.id.action_next && item.getTitle().toString().equals("Submit")) {
+		} else if (item.getItemId() == R.id.action_finish) {
 			//This is the code that extracts the data from the wizard
 			//Cannot get data from first page see above.
 			//It will then make a JSONObject and Post it returning a toast about success or failure
 			
-			/**
-			 * Basic Checking for making sure requirements are met.
-			 */
+			//Basic Checking for making sure requirements are met.
 			if (name.length() > 250 || desc.length() > 1000){
 				toast = Toast.makeText(context, "Your Title or Lenght Exceed Maximum Limits" +
 						"Max Title: 250 Characters, Max Description: 1000 Characters", duration);
@@ -144,12 +134,11 @@ public class CreateEvent extends SherlockFragmentActivity {
 				return true;
 			}
 			
-		    /**
-		     * Creates Time of the form HHMMAAHHMMAA where the first HH is the start time the second
-			 * HH is the end time and the same things for minutes.  The AA is for setting am versus pm.
-			 * 01 is am and 02 is pm.
-			 * TODO Update web script to accept new time input
-			 **/
+		    // Creates Time of the form HHMMAAHHMMAA where the first HH is the start time the second
+			// HH is the end time and the same things for minutes.  The AA is for setting am versus pm.
+			// 01 is am and 02 is pm.
+			// TODO Update web script to accept new time input
+			// TODO Use http://developer.android.com/guide/topics/ui/controls/pickers.html instead?
 			String am_pm_start = ((Spinner) findViewById(R.id.spinner_am_pm_start)).getSelectedItem().toString();
 			String am_pm_end = ((Spinner) findViewById(R.id.spinner_am_pm_end)).getSelectedItem().toString();
 			am_pm_start = (am_pm_start.equals("am")) ? "01" : (am_pm_start.equals("pm")) ? "02" : null;
@@ -162,7 +151,8 @@ public class CreateEvent extends SherlockFragmentActivity {
 					+ ((Spinner) findViewById(R.id.spinner_minutes_end)).getSelectedItem().toString()
 					+ am_pm_end;
 			
-			
+            // TODO: The location should be taken from the EventViewer which has already
+            // done the heavy lifting.
 			LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 			String loc = LocationManager.GPS_PROVIDER;
 			Location lastKnownLocation = locationManager.getLastKnownLocation(loc);
@@ -188,14 +178,14 @@ public class CreateEvent extends SherlockFragmentActivity {
 			    e.printStackTrace();
 			}
 			boolean returnedEvent = APICalls.createEvent(newEvent);
-			String text = "false";
-			if(returnedEvent){
-			    text = "true";
-			}
-			toast = Toast.makeText(context, text, duration);
+			toast = Toast.makeText(context, ((Boolean)returnedEvent).toString(), duration);
 			toast.show();
-			    // TODO Add the actual Call to the database
+			
+			// TODO Add the actual Call to the database
 	
+			// TODO This return is not enough. We will need to wait until the API call
+			// finishes before closing this activity. A progress spinner will probably
+			// be the cleanest way to show progress.
 			return true;
 		}
 
