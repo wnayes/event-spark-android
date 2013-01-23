@@ -12,17 +12,12 @@
 
     <!-- Create Event wizard -->
     <string name="title_activity_create_event">Create Event</string>
-    <string name="title_template_step">Step: Lorem Ipsum</string>
     
-    <string name="event_name_page_title">Tell us about your event:</string>
-    <string name="event_name_hint">Give It a Name</string>
-    
-    
-    <string name="event_description_title">Event Description:</string>
-    <string name="event_description_hint">Describe the Event</string>
-    
-    
-    <string name="event_currently_happening">Is this Event Currently Happening?</string>
+    <string name="event_name_page_title">Tell us about your event!</string>
+    <string name="event_name_hint">What is it called?</string>
+    <string name="event_description_hint">Any more details?</string>
+
+    <string name="event_currently_happening">Is this event currently happening?</string>
     <string name="event_time_page_title">Event Time</string>
     <string name="event_select_hours">Select Hours</string>
     <string name="event_select_minutes">Select Minutes</string>

@@ -19,7 +19,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
+import java.sql.Timestamp;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -77,11 +77,10 @@ public class CreateEvent extends SherlockFragmentActivity {
 
         menu.findItem(R.id.action_back).setEnabled(mPager.getCurrentItem() > 0);
 
-        // Add either a "next" or "finish" button to the action bar.
-        MenuItem item = menu.add(Menu.NONE, R.id.action_next, Menu.NONE,
-                (mPager.getCurrentItem() == mPagerAdapter.getCount() - 1)
-                        ? R.string.action_finish
-                        : R.string.action_next);
+        // Add either a "next" or "submit" button to the action bar.
+        int action = (mPager.getCurrentItem() == mPagerAdapter.getCount() - 1)
+                     ? R.string.action_finish : R.string.action_next;
+        MenuItem item = menu.add(Menu.NONE, R.id.action_next, Menu.NONE, action);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         return true;
     }
@@ -114,9 +113,9 @@ public class CreateEvent extends SherlockFragmentActivity {
 			// So by putting the call here and using it only when switching from the first page
 			// we can save the values to some local variables and use them in future calls
 			if (mPager.getCurrentItem() == 0) {
-				name = ((EditText)findViewById(R.id.event_name)).getText().toString();
-				type = ((Spinner)findViewById(R.id.spinner1)).getSelectedItem().toString();
-				desc = ((EditText)findViewById(R.id.event_description)).getText().toString();
+//				name = ((EditText)findViewById(R.id.event_name)).getText().toString();
+//				type = ((Spinner)findViewById(R.id.spinner1)).getSelectedItem().toString();
+//				desc = ((EditText)findViewById(R.id.event_description)).getText().toString();
 			}
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
@@ -139,17 +138,19 @@ public class CreateEvent extends SherlockFragmentActivity {
 			// 01 is am and 02 is pm.
 			// TODO Update web script to accept new time input
 			// TODO Use http://developer.android.com/guide/topics/ui/controls/pickers.html instead?
-			String am_pm_start = ((Spinner) findViewById(R.id.spinner_am_pm_start)).getSelectedItem().toString();
-			String am_pm_end = ((Spinner) findViewById(R.id.spinner_am_pm_end)).getSelectedItem().toString();
-			am_pm_start = (am_pm_start.equals("am")) ? "01" : (am_pm_start.equals("pm")) ? "02" : null;
-			am_pm_end = (am_pm_end.equals("am")) ? "01" : (am_pm_end.equals("pm")) ? "02": null;
-			
-			String time = ((Spinner) findViewById(R.id.spinner_hours_start)).getSelectedItem().toString()
-					+ ((Spinner) findViewById(R.id.spinner_minutes_start)).getSelectedItem().toString()
-					+ am_pm_start
-					+ ((Spinner) findViewById(R.id.spinner_hours_end)).getSelectedItem().toString()
-					+ ((Spinner) findViewById(R.id.spinner_minutes_end)).getSelectedItem().toString()
-					+ am_pm_end;
+//			String am_pm_start = ((Spinner) findViewById(R.id.spinner_am_pm_start)).getSelectedItem().toString();
+//			String am_pm_end = ((Spinner) findViewById(R.id.spinner_am_pm_end)).getSelectedItem().toString();
+//			am_pm_start = (am_pm_start.equals("am")) ? "01" : (am_pm_start.equals("pm")) ? "02" : null;
+//			am_pm_end = (am_pm_end.equals("am")) ? "01" : (am_pm_end.equals("pm")) ? "02": null;
+//			
+//			String time = ((Spinner) findViewById(R.id.spinner_hours_start)).getSelectedItem().toString()
+//					+ ((Spinner) findViewById(R.id.spinner_minutes_start)).getSelectedItem().toString()
+//					+ am_pm_start
+//					+ ((Spinner) findViewById(R.id.spinner_hours_end)).getSelectedItem().toString()
+//					+ ((Spinner) findViewById(R.id.spinner_minutes_end)).getSelectedItem().toString()
+//					+ am_pm_end;
+			// TODO Read the time from the UI.
+			String time = new Timestamp(new java.util.Date().getTime()).toString();
 			
             // TODO: The location should be taken from the EventViewer which has already
             // done the heavy lifting.

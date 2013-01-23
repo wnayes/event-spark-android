@@ -83,6 +83,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         		Location oldLoc = new Location("savedState");
 	            oldLoc.setLatitude(savedInstanceState.getDouble("currentLatitude"));
 	            oldLoc.setLongitude(savedInstanceState.getDouble("currentLongitude"));
+	            oldLoc.setAccuracy(savedInstanceState.getFloat("currentAccuracy", 0));
 
 	            currentLocation = new LatLng(oldLoc.getLatitude(), oldLoc.getLongitude());
 
@@ -147,7 +148,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	if (currentLocation != null) {
     	    savedInstanceState.putDouble("currentLatitude", currentLocation.latitude);
     	    savedInstanceState.putDouble("currentLongitude", currentLocation.longitude);
+    	    savedInstanceState.putFloat("currentAccuracy", mMap.getMyLocation().getAccuracy());
     	}
+
     	// Our Events cannot be directly put into the Bundle, but
     	// they can be stringified back into JSON first.
     	if (this.currentEvents == null)
