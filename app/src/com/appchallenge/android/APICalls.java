@@ -21,7 +21,7 @@ public class APICalls {
      * events nearest to the user's location.
      */
     public static Event[] getEventsNearLocation(Location location /*, Arguments */) {
-        String getEventsUrl = "http://www.OUR-SERVER-API-URL.com/";
+        String getEventsUrl = "http://saypoint.dreamhosters.com/api/events/search/";
         RestClient client = new RestClient(getEventsUrl);
     	
         // Add parameters
@@ -61,13 +61,13 @@ public class APICalls {
      * Sends information to the REST API for creation of a new event.
      */
     public static boolean createEvent(Event newEvent) {
-        String createEventUrl = "http://www.OUR-SERVER-API-URL.com";
+        String createEventUrl = "http://saypoint.dreamhosters.com/api/events";
         RestClient client = new RestClient(createEventUrl);
 
         client.AddParam("name", newEvent.getName());
         client.AddParam("description", newEvent.getDescription());
-        client.AddParam("type", newEvent.getType());
-        client.AddParam("time", newEvent.getTime());
+        //client.AddParam("type", newEvent.getType());
+        client.AddParam("time", ((Long)newEvent.getTime()).toString());
         LatLng location = newEvent.getLocation();
         client.AddParam("latitude", ((Double)location.latitude).toString());
         client.AddParam("longitude", ((Double)location.longitude).toString());
@@ -79,9 +79,7 @@ public class APICalls {
         }
 
         //return new Event(client.getResponse());
-        /** 
-         * We should return true or false if it worked or fail accordingly.
-         **/
+        // We should return true or false if it worked or fail accordingly.
         boolean bool = false;
         JSONObject jsonObject;
         String name = null, name2 = null;

@@ -26,6 +26,10 @@
     <string name="event_time_length_info">Enter the Start Time:</string>
     <string name="event_time_delay_info">Enter the End Time:</string>
     
+    <string name="change">Change</string>
+    <string name="time_default">12:00 PM</string>
+    <string name="date_default">01/01/2013</string>
+    
     <string name="action_back">Back</string>
     <string name="action_next">Next</string>
     <string name="action_finish">Submit</string>

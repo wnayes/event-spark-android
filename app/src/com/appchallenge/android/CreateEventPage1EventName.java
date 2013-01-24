@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 
 /**
@@ -22,6 +23,13 @@ public class CreateEventPage1EventName extends Fragment {
                              Bundle savedInstanceState) {
         int layoutId = R.layout.fragment_create_event_page_1;
         ViewGroup rootView = (ViewGroup)inflater.inflate(layoutId, container, false);
+        
+        // Read the name and description from the parent Activity.
+        String name = ((CreateEventInterface)getActivity()).getName();
+        ((EditText)rootView.findViewById(R.id.event_name)).setText(name);
+        String desc = ((CreateEventInterface)getActivity()).getDescription();
+        ((EditText)rootView.findViewById(R.id.event_description)).setText(desc);
+
         return rootView;
     }
 }

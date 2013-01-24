@@ -121,8 +121,15 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
         if (item.getItemId() == R.id.menu_create_event) {
-			// Launch the wizard for creating a new event.
 			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
+
+			// Pass the current location to the wizard so the maps appear synced.
+			if (currentLocation != null) {
+                createEvent.putExtra("latitude", currentLocation.latitude);
+			    createEvent.putExtra("longitude", currentLocation.longitude);
+			}
+			
+			// Launch the wizard for creating a new event.
 			startActivity(createEvent);
 			return true;
 		} else if (item.getItemId() == R.id.menu_refresh_events) {
@@ -189,9 +196,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             mMap.setLocationSource(this);
             
             // Check if we were successful in obtaining the map.
-            if (mMap != null) {
+            if (mMap != null)
                 setUpMap();
-            }
         }
     }
 
