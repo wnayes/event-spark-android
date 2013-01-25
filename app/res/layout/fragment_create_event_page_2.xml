@@ -103,10 +103,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:entries="@array/am_pm"
-                android:prompt="@string/event_time_am_pm" />
-                        
+                android:prompt="@string/event_time_am_pm" />         
         </LinearLayout>
-        
+
         <TextView
             android:id="@+id/textView5"
             android:layout_width="match_parent"
@@ -121,18 +120,9 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
-            android:hint="@string/event_enter_hours" >
-
-            
-        </EditText>
-
+            android:hint="@string/event_enter_hours"/>
     </LinearLayout>
-
-   
-
 </ScrollView>
-
-
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
@@ -194,15 +184,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
-            android:hint="@string/event_enter_hours" >
-
-            
-        </EditText>
-
+            android:hint="@string/event_enter_hours"/>
     </LinearLayout>
-
-   
-
 </ScrollView>
 
 </ViewSwitcher>

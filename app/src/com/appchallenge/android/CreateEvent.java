@@ -92,7 +92,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	/**
 	 * The description of the event provided by the user.
 	 */
-    
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -103,7 +102,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	/**
 	 * The date when the event goes live.
 	 */
-	
 	public void setDate(Date date) {
 		this.startDate = date;
 	}
@@ -120,10 +118,10 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		
 		this.duration = (long) hours*60*60 + time;
 	}
+
 	/**
      * Location keeping track of the wizard map camera.
      */
-    
 	public void setLocation(LatLng location) {
 		this.mapLocation = location;
 	}
@@ -152,9 +150,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
                 invalidateOptionsMenu();
             }
         });
-        
-        
-        
+
         if (startDate == null)
         	startDate = new Date();
         
@@ -164,9 +160,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
             mapLocation = new LatLng(receivedIntent.getDoubleExtra("latitude", 0),
                                      receivedIntent.getDoubleExtra("longitude", 0));
         }
-        
-        
-        
     }
 
     @Override
@@ -177,9 +170,14 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         menu.findItem(R.id.action_back).setEnabled(mPager.getCurrentItem() > 0);
 
         // Add either a "next" or "submit" button to the action bar.
-        int action = (mPager.getCurrentItem() == mPagerAdapter.getCount() - 1)
-                     ? R.string.action_finish : R.string.action_next;
-        MenuItem item = menu.add(Menu.NONE, R.id.action_next, Menu.NONE, action);
+        int action = R.string.action_next;
+        int id = R.id.action_next;
+        if (mPager.getCurrentItem() == mPagerAdapter.getCount() - 1) {
+        	action = R.string.action_finish;
+        	id = R.id.action_submit;
+        }
+
+        MenuItem item = menu.add(Menu.NONE, id, Menu.NONE, action);
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         return true;
     }
@@ -194,14 +192,13 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			// See http://developer.android.com/design/patterns/navigation.html for more.
 			NavUtils.navigateUpTo(this, new Intent(this, EventViewer.class));
         	return true;
-        	
 		} else if (item.getItemId() == R.id.action_back) {
 			// Go to the previous step in the wizard. If there is no previous step,
 			// setCurrentItem will do nothing.
 			mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 			return true;
 
-		} else if (item.getItemId() == R.id.action_next && !item.getTitle().toString().equals("Submit")) {
+		} else if (item.getItemId() == R.id.action_next) {
 			// Advance to the next step in the wizard. If there is no next step, setCurrentItem
 			// will do nothing.
 			if(mPager.getCurrentItem() == 0){
@@ -210,7 +207,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			}
 			
 			if(mPager.getCurrentItem() == 1){
-				
 				String minutes = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
 				String hours = ((EditText) findViewById(R.id.event_hours)).getText().toString();
 				String event_time = ((EditText) findViewById(R.id.event_enter_hours)).getText().toString();
@@ -227,13 +223,12 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 					toast.show();
 					return true;
 				}
-				if (Float.parseFloat(event_time) > 24){
+				if (Float.parseFloat(event_time) > 24) {
 					toast = Toast.makeText(context, "Invalid Duration. Enter Number Less Than 24", duration);
 					toast.show();
 					return true;
 				}
-				
-				
+
 				setStartTime(getSeconds(((Spinner) findViewById(R.id.spinner1)).getSelectedItemPosition()), 
 						Integer.parseInt(hours), Integer.parseInt(minutes), am_pm);
 				setDuration(Float.parseFloat(event_time), this.startTime);
@@ -241,9 +236,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
-			
-		  //using item.getItemId() == R.id.action_finish doesn't work because the button is under a different action
-		} else if (item.getItemId() == R.id.action_next && item.getTitle().toString().equals("Submit")) {
+		} else if (item.getItemId() == R.id.action_submit) {
 			// This is the code that extracts the data from the wizard
 			// It will then make a JSONObject and Post it returning a toast about success or failure
 
@@ -312,13 +305,11 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
             return wizardPages.length;
         }
     }
-    
-    
+
     private long getSeconds(int date){
     	Calendar calen = (date == 0) ? cal_1: (date == 1) ? cal_2 : cal_3;
     	long time = calen.getTimeInMillis();
     	return (time / 1000);
     	
     }
-    
 }

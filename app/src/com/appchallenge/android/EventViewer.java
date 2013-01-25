@@ -6,8 +6,6 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,7 +13,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -105,19 +102,19 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         setUpMapIfNeeded();
         mMap.setMyLocationEnabled(true);
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.activity_event_viewer, menu);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
         if (item.getItemId() == R.id.menu_create_event) {
@@ -128,7 +125,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
                 createEvent.putExtra("latitude", currentLocation.latitude);
 			    createEvent.putExtra("longitude", currentLocation.longitude);
 			}
-			
+
 			// Launch the wizard for creating a new event.
 			startActivity(createEvent);
 			return true;
@@ -140,7 +137,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
         return super.onOptionsItemSelected(item);
     }
-    
+
     /**
      * Android can arbitrarily reload our Activity, especially during screen rotations,
      * keyboard opening/closing, etc. When this happens, the full onCreate, onResume, etc.
@@ -191,10 +188,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-            
+
             // Register the LocationSource
             mMap.setLocationSource(this);
-            
+
             // Check if we were successful in obtaining the map.
             if (mMap != null)
                 setUpMap();
@@ -240,12 +237,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	public void deactivate() {
 		mListener = null;
 	}
-	
+
 	/**
 	 * Performs an asynchronous API call to find nearby events.
 	 */
 	private class getEventsNearLocationAPICaller extends AsyncTask<Void, Void, Void> {
-
 		@Override
 		protected void onPreExecute() {
 			// Set up some progress indication?
@@ -256,11 +252,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			//return APICalls.getEventsNearLocation( ... );
 			return null;
 		}
-		
+
 		@Override
 		protected void onPostExecute(Void result) {
 			// Remove progress UI.
 		}
-		
 	}
 }

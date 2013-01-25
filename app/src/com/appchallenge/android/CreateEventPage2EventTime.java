@@ -1,10 +1,8 @@
 package com.appchallenge.android;
 
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
 
 import android.content.Context;
 import android.os.Bundle;
@@ -18,11 +16,6 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.RadioGroup.OnCheckedChangeListener;
-
-
-
-
-
 
 /**
  * The second step of the create event wizard. From this fragment
@@ -41,34 +34,21 @@ public class CreateEventPage2EventTime extends Fragment {
         ViewGroup rootView = (ViewGroup)inflater.inflate(layoutId, container, false);
         
         RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.radioGroup1);        
-        radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() 
-        {
+        radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
             	int button = group.getCheckedRadioButtonId();
-            	
-            	switch(button) {
-                case R.id.radioButton_no:
-                    CreateEvent.switcher.setDisplayedChild(0);
-                    break;
-                case R.id.radioButton_yes:
-                    CreateEvent.switcher.setDisplayedChild(1);
-                    break;
-            }
+
+            	switch (button) {
+	                case R.id.radioButton_no:
+	                    //CreateEvent.switcher.setDisplayedChild(0);
+	                    break;
+	                case R.id.radioButton_yes:
+	                    //CreateEvent.switcher.setDisplayedChild(1);
+	                    break;
+                }
             }
         });
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         Spinner spinner = ((Spinner)rootView.findViewById(R.id.spinner1));
         Context context = getActivity().getApplicationContext();
         Calendar cal = Calendar.getInstance();
@@ -98,15 +78,7 @@ public class CreateEventPage2EventTime extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,date);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         // TODO: Handle changing the UI when checkbox changed occurs.
 //        CheckBox curHappeningCheckbox = (CheckBox)rootView.findViewById(R.id.checkbox_currently_happening);
 //        curHappeningCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
