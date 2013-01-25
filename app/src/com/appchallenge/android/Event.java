@@ -15,10 +15,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * or from scratch.
  */
 public class Event {
-    private String name;
+    private String title;
     private String description;
     private String type;
-    private long time;
+    private long startTime;
+    private long endTime;
     private LatLng location;
 
     /**
@@ -27,10 +28,11 @@ public class Event {
     public Event(String eventJSON) {
         try {
         	JSONObject jsonObject = new JSONObject(eventJSON);
-			this.name = jsonObject.get("name").toString();
+			this.title = jsonObject.get("title").toString();
 			this.description = jsonObject.getString("description").toString();
 			this.type = jsonObject.getString("type").toString();
-			this.time = jsonObject.getLong("time");
+			this.startTime = jsonObject.getLong("start_date");
+			this.endTime = jsonObject.getLong("end_date");
 			double lat = jsonObject.getJSONObject("location").getDouble("latitude");
 			double lng = jsonObject.getJSONObject("location").getDouble("longitude");
 			this.location = new LatLng(lat, lng);
@@ -48,19 +50,20 @@ public class Event {
      * @param type
      * @param location
      */
-    public Event(String name, String description, long time, /*String type,*/ LatLng location) {
-        this.name = name;
+    public Event(String name, String description, long startTime, long endTime,/*String type,*/ LatLng location) {
+        this.title = name;
         this.description = description;
         this.location = location;
         //this.type = type;
-        this.time = time;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
     
     /**
      * @return The name of the Event.
      */
     public String getName() {
-    	return this.name;
+    	return this.title;
     }
     
     /**
@@ -85,10 +88,17 @@ public class Event {
     //}
     
     /**
-     *  @return The time of event milliseconds.
+     *  @return The start time of event in seconds.
      */
-    public long getTime() {
-    	return this.time;
+    public long getStartTime() {
+    	return this.startTime;
+    }
+    
+    /**
+     *  @return The end time in seconds
+     */
+    public long getEndTime() {
+    	return this.endTime;
     }
     
     /**
@@ -97,10 +107,11 @@ public class Event {
     public String toJSON() {
     	JSONObject event = new JSONObject();
     	try {
-			event.put("name", this.name);
+			event.put("name", this.title);
 			event.put("description", this.description);
 			//event.put("type", this.type);
-			event.put("time", this.time);
+			event.put("start_date", this.startTime);
+			event.put("end_date", this.endTime);
 			JSONObject locationObj = new JSONObject();
 			locationObj.put("latitude", this.location.latitude);
 			locationObj.put("longitude", this.location.longitude);
@@ -118,7 +129,7 @@ public class Event {
      * @return A Google Maps marker representing the Event.
      */
     public MarkerOptions toMarker() {
-        return new MarkerOptions().title(this.name)
+        return new MarkerOptions().title(this.title)
                                   .snippet(this.description)
                                   .position(this.location);
     }

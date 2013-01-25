@@ -2,10 +2,10 @@ package com.appchallenge.android;
 
 import android.os.Bundle;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+//import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,7 @@ import android.view.ViewGroup;
  */
 public class CreateEventPage3EventLocation extends SupportMapFragment {
 	// The marker representing the new event.
-	private MarkerOptions eventMarker;
+	//private MarkerOptions eventMarker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,8 +28,8 @@ public class CreateEventPage3EventLocation extends SupportMapFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
     	View view = super.onCreateView(inflater, container, savedInstanceState);
-    	LatLng location = ((CreateEventInterface)getActivity()).getLocation();
-    	getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
+    	//LatLng location = ((CreateEventInterface)getActivity()).getLocation();
+    	//getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
         return view;
     }
 }

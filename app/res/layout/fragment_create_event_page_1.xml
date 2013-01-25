@@ -22,6 +22,7 @@
 	    android:layout_height="wrap_content"
 	    android:hint="@string/event_name_hint"
 	    android:inputType="text|textCapSentences"
+	    android:maxLength="60"
 	    android:layout_marginBottom="16dp"/>
 
 <!-- Selection of event type is hidden until details are finalized.
@@ -48,6 +49,7 @@
 	    android:gravity="top|left"
 	    android:singleLine="false"
 	    android:hint="@string/event_description_hint"
+	    android:maxLength="300"
 	    android:inputType="textMultiLine" />
     </LinearLayout>
 

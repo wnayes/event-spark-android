@@ -2,7 +2,6 @@ package com.appchallenge.android;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -21,17 +20,25 @@ import android.support.v4.view.ViewPager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.List;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -56,16 +63,25 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
      */
     private PagerAdapter mPagerAdapter;
 
-    //private String type = "tempty";
-
     // Methods for the CreateEventInterface, which provide access to wizard public members
     // for the fragment pages.
     // See http://developer.android.com/training/basics/fragments/communicating.html 
 
+    
+    private String name = "";
+    private String description = "";
+    public static Calendar cal_1;
+    public static Calendar cal_2;
+    public static Calendar cal_3;
+    static ViewSwitcher switcher;
+    private Date startDate;
+    private long startTime;
+    private long duration;
+    private LatLng mapLocation;
+    
     /**
      * The name of the event provided by the user.
      */
-    private String name = "";
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -76,7 +92,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	/**
 	 * The description of the event provided by the user.
 	 */
-    private String description = "";
+    
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -87,7 +103,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	/**
 	 * The date when the event goes live.
 	 */
-	private Date startDate;
+	
 	public void setDate(Date date) {
 		this.startDate = date;
 	}
@@ -95,10 +111,19 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		return this.startDate;
 	}
 
+	public void setStartTime(long time, int hours, int minutes, String am_pm){
+		int overflow = (am_pm.equals("am")) ? 0 : 43200;
+		this.startTime = overflow + (minutes*60) + (hours*60*60) + time;
+	}
+	
+	public void setDuration(float hours, long time){
+		
+		this.duration = (long) hours*60*60 + time;
+	}
 	/**
      * Location keeping track of the wizard map camera.
      */
-    private LatLng mapLocation;
+    
 	public void setLocation(LatLng location) {
 		this.mapLocation = location;
 	}
@@ -110,6 +135,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
+        
+        switcher = (ViewSwitcher) findViewById(R.id.profileSwitcher);
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager)findViewById(R.id.pager);
@@ -126,6 +153,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
             }
         });
         
+        
+        
         if (startDate == null)
         	startDate = new Date();
         
@@ -135,6 +164,9 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
             mapLocation = new LatLng(receivedIntent.getDoubleExtra("latitude", 0),
                                      receivedIntent.getDoubleExtra("longitude", 0));
         }
+        
+        
+        
     }
 
     @Override
@@ -169,35 +201,55 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 			return true;
 
-		} else if (item.getItemId() == R.id.action_next) {
+		} else if (item.getItemId() == R.id.action_next && !item.getTitle().toString().equals("Submit")) {
 			// Advance to the next step in the wizard. If there is no next step, setCurrentItem
 			// will do nothing.
+			if(mPager.getCurrentItem() == 0){
+				setName(((EditText) findViewById(R.id.event_name)).getText().toString());
+				setDescription(((EditText) findViewById(R.id.event_description)).getText().toString());
+			}
+			
+			if(mPager.getCurrentItem() == 1){
+				
+				String minutes = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
+				String hours = ((EditText) findViewById(R.id.event_hours)).getText().toString();
+				String event_time = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
+				String am_pm = ((Spinner) findViewById(R.id.spinner1)).getSelectedItem().toString();
+				if (Integer.parseInt(hours) > 12 || Integer.parseInt(minutes) > 60) {
+					toast = Toast.makeText(context, "Invalid Start Time", duration);
+					toast.show();
+					return true;
+				}
+				//String event_time = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
+				if (Float.parseFloat(event_time) > 24){
+					toast = Toast.makeText(context, "Invalid Duration. Enter Number Less Than " + event_time + Float.toString(Float.parseFloat(event_time)), duration);
+					toast.show();
+					return true;
+				}
+				setStartTime(getSeconds(((Spinner) findViewById(R.id.spinner1)).getSelectedItemPosition()), 
+						Integer.parseInt(hours), Integer.parseInt(minutes), am_pm);
+				setDuration(Float.parseFloat(event_time), this.startTime);
+			}
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
-		
-		} else if (item.getItemId() == R.id.action_finish) {
+			
+		  //using item.getItemId() == R.id.action_finish doesn't work because the button is under a different action
+		} else if (item.getItemId() == R.id.action_next && item.getTitle().toString().equals("Submit")) {
 			// This is the code that extracts the data from the wizard
 			// It will then make a JSONObject and Post it returning a toast about success or failure
-			
-			//Basic Checking for making sure requirements are met.
-			if (name.length() > 250 || description.length() > 1000) {
-				toast = Toast.makeText(context, "Your Title or Lenght Exceed Maximum Limits" +
-						"Max Title: 250 Characters, Max Description: 1000 Characters", duration);
-				toast.show();
-				return true;
-			}
 
 			long time = new java.util.Date().getTime();
 			if (this.startDate != null)
 				time = this.startDate.getTime();
 			
-			Event newEvent = new Event(name, description, time, /*type,*/ mapLocation);
+			Event newEvent = new Event(name, description, startTime, this.duration, /*type,*/ mapLocation);
 			
 			JSONObject object = new JSONObject();
 			try {
                 object.put("title", name);
                 object.put("description", description);
-                object.put("time", time);
+                object.put("star_date", startTime);
+                object.put("end_date", this.duration);
                 //object.put("type", type);
                 object.put("latitude", mapLocation.latitude);
                 object.put("longitude", mapLocation.longitude);
@@ -206,14 +258,14 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 				
 				//This toast verifies that the data is being passed correctly
 				//Remove after done debugging
-				//toast.show();
+				toast.show();
 			} catch (JSONException e) {
 			   	Log.e(CreateEvent.class.toString(), "Error creating JSON Object in Create Event");
 			    e.printStackTrace();
 			}
-			boolean returnedEvent = APICalls.createEvent(newEvent);
-			toast = Toast.makeText(context, ((Boolean)returnedEvent).toString(), duration);
-			toast.show();
+			//boolean returnedEvent = APICalls.createEvent(newEvent);
+			//toast = Toast.makeText(context, ((Boolean)returnedEvent).toString(), duration);
+			//toast.show();
 			
 			// TODO Add the actual Call to the database
 	
@@ -252,75 +304,12 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         }
     }
     
-    /**
-     * Shows the time picker to allow changing the Event time.
-     * @param v
-     */
-    public void showEventTimeDialog(View v) {
-        DialogFragment timePicker = new EventTimePicker();
-        timePicker.show(getSupportFragmentManager(), "timePicker");
+    
+    private long getSeconds(int date){
+    	Calendar calen = (date == 0) ? cal_1: (date == 1) ? cal_2 : cal_3;
+    	long time = calen.getTimeInMillis();
+    	return (time / 1000);
+    	
     }
-    public class EventTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			// Use the current time as the default values for the picker
-			final Calendar c = Calendar.getInstance();
-			int hour = c.get(Calendar.HOUR_OF_DAY);
-			int minute = c.get(Calendar.MINUTE);
-			
-			// Create a new instance of TimePickerDialog and return it
-			return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
-		}
-		
-		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			Calendar c = Calendar.getInstance();
-			c.setTime(startDate);
-			c.set(Calendar.HOUR_OF_DAY, hourOfDay);
-			c.set(Calendar.MINUTE, minute);
-			startDate = c.getTime();
-			String time = java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT).format(startDate);
-		    ((TextView)findViewById(R.id.event_time_display)).setText(time);
-		}
-    }
-
-    /**
-     * Shows the date picker to allow changing the Event date.
-     * @param v
-     */
-    public void showEventDateDialog(View v) {
-        DialogFragment datePicker = new EventDatePicker();
-        datePicker.show(getSupportFragmentManager(), "datePicker");
-    }
-    public class EventDatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			// Use the current date as the default date in the picker
-			final Calendar c = Calendar.getInstance();
-			int year = c.get(Calendar.YEAR);
-			int month = c.get(Calendar.MONTH);
-			int day = c.get(Calendar.DAY_OF_MONTH);
-			
-			DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
-			
-			// Set the date limit to today and tomorrow.
-			dialog.getDatePicker().setMinDate(new Date().getTime() - 3000);
-			dialog.getDatePicker().setMaxDate(new Date().getTime() + 86400000);
-			
-			return dialog;
-        }
-		
-		// Update the saved date and UI.
-		public void onDateSet(DatePicker view, int year, int month, int day) {
-			Calendar c = Calendar.getInstance();
-			c.setTime(startDate);
-			c.set(Calendar.YEAR, year);
-			c.set(Calendar.MONTH, month);
-			c.set(Calendar.DAY_OF_MONTH, day);
-			startDate = c.getTime();
-
-			String date = java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT).format(startDate);
-			((TextView)findViewById(R.id.event_date_display)).setText(date);
-        }
-    }
+    
 }
