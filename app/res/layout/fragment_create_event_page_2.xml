@@ -116,7 +116,7 @@
             android:layout_marginBottom="16sp" />
 
         <EditText
-            android:id="@+id/editText1"
+            android:id="@+id/event_enter_hours"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -189,7 +189,7 @@
             android:layout_marginBottom="16sp" />
 
         <EditText
-            android:id="@id/editText1"
+            android:id="@id/event_enter_hours"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"

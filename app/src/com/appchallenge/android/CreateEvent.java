@@ -213,23 +213,32 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 				
 				String minutes = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
 				String hours = ((EditText) findViewById(R.id.event_hours)).getText().toString();
-				String event_time = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
+				String event_time = ((EditText) findViewById(R.id.event_enter_hours)).getText().toString();
 				String am_pm = ((Spinner) findViewById(R.id.spinner1)).getSelectedItem().toString();
+				
+				//Checking if null values left
+				if (minutes.equals("")) { minutes = "0"; }
+				if (hours.equals("")) { hours = "0"; }
+				if (event_time.equals("")) { event_time = "0"; }
+				
+				//Checking for valid inputs
 				if (Integer.parseInt(hours) > 12 || Integer.parseInt(minutes) > 60) {
 					toast = Toast.makeText(context, "Invalid Start Time", duration);
 					toast.show();
 					return true;
 				}
-				//String event_time = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
 				if (Float.parseFloat(event_time) > 24){
-					toast = Toast.makeText(context, "Invalid Duration. Enter Number Less Than " + event_time + Float.toString(Float.parseFloat(event_time)), duration);
+					toast = Toast.makeText(context, "Invalid Duration. Enter Number Less Than 24", duration);
 					toast.show();
 					return true;
 				}
+				
+				
 				setStartTime(getSeconds(((Spinner) findViewById(R.id.spinner1)).getSelectedItemPosition()), 
 						Integer.parseInt(hours), Integer.parseInt(minutes), am_pm);
 				setDuration(Float.parseFloat(event_time), this.startTime);
 			}
+			
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 			
