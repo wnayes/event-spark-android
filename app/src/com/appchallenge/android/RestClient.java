@@ -20,6 +20,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
+//Possibly Obsolete
+
 /**
  * REST client library for Java.
  * @author Luke Lowrey

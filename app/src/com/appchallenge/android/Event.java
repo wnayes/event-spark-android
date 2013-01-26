@@ -30,11 +30,11 @@ public class Event {
         	JSONObject jsonObject = new JSONObject(eventJSON);
 			this.title = jsonObject.get("title").toString();
 			this.description = jsonObject.getString("description").toString();
-			this.type = jsonObject.getString("type").toString();
+			//this.type = jsonObject.getString("type").toString();
 			this.startTime = jsonObject.getLong("start_date");
 			this.endTime = jsonObject.getLong("end_date");
-			double lat = jsonObject.getJSONObject("location").getDouble("latitude");
-			double lng = jsonObject.getJSONObject("location").getDouble("longitude");
+			double lat = jsonObject.getDouble("latitude");
+			double lng = jsonObject.getDouble("longitude");
 			this.location = new LatLng(lat, lng);
 		} catch (JSONException e) {
 			Log.e(Event.class.toString(), "Failed parsing eventJSON in Event constructor.");
@@ -107,15 +107,14 @@ public class Event {
     public String toJSON() {
     	JSONObject event = new JSONObject();
     	try {
-			event.put("name", this.title);
+			event.put("title", this.title);
 			event.put("description", this.description);
 			//event.put("type", this.type);
 			event.put("start_date", this.startTime);
 			event.put("end_date", this.endTime);
-			JSONObject locationObj = new JSONObject();
-			locationObj.put("latitude", this.location.latitude);
-			locationObj.put("longitude", this.location.longitude);
-			event.put("location", locationObj);
+			event.put("latitude", this.location.latitude);
+			event.put("longitude", this.location.longitude);
+			
 		} catch (JSONException e) {
 			Log.e(Event.class.toString(), "Could not stringify existing Event object!");
 			e.printStackTrace();

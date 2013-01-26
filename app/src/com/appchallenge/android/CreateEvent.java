@@ -32,6 +32,11 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -108,6 +113,17 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	public Date getDate() {
 		return this.startDate;
 	}
+	
+	/**
+	 *  Takes in spinner number and returns the seconds of the corresponding calendar
+	 * @param int
+	 * @return long
+	 */
+	private long getSeconds(int date){
+    	Calendar calen = (date == 0) ? cal_1: (date == 1) ? cal_2 : cal_3;
+    	long time = calen.getTimeInMillis();
+    	return (time / 1000);	
+    }
 
 	public void setStartTime(long time, int hours, int minutes, String am_pm){
 		int overflow = (am_pm.equals("am")) ? 0 : 43200;
@@ -199,23 +215,24 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			return true;
 
 		} else if (item.getItemId() == R.id.action_next) {
+			
 			// Advance to the next step in the wizard. If there is no next step, setCurrentItem
 			// will do nothing.
-			if(mPager.getCurrentItem() == 0){
+			if(mPager.getCurrentItem() == 0) {
 				setName(((EditText) findViewById(R.id.event_name)).getText().toString());
 				setDescription(((EditText) findViewById(R.id.event_description)).getText().toString());
 			}
 			
-			if(mPager.getCurrentItem() == 1){
+			if(mPager.getCurrentItem() == 1) {
 				String minutes = ((EditText) findViewById(R.id.event_minutes)).getText().toString();
 				String hours = ((EditText) findViewById(R.id.event_hours)).getText().toString();
 				String event_time = ((EditText) findViewById(R.id.event_enter_hours)).getText().toString();
 				String am_pm = ((Spinner) findViewById(R.id.spinner1)).getSelectedItem().toString();
 				
 				//Checking if null values left
-				if (minutes.equals("")) { minutes = "0"; }
-				if (hours.equals("")) { hours = "0"; }
-				if (event_time.equals("")) { event_time = "0"; }
+				if (minutes.equals("")) minutes = "0";
+				if (hours.equals("")) hours = "0";
+				if (event_time.equals("")) event_time = "0";
 				
 				//Checking for valid inputs
 				if (Integer.parseInt(hours) > 12 || Integer.parseInt(minutes) > 60) {
@@ -237,48 +254,55 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
-			// This is the code that extracts the data from the wizard
 			// It will then make a JSONObject and Post it returning a toast about success or failure
-
-			long time = new java.util.Date().getTime();
-			if (this.startDate != null)
-				time = this.startDate.getTime();
 			
 			Event newEvent = new Event(name, description, startTime, this.duration, /*type,*/ mapLocation);
 			
-			JSONObject object = new JSONObject();
-			try {
-                object.put("title", name);
-                object.put("description", description);
-                object.put("star_date", startTime);
-                object.put("end_date", this.duration);
-                //object.put("type", type);
-                object.put("latitude", mapLocation.latitude);
-                object.put("longitude", mapLocation.longitude);
-                String object_2 = object.toString();
-                toast = Toast.makeText(context, object_2, duration);
-				
-				//This toast verifies that the data is being passed correctly
-				//Remove after done debugging
-				toast.show();
-			} catch (JSONException e) {
-			   	Log.e(CreateEvent.class.toString(), "Error creating JSON Object in Create Event");
-			    e.printStackTrace();
-			}
-			//boolean returnedEvent = APICalls.createEvent(newEvent);
-			//toast = Toast.makeText(context, ((Boolean)returnedEvent).toString(), duration);
-			//toast.show();
+			//Our APICall doesn't work (see comments)
+			//String returnedEvent = APICalls.createEvent(newEvent);
+						
+			getSuccess(POST.post(newEvent.toJSON()));
 			
-			// TODO Add the actual Call to the database
-	
+				
 			// TODO This return is not enough. We will need to wait until the API call
 			// finishes before closing this activity. A progress spinner will probably
 			// be the cleanest way to show progress.
+			// TODO add threading
 			return true;
 		}
 
         return super.onOptionsItemSelected(item);
     }
+    
+    private void getSuccess(String json_input) {
+    	
+    	Context context = getApplicationContext();
+    	int duration = Toast.LENGTH_SHORT;
+        JSONObject jsonObject;
+        String name = null, name2 = null;
+        
+		try {
+			jsonObject = new JSONObject(json_input);
+			name = jsonObject.get("text").toString();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			Log.e(APICalls.class.toString(), "Error Parsing Return Value from text");
+			e.printStackTrace();
+		}
+		
+		try {
+			jsonObject = new JSONObject(json_input);
+			name2 = jsonObject.get("bool").toString();
+		} catch (JSONException e) {
+			Log.e(APICalls.class.toString(), "Error Parsing Return Value from bool");
+			e.printStackTrace();
+		}
+		
+		// TODO Fix toast not popping up
+		if (name2 != null) Toast.makeText(context, "Success", duration).show();
+		if (name != null) Toast.makeText(context, name, duration).show();
+			
+	}
 
 	/**
      * A pager adapter that represents the wizard pages sequentially.
@@ -306,10 +330,4 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         }
     }
 
-    private long getSeconds(int date){
-    	Calendar calen = (date == 0) ? cal_1: (date == 1) ? cal_2 : cal_3;
-    	long time = calen.getTimeInMillis();
-    	return (time / 1000);
-    	
-    }
 }

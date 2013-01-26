@@ -8,8 +8,13 @@ import org.json.JSONObject;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import android.content.Context;
 import android.location.Location;
 import android.util.Log;
+import android.widget.Toast;
+
+//Possibly obsolete
+
 
 /**
  * Holds static methods for calling the REST API functions.
@@ -60,14 +65,16 @@ public class APICalls {
     /**
      * Sends information to the REST API for creation of a new event.
      */
-    public static boolean createEvent(Event newEvent) {
-        String createEventUrl = "http://saypoint.dreamhosters.com/api/events";
+    public static String createEvent(Event newEvent) {
+        //Changed return to string for trouble shooting
+    	String createEventUrl = "http://saypoint.dreamhosters.com/api/index.php/events";
         RestClient client = new RestClient(createEventUrl);
+        
 
-        client.AddParam("name", newEvent.getName());
+        client.AddParam("title", newEvent.getName());
         client.AddParam("description", newEvent.getDescription());
         //client.AddParam("type", newEvent.getType());
-        client.AddParam("startTime", ((Long)newEvent.getStartTime()).toString());
+        client.AddParam("start_date", ((Long)newEvent.getStartTime()).toString());
         client.AddParam("end_date", ((Long)newEvent.getEndTime()).toString());
         LatLng location = newEvent.getLocation();
         client.AddParam("latitude", ((Double)location.latitude).toString());
@@ -84,6 +91,7 @@ public class APICalls {
         boolean bool = false;
         JSONObject jsonObject;
         String name = null, name2 = null;
+        
 		try {
 			jsonObject = new JSONObject(client.getResponse());
 			name = jsonObject.get("text").toString();
@@ -99,13 +107,7 @@ public class APICalls {
 			Log.e(APICalls.class.toString(), "Error Parsing Return Value from bool");
 			e.printStackTrace();
 		}
-		 
-		if(name2 != null){
-			bool = true;
-		}
-		if(name != null){
-			bool = false;			
-		}
-        return bool; 
+		
+        return client.getResponse(); 
     }
 }
