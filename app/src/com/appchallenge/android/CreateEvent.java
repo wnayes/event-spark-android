@@ -4,11 +4,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -19,7 +19,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -71,32 +70,27 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     // Methods for the CreateEventInterface, which provide access to wizard public members
     // for the fragment pages.
     // See http://developer.android.com/training/basics/fragments/communicating.html 
-
     
-    private String name = "";
-    private String description = "";
     public static Calendar cal_1;
     public static Calendar cal_2;
     public static Calendar cal_3;
     static ViewSwitcher switcher;
-    private Date startDate;
-    private long startTime;
-    private long duration;
-    private LatLng mapLocation;
-    
+
     /**
-     * The name of the event provided by the user.
+     * The title of the event provided by the user.
      */
-	public void setName(String name) {
-		this.name = name;
+    private String title = "";
+	public void setTitle(String title) {
+		this.title = title;
 	}
-	public String getName() {
-		return this.name;
+	public String getEventTitle() {
+		return this.title;
 	}
 
 	/**
 	 * The description of the event provided by the user.
 	 */
+	private String description = "";
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -107,6 +101,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	/**
 	 * The date when the event goes live.
 	 */
+	private Date startDate;
 	public void setDate(Date date) {
 		this.startDate = date;
 	}
@@ -115,29 +110,31 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	}
 	
 	/**
-	 *  Takes in spinner number and returns the seconds of the corresponding calendar
+	 * Takes in spinner number and returns the seconds of the corresponding calendar
 	 * @param int
 	 * @return long
 	 */
-	private long getSeconds(int date){
+	private long getSeconds(int date) {
     	Calendar calen = (date == 0) ? cal_1: (date == 1) ? cal_2 : cal_3;
     	long time = calen.getTimeInMillis();
     	return (time / 1000);	
     }
 
-	public void setStartTime(long time, int hours, int minutes, String am_pm){
+	private long startTime;
+	public void setStartTime(long time, int hours, int minutes, String am_pm) {
 		int overflow = (am_pm.equals("am")) ? 0 : 43200;
 		this.startTime = overflow + (minutes*60) + (hours*60*60) + time;
 	}
 	
-	public void setDuration(float hours, long time){
-		
+	private long duration;
+	public void setDuration(float hours, long time) {
 		this.duration = (long) hours*60*60 + time;
 	}
 
 	/**
      * Location keeping track of the wizard map camera.
      */
+	private LatLng mapLocation;
 	public void setLocation(LatLng location) {
 		this.mapLocation = location;
 	}
@@ -215,11 +212,9 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			return true;
 
 		} else if (item.getItemId() == R.id.action_next) {
-			
-			// Advance to the next step in the wizard. If there is no next step, setCurrentItem
-			// will do nothing.
+			// Advance to the next step in the wizard.
 			if(mPager.getCurrentItem() == 0) {
-				setName(((EditText) findViewById(R.id.event_name)).getText().toString());
+				this.setTitle(((EditText) findViewById(R.id.event_name)).getText().toString());
 				setDescription(((EditText) findViewById(R.id.event_description)).getText().toString());
 			}
 			
@@ -251,58 +246,20 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 				setDuration(Float.parseFloat(event_time), this.startTime);
 			}
 			
+			// If there is no next step, setCurrentItem will do nothing.
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
-			// It will then make a JSONObject and Post it returning a toast about success or failure
-			
-			Event newEvent = new Event(name, description, startTime, this.duration, /*type,*/ mapLocation);
-			
-			//Our APICall doesn't work (see comments)
-			//String returnedEvent = APICalls.createEvent(newEvent);
-						
-			getSuccess(POST.post(newEvent.toJSON()));
-			
-				
-			// TODO This return is not enough. We will need to wait until the API call
-			// finishes before closing this activity. A progress spinner will probably
-			// be the cleanest way to show progress.
-			// TODO add threading
+			Event newEvent = new Event(title, description, startTime, this.duration, mapLocation);
+
+			// Perform an asynchrounous API call to create the new event.
+			createEventAPICaller apiCall = new createEventAPICaller();
+			apiCall.execute(newEvent);
 			return true;
 		}
 
         return super.onOptionsItemSelected(item);
     }
-    
-    private void getSuccess(String json_input) {
-    	
-    	Context context = getApplicationContext();
-    	int duration = Toast.LENGTH_SHORT;
-        JSONObject jsonObject;
-        String name = null, name2 = null;
-        
-		try {
-			jsonObject = new JSONObject(json_input);
-			name = jsonObject.get("text").toString();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			Log.e(APICalls.class.toString(), "Error Parsing Return Value from text");
-			e.printStackTrace();
-		}
-		
-		try {
-			jsonObject = new JSONObject(json_input);
-			name2 = jsonObject.get("bool").toString();
-		} catch (JSONException e) {
-			Log.e(APICalls.class.toString(), "Error Parsing Return Value from bool");
-			e.printStackTrace();
-		}
-		
-		// TODO Fix toast not popping up
-		if (name2 != null) Toast.makeText(context, "Success", duration).show();
-		if (name != null) Toast.makeText(context, name, duration).show();
-			
-	}
 
 	/**
      * A pager adapter that represents the wizard pages sequentially.
@@ -330,4 +287,40 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         }
     }
 
+    /**
+	 * Performs an asynchronous API call create a new event.
+	 */
+	private class createEventAPICaller extends AsyncTask<Event, Void, Event> {
+		/**
+	     * Informs the user that the event is being created.
+	     */
+	    ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			// Set up progress indication.
+			dialog = ProgressDialog.show(CreateEvent.this, "Creating...", "");
+		}
+
+		@Override
+		protected Event doInBackground(Event... event) {
+			return APICalls.createEvent(event[0]);
+		}
+
+		@Override
+		protected void onPostExecute(Event result) {
+			// Close the wizard and any progress indication.
+			dialog.dismiss();
+			dialog = null;
+			if (result == null) {
+				(Toast.makeText(getApplicationContext(), "Could not create event!", Toast.LENGTH_LONG)).show();
+				CreateEvent.this.finish();
+				return;
+			}
+			
+			// Add the event to the event viewer.
+			
+			CreateEvent.this.finish();
+		}
+	}
 }

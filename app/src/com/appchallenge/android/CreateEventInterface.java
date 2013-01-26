@@ -8,8 +8,8 @@ import com.google.android.gms.maps.model.LatLng;
  * individual page fragments to communicate with each other.
  */
 public interface CreateEventInterface {
-	public String getName();
-	public void setName(String name);
+	public String getEventTitle();
+	public void setTitle(String name);
 	
 	public String getDescription();
 	public void setDescription(String description);

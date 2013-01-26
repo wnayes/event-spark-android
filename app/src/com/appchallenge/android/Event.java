@@ -8,29 +8,21 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
 /**
  * Representation of an Event, client-side.
- * Can be built either from a JSONObject containing event details
- * or from scratch.
+ * Can be built either from a JSONObject containing event details or from scratch.
  */
 public class Event {
-    private String title;
-    private String description;
-    private String type;
-    private long startTime;
-    private long endTime;
-    private LatLng location;
-
     /**
      * Create an Event from API-generated JSON.
      */
     public Event(String eventJSON) {
         try {
         	JSONObject jsonObject = new JSONObject(eventJSON);
+        	if (jsonObject.has("event"))
+        		jsonObject = jsonObject.getJSONObject("event");
 			this.title = jsonObject.get("title").toString();
 			this.description = jsonObject.getString("description").toString();
-			//this.type = jsonObject.getString("type").toString();
 			this.startTime = jsonObject.getLong("start_date");
 			this.endTime = jsonObject.getLong("end_date");
 			double lat = jsonObject.getDouble("latitude");
@@ -58,49 +50,47 @@ public class Event {
         this.startTime = startTime;
         this.endTime = endTime;
     }
-    
+
     /**
-     * @return The name of the Event.
+     * @return The title of the Event.
      */
-    public String getName() {
+    private String title;
+    public String getTitle() {
     	return this.title;
     }
-    
+
     /**
      * @return The description of the Event.
      */
+    private String description;
     public String getDescription() {
     	return this.description;
     }
-    
+
     /**
      * @return The location of the Event as a LatLng object.
      */
+    private LatLng location;
     public LatLng getLocation() {
     	return this.location;
     }
-    
-    /**
-     * @return The type of the Event
-     */
-    //public String getType() {
-    //	return this.type;
-    //}
-    
+
     /**
      *  @return The start time of event in seconds.
      */
+    private long startTime;
     public long getStartTime() {
     	return this.startTime;
     }
-    
+
     /**
      *  @return The end time in seconds
      */
+    private long endTime;
     public long getEndTime() {
     	return this.endTime;
     }
-    
+
     /**
      * @return The Event stringified into a JSON object.
      */
@@ -109,7 +99,6 @@ public class Event {
     	try {
 			event.put("title", this.title);
 			event.put("description", this.description);
-			//event.put("type", this.type);
 			event.put("start_date", this.startTime);
 			event.put("end_date", this.endTime);
 			event.put("latitude", this.location.latitude);
@@ -123,7 +112,7 @@ public class Event {
 
     	return event.toString();
     }
-    
+
     /**
      * @return A Google Maps marker representing the Event.
      */
@@ -132,7 +121,7 @@ public class Event {
                                   .snippet(this.description)
                                   .position(this.location);
     }
-    
+
     /**
      * @return A Google Maps marker representing the Event.
      * @param isDraggable

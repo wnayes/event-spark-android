@@ -65,15 +65,13 @@ public class APICalls {
     /**
      * Sends information to the REST API for creation of a new event.
      */
-    public static String createEvent(Event newEvent) {
-        //Changed return to string for trouble shooting
-    	String createEventUrl = "http://saypoint.dreamhosters.com/api/index.php/events";
+    public static Event createEvent(Event newEvent) {
+        // Changed return to string for trouble shooting
+    	String createEventUrl = "http://saypoint.dreamhosters.com/api/events";
         RestClient client = new RestClient(createEventUrl);
-        
 
-        client.AddParam("title", newEvent.getName());
+        client.AddParam("title", newEvent.getTitle());
         client.AddParam("description", newEvent.getDescription());
-        //client.AddParam("type", newEvent.getType());
         client.AddParam("start_date", ((Long)newEvent.getStartTime()).toString());
         client.AddParam("end_date", ((Long)newEvent.getEndTime()).toString());
         LatLng location = newEvent.getLocation();
@@ -85,29 +83,18 @@ public class APICalls {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //return new Event(client.getResponse());
-        // We should return true or false if it worked or fail accordingly.
-        boolean bool = false;
-        JSONObject jsonObject;
-        String name = null, name2 = null;
         
-		try {
-			jsonObject = new JSONObject(client.getResponse());
-			name = jsonObject.get("text").toString();
+        String result = client.getResponse();
+        Log.d("APICalls.createEvent", result);
+        
+        // Determine if an error has occurred.
+        try {
+			if ((new JSONObject(result)).has("error"))
+				return null;
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			Log.e(APICalls.class.toString(), "Error Parsing Return Value from text");
 			e.printStackTrace();
 		}
-		try {
-			jsonObject = new JSONObject(client.getResponse());
-			name2 = jsonObject.get("bool").toString();
-		} catch (JSONException e) {
-			Log.e(APICalls.class.toString(), "Error Parsing Return Value from bool");
-			e.printStackTrace();
-		}
-		
-        return client.getResponse(); 
+
+        return new Event(result);
     }
 }
