@@ -16,6 +16,9 @@ public interface CreateEventInterface {
 
 	public Date getDate();
 	public void setDate(Date date);
+	
+	public float getDuration();
+	public void setDuration(float duration);
 
 	public LatLng getLocation();
 	public void setLocation(LatLng location);

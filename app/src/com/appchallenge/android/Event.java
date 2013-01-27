@@ -42,11 +42,10 @@ public class Event {
      * @param type
      * @param location
      */
-    public Event(String name, String description, long startTime, long endTime,/*String type,*/ LatLng location) {
+    public Event(String name, String description, long startTime, long endTime, LatLng location) {
         this.title = name;
         this.description = description;
         this.location = location;
-        //this.type = type;
         this.startTime = startTime;
         this.endTime = endTime;
     }

@@ -27,7 +27,9 @@
     <string name="event_minutes">Minutes</string>
     <string name="event_time_am_pm">am or pm?</string>
     <string name="event_time_duration">Enter Duration</string>
-    <string name="event_enter_hours">Use a fraction of Hours</string>
+    <string name="event_enter_hours">Duration of event (in hours)</string>
+    
+    <string name="change">Change</string>
     
     
     <string name="action_back">Back</string>
@@ -45,6 +47,11 @@
         <item>Study</item>
         <item>Other</item>
         
+    </string-array>
+    
+    <string-array name="relative_days">
+        <item>Today</item>
+        <item>Tomorrow</item>
     </string-array>
     
     <!-- Arrays for Selecting the Time -->

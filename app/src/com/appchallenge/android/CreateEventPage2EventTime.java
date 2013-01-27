@@ -1,21 +1,25 @@
 package com.appchallenge.android;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
-import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
 
 /**
  * The second step of the create event wizard. From this fragment
@@ -33,116 +37,69 @@ public class CreateEventPage2EventTime extends Fragment {
         int layoutId = R.layout.fragment_create_event_page_2;
         ViewGroup rootView = (ViewGroup)inflater.inflate(layoutId, container, false);
         
-        RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.radioGroup1);        
-        radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-            	int button = group.getCheckedRadioButtonId();
+        // Populate the date spinner with the next two days.
+        Spinner daySpinner = (Spinner)rootView.findViewById(R.id.daySpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                                                                             R.array.relative_days,
+                                                                             android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        daySpinner.setAdapter(adapter);
+        
+        // Select the correct day spinner value.
+        Date startDate = ((CreateEventInterface)getActivity()).getDate();
+        Calendar c = Calendar.getInstance();
+        c.setTime(startDate);
+        Calendar today = Calendar.getInstance();
+        today.setTime(new Date());
+        if (c.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR))
+        	daySpinner.setSelection(1);
+        else
+        	daySpinner.setSelection(0);
 
-            	switch (button) {
-	                case R.id.radioButton_no:
-	                    //CreateEvent.switcher.setDisplayedChild(0);
-	                    break;
-	                case R.id.radioButton_yes:
-	                    //CreateEvent.switcher.setDisplayedChild(1);
-	                    break;
-                }
+        // Set the time string.
+        String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(startDate);
+        ((TextView)rootView.findViewById(R.id.event_time_display)).setText(timeString);
+        
+        // Display the current duration.
+        EditText durationBox = (EditText)rootView.findViewById(R.id.event_duration);
+        Float duration = ((CreateEventInterface)getActivity()).getDuration();
+        if (duration < 0.05 && duration > -0.05)
+        	durationBox.setText("");
+        else
+        	durationBox.setText(duration.toString());
+       
+        // Watch for changes to the date spinner.
+        daySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            	Date startDate = ((CreateEventInterface)getActivity()).getDate();
+            	Calendar c = Calendar.getInstance();
+            	c.setTime(startDate);
+            	Calendar today = Calendar.getInstance();
+                today.setTime(new Date());
+            	if (c.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR))
+            		c.add(Calendar.DATE, 1);
+            	else
+            		c.add(Calendar.DATE, -1);
+            	((CreateEventInterface)getActivity()).setDate(c.getTime());
             }
+            // Interface requirements
+            public void onNothingSelected(AdapterView<?> parentView) {}
+        });
+        
+       // Watch for changes to the event duration input.
+        durationBox.addTextChangedListener(new TextWatcher() {
+			public void afterTextChanged(Editable s) {
+				if (s.toString().equals(""))
+					((CreateEventInterface)getActivity()).setDuration(0);
+				else
+				  ((CreateEventInterface)getActivity()).setDuration(Float.parseFloat(s.toString()));
+			}
+			
+			// Unused interface methods of TextWatcher.
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
 
-        Spinner spinner = ((Spinner)rootView.findViewById(R.id.spinner1));
-        Context context = getActivity().getApplicationContext();
-        Calendar cal = Calendar.getInstance();
-    	List<String> date;
-        
-    	date = new ArrayList<String>();
-    	CreateEvent.cal_1 = cal;
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day1 = cal.get(Calendar.DAY_OF_MONTH);
-        date.add(numberDateToString(month)+" "+Integer.toString(day1)+", "+Integer.toString(year));
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        CreateEvent.cal_2 = cal;
-        int year_1 = cal.get(Calendar.YEAR);
-        int month_1 = cal.get(Calendar.MONTH);
-        int day1_1 = cal.get(Calendar.DAY_OF_MONTH);
-        date.add(numberDateToString(month_1)+" "+Integer.toString(day1_1)+", "+Integer.toString(year_1));
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        CreateEvent.cal_3 = cal;
-        int year_2 = cal.get(Calendar.YEAR);
-        int month_2 = cal.get(Calendar.MONTH);
-        int day1_2 = cal.get(Calendar.DAY_OF_MONTH);
-        date.add(numberDateToString(month_2)+" "+Integer.toString(day1_2)+", "+Integer.toString(year_2));
-        
-        
-        //spinner;
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,date);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        // TODO: Handle changing the UI when checkbox changed occurs.
-//        CheckBox curHappeningCheckbox = (CheckBox)rootView.findViewById(R.id.checkbox_currently_happening);
-//        curHappeningCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                Toast.makeText(getActivity().getApplicationContext(),
-//                               "Checked: " + ((Boolean)isChecked).toString(),
-//                               Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         return rootView;
-    }
-    
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-        //Context context = getApplicationContext();
-        //CharSequence text = "Hello toast!";
-        int duration = Toast.LENGTH_SHORT;
-        //Toast toast = Toast.makeText(context, date, duration);
-        //toast.show();
-        switch(view.getId()) {
-            case R.id.radioButton_no:
-                if (checked){
-                	CreateEvent.switcher.setDisplayedChild(0);
-                }
-                break;
-            case R.id.radioButton_yes:
-                if (checked){
-                    CreateEvent.switcher.setDisplayedChild(1);
-                }
-                break;
-    
-        }
-    }
-    private String numberDateToString(int date){
-    	String month = "";
-    	switch(date){
-    	case 0: month = "January";
-    	        break;
-    	case 1: month = "February";
-    	        break;
-    	case 2: month = "March";
-    	        break;
-    	case 3: month = "April";
-    	        break;
-    	case 4: month = "May";
-    	        break;
-    	case 5: month = "June";
-    	        break;
-    	case 6: month = "July";
-    	        break;
-    	case 7: month = "August";
-    	        break;
-    	case 8: month = "September";
-    	        break;
-    	case 9: month = "October";
-    	        break;
-    	case 10: month = "November";
-    	        break;
-    	case 11: month = "December";
-    			break;
-    	}
-    	
-    	return month;
     }
 }

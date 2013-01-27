@@ -8,13 +8,8 @@ import org.json.JSONObject;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import android.content.Context;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
-
-//Possibly obsolete
-
 
 /**
  * Holds static methods for calling the REST API functions.
