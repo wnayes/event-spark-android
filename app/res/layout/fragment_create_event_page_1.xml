@@ -9,7 +9,7 @@
       android:orientation="vertical"
       android:padding="16dp"
       android:focusableInTouchMode="true">
-
+        
       <TextView android:id="@+id/event_name_page_title"
         android:textSize="20sp"
         android:text="@string/event_name_page_title"
