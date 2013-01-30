@@ -3,6 +3,7 @@ package com.appchallenge.android;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,48 +21,52 @@ public class APICalls {
 	 * Performs the HTTP REST API request for a JSON listing of the
      * events nearest to the user's location.
      */
-    public static Event[] getEventsNearLocation(Location location /*, Arguments */) {
+    public static Event[] getEventsNearLocation(LatLng location) {
         String getEventsUrl = "http://saypoint.dreamhosters.com/api/events/search/";
         RestClient client = new RestClient(getEventsUrl);
-    	
+
         // Add parameters
-        client.AddParam("latitude", ((Double)location.getLatitude()).toString());
-        client.AddParam("longitude", ((Double)location.getLongitude()).toString());
-	
+        client.AddParam("latitude", ((Double)location.latitude).toString());
+        client.AddParam("longitude", ((Double)location.longitude).toString());
+
     	try {
             client.Execute(RestClient.RequestMethod.GET);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Parse the given Events and return an ArrayList.
+    	Log.d("APICalls.getEventsNearLocation", client.getResponse());
+
+        // Parse the given Events and create an ArrayList.
     	ArrayList<Event> events = new ArrayList<Event>();
     	try {
             JSONObject eventJSON = new JSONObject(client.getResponse());
-            Iterator<?> keys = eventJSON.keys();
-
-            while(keys.hasNext()) {
-                String key = (String)keys.next();
-                if (eventJSON.get(key) instanceof JSONObject) {
-                    events.add(new Event(((JSONObject)eventJSON.get(key)).toString()));
-                }
+            
+            if (!eventJSON.has("events")) {
+            	Log.e("APICalls.getEventsNearLocation", "'events' key not present");
+            	return null;
+            }
+            
+            JSONArray eventsArray = eventJSON.getJSONArray("events");
+            for (int i = 0; i < eventsArray.length(); ++i) {
+            	JSONObject event = eventsArray.getJSONObject(i);
+            	events.add(new Event(event.toString()));
             }
         } catch (JSONException e) {
             Log.e(APICalls.class.toString(), "Error parsing list of Events in getEventsNearLocation()");
             e.printStackTrace();
             return null;
         }
+    	
+    	Log.d("APICalls.getEventsNearLocation", "Found " + events.size() + " events.");
 
-        return (Event[])events.toArray();
+        return (Event[])events.toArray(new Event[events.size()]);
     }
-    
-    
-    
+
     /**
      * Sends information to the REST API for creation of a new event.
      */
     public static Event createEvent(Event newEvent) {
-        // Changed return to string for trouble shooting
     	String createEventUrl = "http://saypoint.dreamhosters.com/api/events";
         RestClient client = new RestClient(createEventUrl);
 
@@ -78,10 +83,10 @@ public class APICalls {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         String result = client.getResponse();
         Log.d("APICalls.createEvent", result);
-        
+
         // Determine if an error has occurred.
         try {
 			if ((new JSONObject(result)).has("error"))

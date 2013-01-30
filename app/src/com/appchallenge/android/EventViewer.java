@@ -17,6 +17,7 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.Window;
 
 /**
  * Displays a user's location and surrounding events.
@@ -53,6 +54,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_event_viewer);
         
         // We may be reloading due to a configuration change.
@@ -131,7 +133,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			return true;
 		} else if (item.getItemId() == R.id.menu_refresh_events) {
 			// Refresh the event listing.
-			new getEventsNearLocationAPICaller().execute();
+			new getEventsNearLocationAPICaller().execute(currentLocation);
 			return true;
 		}
 
@@ -241,21 +243,28 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	/**
 	 * Performs an asynchronous API call to find nearby events.
 	 */
-	private class getEventsNearLocationAPICaller extends AsyncTask<Void, Void, Void> {
+	private class getEventsNearLocationAPICaller extends AsyncTask<LatLng, Void, Event[]> {
 		@Override
 		protected void onPreExecute() {
-			// Set up some progress indication?
+			// Establish progress UI changes.
+			setProgressBarIndeterminateVisibility(Boolean.TRUE);
 		}
 
 		@Override
-		protected Void doInBackground(Void... arg0) {
-			//return APICalls.getEventsNearLocation( ... );
-			return null;
+		protected Event[] doInBackground(LatLng... location) {
+			return APICalls.getEventsNearLocation(location[0]);
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
+		protected void onPostExecute(Event[] result) {
 			// Remove progress UI.
+			setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+			// Keep track of these events and populate the map.
+			currentEvents = result.clone();
+			mMap.clear();
+			for (Event event : currentEvents)
+				mMap.addMarker(event.toMarker());
 		}
 	}
 }
