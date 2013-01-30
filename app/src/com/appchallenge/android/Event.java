@@ -21,6 +21,7 @@ public class Event {
         	JSONObject jsonObject = new JSONObject(eventJSON);
         	if (jsonObject.has("event"))
         		jsonObject = jsonObject.getJSONObject("event");
+        	this.id = jsonObject.getInt("id");
 			this.title = jsonObject.get("title").toString();
 			this.description = jsonObject.getString("description").toString();
 			this.startTime = jsonObject.getLong("start_date");
@@ -43,11 +44,20 @@ public class Event {
      * @param location
      */
     public Event(String name, String description, long startTime, long endTime, LatLng location) {
+    	this.id = -1;
         this.title = name;
         this.description = description;
         this.location = location;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    /**
+     * @return The internal id of an Event.
+     */
+    private int id;
+    public int getId() {
+    	return this.id;
     }
 
     /**
@@ -96,6 +106,7 @@ public class Event {
     public String toJSON() {
     	JSONObject event = new JSONObject();
     	try {
+    		event.put("id", this.id);
 			event.put("title", this.title);
 			event.put("description", this.description);
 			event.put("start_date", this.startTime);

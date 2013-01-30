@@ -35,7 +35,7 @@ public class APICalls {
             e.printStackTrace();
         }
 
-    	Log.d("APICalls.getEventsNearLocation", client.getResponse());
+    	Log.d("APICalls.getEventsNearLocation", (client.getResponse() == null) ? "" : client.getResponse());
 
         // Parse the given Events and create an ArrayList.
     	ArrayList<Event> events = new ArrayList<Event>();
@@ -56,8 +56,12 @@ public class APICalls {
             Log.e(APICalls.class.toString(), "Error parsing list of Events in getEventsNearLocation()");
             e.printStackTrace();
             return null;
+        } catch (NullPointerException e) {
+        	Log.e(APICalls.class.toString(), "Other parsing error - likely networking issue.");
+        	e.printStackTrace();
+            return null;
         }
-    	
+
     	Log.d("APICalls.getEventsNearLocation", "Found " + events.size() + " events.");
 
         return (Event[])events.toArray(new Event[events.size()]);

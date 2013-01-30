@@ -1,10 +1,15 @@
 package com.appchallenge.android;
 
+import java.util.HashMap;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import android.content.Intent;
 import android.location.Location;
@@ -13,6 +18,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -22,7 +29,7 @@ import com.actionbarsherlock.view.Window;
 /**
  * Displays a user's location and surrounding events.
  */
-public class EventViewer extends SherlockFragmentActivity implements LocationListener, LocationSource {
+public class EventViewer extends SherlockFragmentActivity implements LocationListener, LocationSource, OnInfoWindowClickListener {
     /**
      * Object representing the Google Map display of our Events.
      * Note that this may be null if the Google Play services APK is not available.
@@ -33,7 +40,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * Listener for the Google Map user location.
      */
     private OnLocationChangedListener mListener;
-    
+
     /**
      * Store the current location and zoom of the user.
      * Currently defaulted to Minneapolis, MN.
@@ -45,11 +52,18 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      */
     private LatLng currentMapLocation = new LatLng(44.9764164, -93.2323474);
     private float currentMapZoom = 12;
-    
+
     /**
      * Array of Events we have downloaded for the user.
      */
     private Event[] currentEvents;
+    
+    /**
+     * Maps the existing markers to their corresponding Event ID.
+     * This allows actions taken on a marker to be traced back to the
+     * target Event.
+     */
+    HashMap<Marker, Integer> eventMarkerMap = new HashMap<Marker, Integer>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +81,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             String[] JSONEvents = savedInstanceState.getStringArray("currentEvents");
             if (JSONEvents != null) {
             	this.currentEvents = new Event[JSONEvents.length];
-                for (int i = 0; i < JSONEvents.length; ++i) {
+                for (int i = 0; i < JSONEvents.length; ++i)
             	    this.currentEvents[i] = new Event(JSONEvents[i]);
-                }
+                reloadEventMarkers();
             }
         }
 
@@ -200,12 +214,67 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         }
     }
 
-    // This is where we can add markers or lines, add listeners or move the camera.
-    // This should only be called once and when we are sure that the map is not null.
+    /**
+     *  This is where we can add markers or lines, add listeners or move the camera.
+     *  This should only be called once and when we are sure that the map is not null.
+     */
     private void setUpMap() {
     	//mMap.getUiSettings().setZoomControlsEnabled(false);
     	mMap.setMyLocationEnabled(true);
-    	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapLocation, currentMapZoom));    	
+    	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapLocation, currentMapZoom));
+    	mMap.setOnInfoWindowClickListener(this);
+    }
+
+    /**
+     * Occurs when the user clicks the marker info windows.
+     * Shows the extended information activity for the marker.
+     * @param marker
+     */
+	@Override
+	public void onInfoWindowClick(Marker marker) {
+		// Retrieve the marker event via hash map.
+
+		// It seems like it might be possible to map directly from marker to
+		// Event objects, but there were some reference issues that made
+		// mapping to ID more appealing even despite the increased complexity.
+		int selectedId = eventMarkerMap.get(marker);
+		Event selectedEvent = null;
+		for (Event event : this.currentEvents) {
+			if (event.getId() == selectedId)
+				selectedEvent = event;
+		}
+		
+		if (selectedEvent == null) {
+			Log.e("EventViewer.onInfoWindowClick", "selectedEvent == null");
+			return;
+		}
+		
+		// Pass information about the event to the details activity.
+		Intent eventDetails = new Intent(EventViewer.this, EventDetails.class);
+		eventDetails.putExtra("id", selectedEvent.getId());
+		eventDetails.putExtra("title", selectedEvent.getTitle());
+		eventDetails.putExtra("description", selectedEvent.getDescription());
+		eventDetails.putExtra("startDate", selectedEvent.getStartTime());
+		eventDetails.putExtra("endDate", selectedEvent.getEndTime());
+		eventDetails.putExtra("latitude", selectedEvent.getLocation().latitude);
+		eventDetails.putExtra("longitude", selectedEvent.getLocation().longitude);
+		startActivity(eventDetails);
+	}
+
+    /**
+     * Adds the current Events tracked in this activity to the map.
+     */
+    private void reloadEventMarkers() {
+    	if (this.currentEvents == null || this.currentEvents.length == 0)
+    		return;
+
+    	setUpMapIfNeeded();
+    	mMap.clear();
+        eventMarkerMap.clear();
+        for (Event event : this.currentEvents) {
+    		Marker m = mMap.addMarker(event.toMarker());
+    		eventMarkerMap.put(m, event.getId());
+    	}
     }
 
 	@Override
@@ -217,12 +286,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		// Act based on the new location.
         if (location != null) {
         	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        	new getEventsNearLocationAPICaller().execute(currentLocation);
 	        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
         }
-
-//		// Keep the user's zoom if they have changed it.
-//		if (Math.abs(currentZoom - mMap.getCameraPosition().zoom) > 0.2)
-//			currentZoom = mMap.getCameraPosition().zoom;
 	}
 
 	// Methods required (besides onLocationChanged()) for LocationListener.
@@ -261,10 +327,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
 			// Keep track of these events and populate the map.
+			if (result == null) {
+				Toast.makeText(getApplicationContext(), "No events found near you!", Toast.LENGTH_LONG)
+				     .show();
+				currentEvents = null;
+				eventMarkerMap.clear();
+				return;
+			}
+
 			currentEvents = result.clone();
-			mMap.clear();
-			for (Event event : currentEvents)
-				mMap.addMarker(event.toMarker());
+			reloadEventMarkers();
 		}
 	}
 }
