@@ -1,19 +1,24 @@
 package com.appchallenge.android;
 
 import java.util.HashMap;
+import java.util.Timer;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -24,7 +29,9 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+import com.appchallenge.android.LocationFinder.GetLastLocation;
 
 /**
  * Displays a user's location and surrounding events.
@@ -43,12 +50,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     /**
      * Store the current location and zoom of the user.
-     * Currently defaulted to Minneapolis, MN.
      */
     private LatLng currentLocation;
 
     /**
      * Values saving the current location and zoom of the Map.
+     * Currently defaulted to Minneapolis, MN.
      */
     private LatLng currentMapLocation = new LatLng(44.9764164, -93.2323474);
     private float currentMapZoom = 12;
@@ -68,7 +75,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_event_viewer);
         
         // We may be reloading due to a configuration change.
@@ -85,6 +91,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             	    this.currentEvents[i] = new Event(JSONEvents[i]);
                 reloadEventMarkers();
             }
+            
+            // Restore any closed dialogs.
+            if (savedInstanceState.getBoolean("internetDialogOpen", false))
+            	this.displayConnectivityDialog();
+            if (savedInstanceState.getBoolean("noLocationSourceDialogOpen", false))
+            	this.showNoLocationSourceDialog();
         }
 
         setUpMapIfNeeded();
@@ -106,10 +118,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         }
 
         // Grab the latest location information.
-        if (savedInstanceState == null) {
-            LocationFinder locationFinder = new LocationFinder();
-            locationFinder.getLocation(this);
-        }
+        if (savedInstanceState == null)
+        	this.updateUserLocation();
     }
 
     @Override
@@ -118,16 +128,33 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         setUpMapIfNeeded();
         mMap.setMyLocationEnabled(true);
     }
-
+    
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
+    }
+    
+    @Override
+    protected void onStop() {
+    	// Prevent dialogs from leaking and remaining open.
+    	if (internetDialog != null && internetDialog.isShowing()) {
+    		internetDialog.cancel();
+    		internetDialog = null;
+    	}
+    	if (noLocationSourceDialog != null && noLocationSourceDialog.isShowing()) {
+    		noLocationSourceDialog.cancel();
+    		noLocationSourceDialog = null;
+    	}
+        super.onStop();
     }
 
-    @Override
+    private Menu _menu;
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.activity_event_viewer, menu);
+        
+        // Keep a reference to the menu for later uses (refresh indicator change).
+        this._menu = menu;
         return true;
     }
 
@@ -147,7 +174,13 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			return true;
 		} else if (item.getItemId() == R.id.menu_refresh_events) {
 			// Refresh the event listing.
-			new getEventsNearLocationAPICaller().execute(currentLocation);
+			if (!isOnline()) {
+				// Tell the user to connect to the Internet.
+				this.displayConnectivityDialog();
+			}
+			else if (currentLocation != null) {
+			    new getEventsNearLocationAPICaller().execute(currentLocation);
+			}
 			return true;
 		}
 
@@ -173,14 +206,22 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     	// Our Events cannot be directly put into the Bundle, but
     	// they can be stringified back into JSON first.
-    	if (this.currentEvents == null)
-            return;
+    	if (this.currentEvents != null) {
+            String[] JSONEvents = new String[this.currentEvents.length];
+            for (int i = 0; i < this.currentEvents.length; ++i) {
+    	    	JSONEvents[i] = this.currentEvents[i].toJSON();
+            }
+            savedInstanceState.putStringArray("currentEvents", JSONEvents);
+    	}
+    	
+    	// Dialogs get thrown under the bus on configuration changes, so their
+        // state must be remembered.
+    	if (internetDialog != null && internetDialog.isShowing())
+    		savedInstanceState.putBoolean("internetDialogOpen", true);
+    	if (noLocationSourceDialog != null && noLocationSourceDialog.isShowing())
+    		savedInstanceState.putBoolean("noLocationSourceDialogOpen", true);
 
-        String[] JSONEvents = new String[this.currentEvents.length];
-        for (int i = 0; i < this.currentEvents.length; ++i) {
-    		JSONEvents[i] = this.currentEvents[i].toJSON();
-        }
-        savedInstanceState.putStringArray("currentEvents", JSONEvents);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     /**
@@ -276,6 +317,31 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     		eventMarkerMap.put(m, event.getId());
     	}
     }
+    
+    private AlertDialog noLocationSourceDialog;
+    private void showNoLocationSourceDialog() {
+    	if (noLocationSourceDialog != null) {
+    		noLocationSourceDialog.cancel();
+		}
+    	noLocationSourceDialog = new AlertDialog.Builder(this).create();
+    	noLocationSourceDialog.setTitle("Location Source Needed");
+    	noLocationSourceDialog.setMessage("Turn on GPS or your cellular connection and try again!");
+    	noLocationSourceDialog.setIcon(android.R.drawable.ic_dialog_alert);
+    	noLocationSourceDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+	        }
+	    });
+    	noLocationSourceDialog.show();
+    }
+    public void updateUserLocation() {
+        LocationFinder locationFinder = new LocationFinder();
+        boolean sourcesExist = locationFinder.getLocation(this);
+        if (!sourcesExist) {
+        	// Show a dialog indicating to turn on some location source.
+        	showNoLocationSourceDialog();
+        }
+    }
 
 	@Override
 	public void onLocationChanged(Location location) {
@@ -286,8 +352,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		// Act based on the new location.
         if (location != null) {
         	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        	new getEventsNearLocationAPICaller().execute(currentLocation);
-	        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
+        	mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
+        	if (isOnline())
+        	    new getEventsNearLocationAPICaller().execute(currentLocation);
         }
 	}
 
@@ -307,13 +374,51 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	}
 
 	/**
+	 * Determines if the device has internet connectivity.
+	 * @return Whether a data connection is available.
+	 */
+	public boolean isOnline() {
+        ConnectivityManager connectivityManager =
+          (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
+    }
+
+	/**
+	 * Shows a dialog informing the user that an internet connection is not available.
+	 */
+	private AlertDialog internetDialog;
+	public void displayConnectivityDialog() {
+		if (internetDialog != null) {
+			internetDialog.cancel();
+		}
+		internetDialog = new AlertDialog.Builder(this).create();
+		internetDialog.setTitle("Internet Connection Needed");
+		internetDialog.setMessage("Connect your device to an Internet source and try again!");
+		internetDialog.setIcon(android.R.drawable.ic_dialog_alert);
+		internetDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+	        }
+	    });
+		internetDialog.show();
+	}
+
+	/**
 	 * Performs an asynchronous API call to find nearby events.
 	 */
 	private class getEventsNearLocationAPICaller extends AsyncTask<LatLng, Void, Event[]> {
+		/**
+		 * Quick access to the refresh button in the actionbar.
+		 */
+		MenuItem refreshItem;
+
 		@Override
 		protected void onPreExecute() {
 			// Establish progress UI changes.
-			setProgressBarIndeterminateVisibility(Boolean.TRUE);
+		    refreshItem = _menu.findItem(R.id.menu_refresh_events);
+			refreshItem.setActionView(R.layout.actionbar_refresh_progress);
 		}
 
 		@Override
@@ -324,7 +429,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		@Override
 		protected void onPostExecute(Event[] result) {
 			// Remove progress UI.
-			setProgressBarIndeterminateVisibility(Boolean.FALSE);
+			refreshItem.setActionView(null);
+			refreshItem = null;
 
 			// Keep track of these events and populate the map.
 			if (result == null) {
