@@ -11,10 +11,10 @@
           android:title="@string/menu_create_event"
           android:showAsAction="ifRoom" />
     
-    <!-- Refresh location and event listing. -->
+    <!-- Refresh event listing. -->
     <item android:id="@+id/menu_refresh_events"
           android:icon="@drawable/refresh"
           android:title="@string/menu_refresh_events"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="always" />
 
 </menu>
