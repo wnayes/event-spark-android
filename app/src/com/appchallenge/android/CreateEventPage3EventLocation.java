@@ -4,8 +4,11 @@ import android.os.Bundle;
 
 //import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 //import com.google.android.gms.maps.model.LatLng;
 //import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -32,6 +35,27 @@ public class CreateEventPage3EventLocation extends SupportMapFragment {
     	View view = super.onCreateView(inflater, container, savedInstanceState);
     	LatLng location = ((CreateEventInterface)getActivity()).getLocation();
     	getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
+    	final Marker marker = getMap().addMarker(new MarkerOptions()
+    	                       .position(location)
+    	                       .title(((CreateEventInterface)getActivity()).getEventTitle())
+    	                       .draggable(true));
+    	getMap().setOnMarkerDragListener(new OnMarkerDragListener(){
+    					
+			@Override
+			public void onMarkerDragEnd(Marker arg0) {
+				LatLng new_location = marker.getPosition();
+	    		((CreateEventInterface)getActivity()).setLocation(new_location);
+			}
+			
+			//Unused Functions
+			@Override
+			public void onMarkerDragStart(Marker arg0){}			
+			@Override
+			public void onMarkerDrag(Marker arg0){}
+    	});
+    	
         return view;
     }
+
+
 }

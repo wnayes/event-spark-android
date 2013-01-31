@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -13,8 +13,33 @@
     </style>
 
     <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
+    <style name="eventHoundTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name = "android:textSize">15sp</item>
+        <item name="android:textColor">#31312e</item>
+    </style>
+    
+    <style name="eventHoundTheme.spinner">
+        <item name="android:layout_width">0dip</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+    
+    <style name="eventHoundTheme.title">
+        <item name="android:textSize">20sp</item>
+    </style>
+    
+    <style name="eventHoundTheme.button">
+        <item name="android:layout_width">0dip</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">.6</item>
+    </style>
+    
+    <style name="eventHoundTheme.sentence">
+        <item name="android:textSize">10sp</item>
     </style>
 
 </resources>

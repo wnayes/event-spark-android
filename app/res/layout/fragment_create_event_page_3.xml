@@ -4,11 +4,20 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp" >
-      
+          
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/new_event_map"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            class="com.google.android.gms.maps.SupportMapFragment"/>
-
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            class="com.google.android.gms.maps.SupportMapFragment">
+                    
+        </fragment>
+        <!-- Has yet to be displayed in the app -->
+        <TextView
+                android:text="@string/event_location_page_sentence_1"
+                android:layout_weight="1"
+                android:layout_height="0dip"
+                style="@style/eventHoundTheme.sentence" />
+        
 </LinearLayout>

@@ -1,15 +1,12 @@
 package com.appchallenge.android;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import android.location.Location;
 import android.util.Log;
 
 /**

@@ -9,21 +9,29 @@
       android:orientation="vertical"
       android:padding="16dp"
       android:focusableInTouchMode="true">
-        
-      <TextView android:id="@+id/event_name_page_title"
-        android:textSize="20sp"
-        android:text="@string/event_name_page_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"/>
+
+      <ImageView
+          android:id="@+id/imageView1"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:src="@drawable/temp2" 
+          android:contentDescription="@string/event_create_image_flavor_text"/>
+      
+      <TextView 
+          android:id="@+id/event_create_instructions_1"
+          style="@style/eventHoundTheme.sentence"
+          android:text="@string/event_create_instructions_1" />
+      
+      <TextView 
+          android:id="@+id/event_create_instructions_2"
+          style="@style/eventHoundTheme.sentence"
+          android:text="@string/event_create_instructions_2" />
 
       <EditText android:id="@+id/event_name"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:hint="@string/event_name_hint"
-	    android:inputType="text|textCapSentences"
-	    android:maxLength="60"
-	    android:layout_marginBottom="16dp"/>
+          style="@style/eventHoundTheme"
+	      android:hint="@string/event_name_hint"
+	      android:inputType="text|textCapSentences"
+	      android:maxLength="60" />
 
 <!-- Selection of event type is hidden until details are finalized.
       <TextView android:id="@+id/event_spinner_title"
@@ -34,23 +42,20 @@
         android:textSize="20sp" />
     
       <Spinner
-        android:id="@+id/spinner1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:entries="@array/type_array"
-        android:hint="@string/event_select_type"
-        android:prompt="@string/event_select_type" />
+          android:id="@+id/spinner1"
+          stlye="@stlye/eventHoundTheme.spinner"
+          android:entries="@array/type_array"
+          android:hint="@string/event_select_type"
+          android:prompt="@string/event_select_type" />
 -->
 
       <EditText android:id="@+id/event_description"
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:lines="5"
-	    android:gravity="top|left"
-	    android:singleLine="false"
-	    android:hint="@string/event_description_hint"
-	    android:maxLength="300"
-	    android:inputType="textMultiLine" />
+          style="@style/eventHoundTheme"
+	      android:inputType="textMultiLine|textCapSentences"
+	      android:gravity="top|left"
+	      android:singleLine="false"
+	      android:hint="@string/event_description_hint"
+	      android:maxLength="300"/>
     </LinearLayout>
 
 </ScrollView>

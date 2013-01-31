@@ -10,6 +10,18 @@
     <string name="menu_settings">Settings</string>
 
     <!-- Create Event wizard -->
+    
+    <string name="event_create_image_flavor_text">Create Event Wizard</string>
+    
+    <string name="event_create_instructions_1">Welcome to the Create Event Wizard!</string>
+    <string name="event_create_instructions_2">
+        This page lets you set the title and description about the event.\n
+        Try to make your title something short and catchy.\n</string>
+        
+    <string name="event_time_page_sentence_1">Here you can set the start and end time of the event.</string>
+    
+    <string name="event_location_page_sentence_1">Here you can move the marker to select your current position.</string>
+    
     <string name="title_activity_create_event">Create Event</string>
     <string name="event_name_page_title">Tell us about your event!</string>
     <string name="event_name_hint">What is it called?</string>
@@ -18,8 +30,8 @@
     <string name="event_currently_happening">Is this event currently happening?</string>
     <string name="event_time_yes">Yes</string>
     <string name="event_time_no">No</string>
-    <string name="event_date_set_start">Select Start Date:</string>
-    <string name="event_time_start">Enter the Start Time:</string>
+    <string name="event_time_start">Enter Start Time:</string>
+    <string name="event_time_end">Enter End Time:</string>
     <string name="event_hours">Hours</string>
     <string name="event_minutes">Minutes</string>
     <string name="event_time_am_pm">am or pm?</string>
