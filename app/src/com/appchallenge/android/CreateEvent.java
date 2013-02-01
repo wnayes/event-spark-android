@@ -47,8 +47,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter mPagerAdapter;
-
-    
     
     /**
      * The title of the event provided by the user.
@@ -84,6 +82,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		Log.d("setDate", "startDate is now: " + startDate.getTime());
 	}
 	public Date getDate() {
+		Log.d("The start", "date was gotten");
 		return this.startDate;
 	}
 	
@@ -92,6 +91,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	}
 	
 	public Date getEndDate() {
+		Log.d("The end", "date was gotten");
 		return this.endDate;
 	}
 
@@ -133,8 +133,9 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         else if (this.startDate == null && this.endDate == null) {
            	this.startDate = new Date();
            	c.add(Calendar.HOUR, 3);
-            this.endDate = c.getTime();
-            Log.d("Here3", "time_2");
+            //this.endDate = c.getTime();
+           	setEndDate(c.getTime());
+            Log.d("Here3", this.endDate.toString());
         }
         // Set the map location to use the location given from the EventViewer.
         if (mapLocation == null) {
@@ -188,8 +189,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			// Advance to the next step in the wizard. If there is no
             // next step, setCurrentItem will do nothing.
 			
-			if(mPager.getCurrentItem() == 0 && (this.title == "" || this.description == "")){
-				Toast.makeText(context, "Enter a Valid Title or Description", duration).show();
+			if(mPager.getCurrentItem() == 0 && (this.title == "")){
+				Toast.makeText(context, "Enter a Valid Title.", duration).show();
 				return true;
 			}
 			// TODO add error checking for valid times.
@@ -208,13 +209,25 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
 			// Perform an asynchrounous API call to create the new event.
 			createEventAPICaller apiCall = new createEventAPICaller();
-			Toast.makeText(context, newEvent.toJSON(), duration).show();
+			//Toast.makeText(context, newEvent.toJSON(), duration).show();
 			apiCall.execute(newEvent);
 			return true;
 		}
 
         return super.onOptionsItemSelected(item);
     }
+    
+    @Override
+    public void onBackPressed() {
+    	// check if page 2 is open
+    	    
+    	    if(mPager.getCurrentItem() != 0){
+    	    	mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+    	    }
+    	    else{
+    	        super.onBackPressed(); 
+    	    }
+    	}
     
     /**
      * Shows the time picker to allow changing the Event time.
@@ -227,11 +240,11 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     	switch(v.getId()){
     	case R.id.event_start_button:
             DialogFragment timePicker = new StartTimePicker();
-            timePicker.show(getSupportFragmentManager(), "timePicker");
+            timePicker.show(getSupportFragmentManager(), "startTimePicker");
             break;
     	case R.id.event_end_button:
     		DialogFragment timePicker_2 = new EndTimePicker();
-            timePicker_2.show(getSupportFragmentManager(), "timePicker");
+            timePicker_2.show(getSupportFragmentManager(), "endTimePicker");
             break;
     	}
     }
@@ -254,7 +267,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			cal.set(Calendar.MINUTE, minute);
 			((CreateEventInterface)getActivity()).setDate(cal.getTime());
-			String time_2 = DateFormat.getTimeInstance(DateFormat.SHORT).format(((CreateEventInterface)getActivity()).getDate());
+			String time_2 = DateFormat.getTimeInstance(DateFormat.SHORT).format(cal.getTime());
 		    ((Button) findViewById(R.id.event_start_button)).setText(time_2);
 		}
     }
@@ -265,19 +278,20 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			// Use the current time as the default values for the picker
 			// Set the default time in on create
-			Date endTime = ((CreateEventInterface)getActivity()).getEndDate();
+			Date endTime = ((CreateEventInterface) getActivity()).getEndDate();
 			Calendar c = Calendar.getInstance();
 			c.setTime(endTime);
+			Log.d("Herehere", Integer.toString(c.get(Calendar.HOUR))+ " " + Integer.toString(c.get(Calendar.MINUTE)) + " " + endTime.toString());
 			// Create a new instance of TimePickerDialog and return it
 			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR), c.get(Calendar.MINUTE), false);
 		}
 		
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 			Calendar c = Calendar.getInstance();
-			c.setTime(((CreateEventInterface)getActivity()).getDate());
+			c.setTime(((CreateEventInterface)getActivity()).getEndDate());
 			c.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			c.set(Calendar.MINUTE, minute);
-			((CreateEventInterface)getActivity()).setDate(c.getTime());
+			((CreateEventInterface)getActivity()).setEndDate(c.getTime());
 			String time = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.getTime());
 		    ((Button) findViewById(R.id.event_end_button)).setText(time);
 		}
