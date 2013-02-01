@@ -86,7 +86,7 @@ public class APICalls {
         }
 
         String result = client.getResponse();
-        Log.d("APICalls.createEvent", result);
+        Log.d("APICalls.createEvent", result == null ? "" : result);
 
         // Determine if an error has occurred.
         try {
@@ -94,7 +94,11 @@ public class APICalls {
 				return null;
 		} catch (JSONException e) {
 			e.printStackTrace();
-		}
+			return null;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		} 
 
         return new Event(result);
     }

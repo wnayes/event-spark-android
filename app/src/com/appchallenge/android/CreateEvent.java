@@ -76,21 +76,23 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	 * The date when the event goes live.
 	 */
 	private Date startDate;
-	private Date endDate;
-	public void setDate(Date date) {
+	public void setStartDate(Date date) {
 		if (startDate != null)
 		    Log.d("setDate", "startDate was: " + startDate.getTime());
 		this.startDate = date;
 		Log.d("setDate", "startDate is now: " + startDate.getTime());
 	}
-	public Date getDate() {
+	public Date getStartDate() {
 		return this.startDate;
 	}
-	
+
+	/**
+	 * The date when the event finishes.
+	 */
+	private Date endDate;
 	public void setEndDate(Date date) {
 		this.endDate = date;
 	}
-	
 	public Date getEndDate() {
 		return this.endDate;
 	}
@@ -125,17 +127,21 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
                 invalidateOptionsMenu();
             }
         });
-        Calendar c = Calendar.getInstance();
+        
+        // Set the initial date values for the event.
         if ((savedInstanceState != null) && savedInstanceState.containsKey("startDate") && savedInstanceState.containsKey("endDate")) {
         	this.startDate = new Date(savedInstanceState.getLong("startDate"));
         	this.endDate = new Date(savedInstanceState.getLong("endDate"));
         }
         else if (this.startDate == null && this.endDate == null) {
+        	Calendar c = Calendar.getInstance();
            	this.startDate = new Date();
-           	c.add(Calendar.HOUR, 3);
+           	c.add(Calendar.HOUR_OF_DAY, 3);
             this.endDate = c.getTime();
-            Log.d("Here3", "time_2");
+            Log.d("set startDate", ((Long)this.startDate.getTime()).toString());
+            Log.d("set endDate", ((Long)this.endDate.getTime()).toString());
         }
+
         // Set the map location to use the location given from the EventViewer.
         if (mapLocation == null) {
             Intent receivedIntent = getIntent();
@@ -145,7 +151,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     }
     
     public void onSaveInstanceState(Bundle savedInstanceState) {
-    	savedInstanceState.putLong("startDate", getDate().getTime());
+    	savedInstanceState.putLong("startDate", getStartDate().getTime());
+    	savedInstanceState.putLong("endDate", getEndDate().getTime());
     	
     	super.onSaveInstanceState(savedInstanceState);
     }
@@ -187,23 +194,18 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		} else if (item.getItemId() == R.id.action_next) {
 			// Advance to the next step in the wizard. If there is no
             // next step, setCurrentItem will do nothing.
-			
-			if(mPager.getCurrentItem() == 0 && (this.title == "" || this.description == "")){
-				Toast.makeText(context, "Enter a Valid Title or Description", duration).show();
+
+			if (mPager.getCurrentItem() == 0 && this.title == "") {
+				Toast.makeText(context, "Please enter a title for the event!", duration).show();
 				return true;
 			}
 			// TODO add error checking for valid times.
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
-			
-			//
-			
-			
 			// Prepare the date inputs to be in seconds.
 			long startTime = this.startDate.getTime() / 1000;
 			long endTime = this.endDate.getTime() / 1000;
-			//long endTime = (startTime + (long)(this.duration * 60 * 60));
 			Event newEvent = new Event(title, description, startTime, endTime, mapLocation);
 
 			// Perform an asynchrounous API call to create the new event.
@@ -221,65 +223,73 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
      * @param v
      */
     public void showEventTimeDialog(View v) {
-    	Log.d("showEvent", Integer.toString(v.getId()));
-    	Log.d("Start ID", Integer.toString(R.id.event_start_button));
-    	Log.d("end ID", Integer.toString(R.id.event_end_button));
-    	switch(v.getId()){
-    	case R.id.event_start_button:
-            DialogFragment timePicker = new StartTimePicker();
-            timePicker.show(getSupportFragmentManager(), "timePicker");
-            break;
-    	case R.id.event_end_button:
-    		DialogFragment timePicker_2 = new EndTimePicker();
-            timePicker_2.show(getSupportFragmentManager(), "timePicker");
-            break;
+    	DialogFragment timePicker;
+    	switch (v.getId()) {
+	    	case R.id.event_start_button:
+	            timePicker = new StartTimePicker();
+	            timePicker.show(getSupportFragmentManager(), "timePicker");
+	            break;
+	    	case R.id.event_end_button:
+	    		timePicker = new EndTimePicker();
+	    		timePicker.show(getSupportFragmentManager(), "timePicker");
+	            break;
     	}
     }
-    @SuppressLint("ValidFragment")
+
 	public class StartTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			// Use the current time as the default values for the picker
-			Date startTime = ((CreateEventInterface)getActivity()).getDate();
+			Date startTime = ((CreateEventInterface)getActivity()).getStartDate();
 			Calendar c = Calendar.getInstance();
 			c.setTime(startTime);
 			
 			// Create a new instance of TimePickerDialog and return it
-			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR), c.get(Calendar.MINUTE), false);
+			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false);
 		}
 		
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			// Create a new Date object with the updated time.
 			Calendar cal = Calendar.getInstance();
-			cal.setTime(((CreateEventInterface)getActivity()).getDate());
+			cal.setTime(((CreateEventInterface)getActivity()).getStartDate());
 			cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			cal.set(Calendar.MINUTE, minute);
-			((CreateEventInterface)getActivity()).setDate(cal.getTime());
-			String time_2 = DateFormat.getTimeInstance(DateFormat.SHORT).format(((CreateEventInterface)getActivity()).getDate());
-		    ((Button) findViewById(R.id.event_start_button)).setText(time_2);
+
+			// Send this updated date back to the wizard activity.
+			Date newDate = cal.getTime();
+			((CreateEventInterface)getActivity()).setStartDate(newDate);
+
+			// Update the display text.
+			String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate);
+		    ((Button) findViewById(R.id.event_start_button)).setText(timeString);
 		}
     }
 
-    @SuppressLint("ValidFragment")
 	public class EndTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			// Use the current time as the default values for the picker
-			// Set the default time in on create
 			Date endTime = ((CreateEventInterface)getActivity()).getEndDate();
 			Calendar c = Calendar.getInstance();
 			c.setTime(endTime);
+
 			// Create a new instance of TimePickerDialog and return it
-			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR), c.get(Calendar.MINUTE), false);
+			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false);
 		}
 		
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			// Create a new Date object with the updated time.
 			Calendar c = Calendar.getInstance();
-			c.setTime(((CreateEventInterface)getActivity()).getDate());
+			c.setTime(((CreateEventInterface)getActivity()).getEndDate());
 			c.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			c.set(Calendar.MINUTE, minute);
-			((CreateEventInterface)getActivity()).setDate(c.getTime());
-			String time = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.getTime());
-		    ((Button) findViewById(R.id.event_end_button)).setText(time);
+
+			// Send this updated date back to the wizard activity.
+			Date newDate = c.getTime();
+			((CreateEventInterface)getActivity()).setEndDate(newDate);
+
+			// Update the display text.
+			String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate);
+		    ((Button) findViewById(R.id.event_end_button)).setText(timeString);
 		}
     }
     

@@ -1,9 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item android:id="@+id/menu_settings"
-          android:orderInCategory="100"
-          android:showAsAction="never"
-          android:title="@string/menu_settings"/>
     
     <!-- Show the Create Event wizard. -->
     <item android:id="@+id/menu_create_event"
@@ -15,6 +10,12 @@
     <item android:id="@+id/menu_refresh_events"
           android:icon="@drawable/refresh"
           android:title="@string/menu_refresh_events"
-          android:showAsAction="always" />
+          android:showAsAction="ifRoom" />
+
+    <!-- Settings menu -->
+    <item android:id="@+id/menu_settings"
+          android:icon="@drawable/ic_action_settings"
+          android:showAsAction="ifRoom"
+          android:title="@string/menu_settings"/>
 
 </menu>
