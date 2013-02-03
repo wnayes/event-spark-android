@@ -11,6 +11,32 @@
           android:icon="@drawable/refresh"
           android:title="@string/menu_refresh_events"
           android:showAsAction="ifRoom" />
+    
+    <item
+    android:id="@+id/event_type_filter"
+    android:title="Filter By Type"
+    android:showAsAction="ifRoom">
+    <menu>
+        <item
+            android:id="@+id/academics"
+            android:title="Academics" />
+        <item
+            android:id="@+id/athletics"
+            android:title="Athletics" />
+        <item
+            android:id="@+id/entertainmnet"
+            android:title="Entertainment" />
+        <item
+            android:id="@+id/promotions"
+            android:title="Promotions" />
+        <item
+            android:id="@+id/social"
+            android:title="Social" />
+        <item
+            android:id="@+id/other"
+            android:title="Other" />
+    </menu>
+</item>
 
     <!-- Settings menu -->
     <item android:id="@+id/menu_settings"

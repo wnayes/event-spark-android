@@ -23,6 +23,7 @@ public class Event {
         		jsonObject = jsonObject.getJSONObject("event");
         	this.id = jsonObject.getInt("id");
 			this.title = jsonObject.get("title").toString();
+			//this.type = jsonObject.get("type").toString();
 			this.description = jsonObject.getString("description").toString();
 			this.startTime = jsonObject.getLong("start_date");
 			this.endTime = jsonObject.getLong("end_date");
@@ -43,9 +44,10 @@ public class Event {
      * @param type
      * @param location
      */
-    public Event(String name, String description, long startTime, long endTime, LatLng location) {
+    public Event(String name, String type, String description, long startTime, long endTime, LatLng location) {
     	this.id = -1;
         this.title = name;
+        this.type = type;
         this.description = description;
         this.location = location;
         this.startTime = startTime;
@@ -67,6 +69,14 @@ public class Event {
     public String getTitle() {
     	return this.title;
     }
+    
+    /**
+     * @return The type of the event
+     */
+    private String type = "";
+    public String getType() {
+		return this.type;
+	}
 
     /**
      * @return The description of the Event.
@@ -108,6 +118,7 @@ public class Event {
     	try {
     		event.put("id", this.id);
 			event.put("title", this.title);
+			event.put("type", this.type);
 			event.put("description", this.description);
 			event.put("start_date", this.startTime);
 			event.put("end_date", this.endTime);
@@ -139,4 +150,5 @@ public class Event {
     public MarkerOptions toMarker(Boolean isDraggable) {
         return this.toMarker().draggable(isDraggable);
     }
+
 }

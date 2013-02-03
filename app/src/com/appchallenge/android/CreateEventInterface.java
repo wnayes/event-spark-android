@@ -22,5 +22,8 @@ public interface CreateEventInterface {
 	
 	public LatLng getLocation();
 	public void setLocation(LatLng location);
+	
+	public String getType();
+	public void setType(String type);
 
 }

@@ -1,5 +1,8 @@
 package com.appchallenge.android;
 
+
+
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -7,7 +10,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 
 /**
@@ -28,7 +34,11 @@ public class CreateEventPage1EventName extends Fragment {
         
         EditText titleBox = (EditText)rootView.findViewById(R.id.event_name);
         EditText descBox = (EditText)rootView.findViewById(R.id.event_description);
-        
+        Spinner typeSpinner = (Spinner)rootView.findViewById(R.id.event_type_spinner);
+        //ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                                                                             //R.array.type_array,
+                                                                             //android.R.layout.simple_spinner_item);
+        //typeSpinner.setAdapter(adapter);
         // Read the title and description from the parent Activity.
         titleBox.setText(((CreateEventInterface)getActivity()).getEventTitle());
         descBox.setText(((CreateEventInterface)getActivity()).getDescription());
@@ -51,6 +61,15 @@ public class CreateEventPage1EventName extends Fragment {
 			// Unused interface methods of TextWatcher.
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
+        
+        typeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            	String type = ((Spinner) parentView.findViewById(R.id.event_type_spinner)).getSelectedItem().toString();
+            	((CreateEventInterface)getActivity()).setType(type);
+            }
+            // Interface requirements
+            public void onNothingSelected(AdapterView<?> parentView) {}
         });
 
         return rootView;
