@@ -76,9 +76,9 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	private Date startDate;
 	public void setStartDate(Date date) {
 		if (startDate != null)
-		    Log.d("setDate", "startDate was: " + startDate.getTime());
+		    Log.d("setStartDate", "startDate was: " + startDate.getTime());
 		this.startDate = date;
-		Log.d("setDate", "startDate is now: " + startDate.getTime());
+		Log.d("setStartDate", "startDate now: " + startDate.getTime());
 	}
 <<<<<<< HEAD
 	public Date getDate() {
@@ -94,7 +94,10 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	 */
 	private Date endDate;
 	public void setEndDate(Date date) {
+		if (endDate != null)
+		    Log.d("setEndDate", "endDate was: " + endDate.getTime());
 		this.endDate = date;
+		Log.d("setEndDate", "endDate now: " + endDate.getTime());
 	}
 	public Date getEndDate() {
 		Log.d("The end", "date was gotten");
@@ -117,6 +120,38 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
 
+        // Set the initial date values for the event.
+        if ((savedInstanceState != null) && savedInstanceState.containsKey("startDate") && savedInstanceState.containsKey("endDate")) {
+        	this.startDate = new Date(savedInstanceState.getLong("startDate"));
+        	this.endDate = new Date(savedInstanceState.getLong("endDate"));
+        }
+        else if (this.startDate == null && this.endDate == null) {
+        	this.startDate = new Date();
+        	Calendar c = Calendar.getInstance();
+<<<<<<< HEAD
+           	this.startDate = new Date();
+<<<<<<< HEAD
+           	c.add(Calendar.HOUR, 3);
+            //this.endDate = c.getTime();
+           	setEndDate(c.getTime());
+            Log.d("Here3", this.endDate.toString());
+=======
+=======
+>>>>>>> f82f6b5... Fixed the last time picker bug. Prevent a few more null pointer issues with the refresh UI.
+           	c.add(Calendar.HOUR_OF_DAY, 3);
+            this.endDate = c.getTime();
+            Log.d("set startDate", ((Long)this.startDate.getTime()).toString());
+            Log.d("set endDate", ((Long)this.endDate.getTime()).toString());
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
+        }
+
+        // Set the map location to use the location given from the EventViewer.
+        if (mapLocation == null) {
+            Intent receivedIntent = getIntent();
+            mapLocation = new LatLng(receivedIntent.getDoubleExtra("latitude", 0),
+                                     receivedIntent.getDoubleExtra("longitude", 0));
+        }
+
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager)findViewById(R.id.pager);
         mPagerAdapter = new CreateEventPagerAdapter(getSupportFragmentManager());
@@ -131,34 +166,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
                 invalidateOptionsMenu();
             }
         });
-        
-        // Set the initial date values for the event.
-        if ((savedInstanceState != null) && savedInstanceState.containsKey("startDate") && savedInstanceState.containsKey("endDate")) {
-        	this.startDate = new Date(savedInstanceState.getLong("startDate"));
-        	this.endDate = new Date(savedInstanceState.getLong("endDate"));
-        }
-        else if (this.startDate == null && this.endDate == null) {
-        	Calendar c = Calendar.getInstance();
-           	this.startDate = new Date();
-<<<<<<< HEAD
-           	c.add(Calendar.HOUR, 3);
-            //this.endDate = c.getTime();
-           	setEndDate(c.getTime());
-            Log.d("Here3", this.endDate.toString());
-=======
-           	c.add(Calendar.HOUR_OF_DAY, 3);
-            this.endDate = c.getTime();
-            Log.d("set startDate", ((Long)this.startDate.getTime()).toString());
-            Log.d("set endDate", ((Long)this.endDate.getTime()).toString());
->>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
-        }
-
-        // Set the map location to use the location given from the EventViewer.
-        if (mapLocation == null) {
-            Intent receivedIntent = getIntent();
-            mapLocation = new LatLng(receivedIntent.getDoubleExtra("latitude", 0),
-                                     receivedIntent.getDoubleExtra("longitude", 0));
-        }
     }
     
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -270,11 +277,11 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     	switch (v.getId()) {
 	    	case R.id.event_start_button:
 	            timePicker = new StartTimePicker();
-	            timePicker.show(getSupportFragmentManager(), "timePicker");
+	            timePicker.show(getSupportFragmentManager(), "startTimePicker");
 	            break;
 	    	case R.id.event_end_button:
 	    		timePicker = new EndTimePicker();
-	    		timePicker.show(getSupportFragmentManager(), "timePicker");
+	    		timePicker.show(getSupportFragmentManager(), "endTimePicker");
 	            break;
 >>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
     	}

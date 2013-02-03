@@ -417,9 +417,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		@Override
 		protected void onPreExecute() {
 			// Establish progress UI changes.
-		    refreshItem = _menu.findItem(R.id.menu_refresh_events);
-		    if (refreshItem != null)
-			    refreshItem.setActionView(R.layout.actionbar_refresh_progress);
+			if (_menu != null) {
+		        refreshItem = _menu.findItem(R.id.menu_refresh_events);
+		        if (refreshItem != null)
+			        refreshItem.setActionView(R.layout.actionbar_refresh_progress);
+			}
 		}
 
 		@Override

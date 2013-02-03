@@ -47,7 +47,7 @@ public class CreateEventPage2EventTime extends Fragment {
         Calendar today = Calendar.getInstance();
         Date endDate = ((CreateEventInterface)getActivity()).getEndDate();
         
-     // Set the time string.
+        // Set the time string.
         String startString = DateFormat.getTimeInstance(DateFormat.SHORT).format(startDate);
         Button start_button = ((Button) rootView.findViewById(R.id.event_start_button));
         start_button.setText(startString);
@@ -60,7 +60,6 @@ public class CreateEventPage2EventTime extends Fragment {
         end_button.setText(endString);
         
         // Select the correct day spinner value.
-        
         today.setTime(new Date());
         if (c.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
         	startSpinner.setSelection(1);
@@ -89,9 +88,9 @@ public class CreateEventPage2EventTime extends Fragment {
         
         endSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	Date startDate = ((CreateEventInterface)getActivity()).getStartDate();
+            	Date endDate = ((CreateEventInterface)getActivity()).getEndDate();
             	Calendar c = Calendar.getInstance();
-            	c.setTime(startDate);
+            	c.setTime(endDate);
             	Calendar today = Calendar.getInstance();
                 today.setTime(new Date());
             	if (c.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR))
