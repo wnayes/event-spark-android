@@ -15,7 +15,7 @@
     
     <string name="event_create_instructions_1">Welcome to the Create Event Wizard!</string>
     <string name="event_create_instructions_2">
-        This page lets you set the title and description about the event.\n
+        This page lets you set the title, type, and description about the event.\n
         Try to make your title something short and catchy.\n</string>
         
     <string name="event_time_page_sentence_1">Here you can set the start and end time of the event.</string>
@@ -27,16 +27,8 @@
     <string name="event_name_hint">What is it called?</string>
     <string name="event_description_hint">Any more details?</string>
     <string name="event_time_page_title">Event Time</string>
-    <string name="event_currently_happening">Is this event currently happening?</string>
-    <string name="event_time_yes">Yes</string>
-    <string name="event_time_no">No</string>
     <string name="event_time_start">Enter Start Time:</string>
     <string name="event_time_end">Enter End Time:</string>
-    <string name="event_hours">Hours</string>
-    <string name="event_minutes">Minutes</string>
-    <string name="event_time_am_pm">am or pm?</string>
-    <string name="event_time_duration">Enter Duration</string>
-    <string name="event_enter_hours">Duration of event (in hours)</string>
     <string name="change">Change</string>
     <string name="action_back">Back</string>
     <string name="action_next">Next</string>
@@ -50,10 +42,11 @@
     <string name="event_spinner_title">Select Type of Event:</string>
 
     <string-array name="type_array">
-        <item>Concert</item>
-        <item>Party</item>
-        <item>Sport</item>
-        <item>Study</item>
+        <item>Academics</item>
+        <item>Athletics</item>
+        <item>Entertainment</item>
+        <item>Promotions</item>
+        <item>Social</item>
         <item>Other</item>
     </string-array>
 

@@ -182,9 +182,46 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
 			}
 			return true;
+		} else {
+			switch(item.getItemId()) {
+			    case R.id.academics:
+				    filterSearch("Academics");
+				    break;
+			    case R.id.athletics:
+			    	filterSearch("Athletics");
+				    break;
+			    case R.id.entertainmnet:
+			    	filterSearch("Entertainment");
+			    	break;
+			    case R.id.promotions:
+			    	filterSearch("Promotions");
+			    	break;
+			    case R.id.social:
+			    	filterSearch("Social");
+			    	break;
+			    case R.id.other:
+			    	filterSearch("Other");
+			    	break;
+			}
+			
+			return true;
 		}
 
-        return super.onOptionsItemSelected(item);
+        //return super.onOptionsItemSelected(item);
+    }
+    
+    public void filterSearch(String type) {
+    	
+    	setUpMapIfNeeded();
+    	mMap.clear();
+        eventMarkerMap.clear();
+        for (Event event : this.currentEvents) {
+        	if (event.getType().equals(type)){
+    		    Marker m = mMap.addMarker(event.toMarker());
+    		    eventMarkerMap.put(m, event.getId());
+        	}
+    	}
+    	
     }
 
     /**
