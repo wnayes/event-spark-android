@@ -14,8 +14,8 @@ public interface CreateEventInterface {
 	public String getDescription();
 	public void setDescription(String description);
 
-	public Date getDate();
-	public void setDate(Date date);
+	public Date getStartDate();
+	public void setStartDate(Date date);
 	
 	public Date getEndDate();
 	public void setEndDate(Date date);

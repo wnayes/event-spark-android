@@ -74,22 +74,28 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	 * The date when the event goes live.
 	 */
 	private Date startDate;
-	private Date endDate;
-	public void setDate(Date date) {
+	public void setStartDate(Date date) {
 		if (startDate != null)
 		    Log.d("setDate", "startDate was: " + startDate.getTime());
 		this.startDate = date;
 		Log.d("setDate", "startDate is now: " + startDate.getTime());
 	}
+<<<<<<< HEAD
 	public Date getDate() {
 		Log.d("The start", "date was gotten");
+=======
+	public Date getStartDate() {
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
 		return this.startDate;
 	}
-	
+
+	/**
+	 * The date when the event finishes.
+	 */
+	private Date endDate;
 	public void setEndDate(Date date) {
 		this.endDate = date;
 	}
-	
 	public Date getEndDate() {
 		Log.d("The end", "date was gotten");
 		return this.endDate;
@@ -125,18 +131,28 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
                 invalidateOptionsMenu();
             }
         });
-        Calendar c = Calendar.getInstance();
+        
+        // Set the initial date values for the event.
         if ((savedInstanceState != null) && savedInstanceState.containsKey("startDate") && savedInstanceState.containsKey("endDate")) {
         	this.startDate = new Date(savedInstanceState.getLong("startDate"));
         	this.endDate = new Date(savedInstanceState.getLong("endDate"));
         }
         else if (this.startDate == null && this.endDate == null) {
+        	Calendar c = Calendar.getInstance();
            	this.startDate = new Date();
+<<<<<<< HEAD
            	c.add(Calendar.HOUR, 3);
             //this.endDate = c.getTime();
            	setEndDate(c.getTime());
             Log.d("Here3", this.endDate.toString());
+=======
+           	c.add(Calendar.HOUR_OF_DAY, 3);
+            this.endDate = c.getTime();
+            Log.d("set startDate", ((Long)this.startDate.getTime()).toString());
+            Log.d("set endDate", ((Long)this.endDate.getTime()).toString());
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
         }
+
         // Set the map location to use the location given from the EventViewer.
         if (mapLocation == null) {
             Intent receivedIntent = getIntent();
@@ -146,7 +162,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     }
     
     public void onSaveInstanceState(Bundle savedInstanceState) {
-    	savedInstanceState.putLong("startDate", getDate().getTime());
+    	savedInstanceState.putLong("startDate", getStartDate().getTime());
+    	savedInstanceState.putLong("endDate", getEndDate().getTime());
     	
     	super.onSaveInstanceState(savedInstanceState);
     }
@@ -188,23 +205,24 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		} else if (item.getItemId() == R.id.action_next) {
 			// Advance to the next step in the wizard. If there is no
             // next step, setCurrentItem will do nothing.
+<<<<<<< HEAD
 			
 			if(mPager.getCurrentItem() == 0 && (this.title == "")){
 				Toast.makeText(context, "Enter a Valid Title.", duration).show();
+=======
+
+			if (mPager.getCurrentItem() == 0 && this.title == "") {
+				Toast.makeText(context, "Please enter a title for the event!", duration).show();
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
 				return true;
 			}
 			// TODO add error checking for valid times.
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
-			
-			//
-			
-			
 			// Prepare the date inputs to be in seconds.
 			long startTime = this.startDate.getTime() / 1000;
 			long endTime = this.endDate.getTime() / 1000;
-			//long endTime = (startTime + (long)(this.duration * 60 * 60));
 			Event newEvent = new Event(title, description, startTime, endTime, mapLocation);
 
 			// Perform an asynchrounous API call to create the new event.
@@ -234,6 +252,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
      * @param v
      */
     public void showEventTimeDialog(View v) {
+<<<<<<< HEAD
     	Log.d("showEvent", Integer.toString(v.getId()));
     	Log.d("Start ID", Integer.toString(R.id.event_start_button));
     	Log.d("end ID", Integer.toString(R.id.event_end_button));
@@ -246,54 +265,96 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     		DialogFragment timePicker_2 = new EndTimePicker();
             timePicker_2.show(getSupportFragmentManager(), "endTimePicker");
             break;
+=======
+    	DialogFragment timePicker;
+    	switch (v.getId()) {
+	    	case R.id.event_start_button:
+	            timePicker = new StartTimePicker();
+	            timePicker.show(getSupportFragmentManager(), "timePicker");
+	            break;
+	    	case R.id.event_end_button:
+	    		timePicker = new EndTimePicker();
+	    		timePicker.show(getSupportFragmentManager(), "timePicker");
+	            break;
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
     	}
     }
-    @SuppressLint("ValidFragment")
+
 	public class StartTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			// Use the current time as the default values for the picker
-			Date startTime = ((CreateEventInterface)getActivity()).getDate();
+			Date startTime = ((CreateEventInterface)getActivity()).getStartDate();
 			Calendar c = Calendar.getInstance();
 			c.setTime(startTime);
 			
 			// Create a new instance of TimePickerDialog and return it
-			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR), c.get(Calendar.MINUTE), false);
+			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false);
 		}
 		
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			// Create a new Date object with the updated time.
 			Calendar cal = Calendar.getInstance();
-			cal.setTime(((CreateEventInterface)getActivity()).getDate());
+			cal.setTime(((CreateEventInterface)getActivity()).getStartDate());
 			cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			cal.set(Calendar.MINUTE, minute);
+<<<<<<< HEAD
 			((CreateEventInterface)getActivity()).setDate(cal.getTime());
 			String time_2 = DateFormat.getTimeInstance(DateFormat.SHORT).format(cal.getTime());
 		    ((Button) findViewById(R.id.event_start_button)).setText(time_2);
+=======
+
+			// Send this updated date back to the wizard activity.
+			Date newDate = cal.getTime();
+			((CreateEventInterface)getActivity()).setStartDate(newDate);
+
+			// Update the display text.
+			String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate);
+		    ((Button) findViewById(R.id.event_start_button)).setText(timeString);
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
 		}
     }
 
-    @SuppressLint("ValidFragment")
 	public class EndTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
+<<<<<<< HEAD
 			// Use the current time as the default values for the picker
 			// Set the default time in on create
 			Date endTime = ((CreateEventInterface) getActivity()).getEndDate();
 			Calendar c = Calendar.getInstance();
 			c.setTime(endTime);
 			Log.d("Herehere", Integer.toString(c.get(Calendar.HOUR))+ " " + Integer.toString(c.get(Calendar.MINUTE)) + " " + endTime.toString());
+=======
+			Date endTime = ((CreateEventInterface)getActivity()).getEndDate();
+			Calendar c = Calendar.getInstance();
+			c.setTime(endTime);
+
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
 			// Create a new instance of TimePickerDialog and return it
-			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR), c.get(Calendar.MINUTE), false);
+			return new TimePickerDialog(getActivity(), this, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false);
 		}
 		
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			// Create a new Date object with the updated time.
 			Calendar c = Calendar.getInstance();
 			c.setTime(((CreateEventInterface)getActivity()).getEndDate());
 			c.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			c.set(Calendar.MINUTE, minute);
+<<<<<<< HEAD
 			((CreateEventInterface)getActivity()).setEndDate(c.getTime());
 			String time = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.getTime());
 		    ((Button) findViewById(R.id.event_end_button)).setText(time);
+=======
+
+			// Send this updated date back to the wizard activity.
+			Date newDate = c.getTime();
+			((CreateEventInterface)getActivity()).setEndDate(newDate);
+
+			// Update the display text.
+			String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate);
+		    ((Button) findViewById(R.id.event_end_button)).setText(timeString);
+>>>>>>> 670218d... Attempt at fixing some of the time picker issues. Gave the settings menuitem an icon.
 		}
     }
     

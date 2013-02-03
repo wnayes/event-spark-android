@@ -41,7 +41,7 @@ public class CreateEventPage2EventTime extends Fragment {
         startSpinner.setAdapter(adapter);
         endSpinner.setAdapter(adapter);
         
-        Date startDate = ((CreateEventInterface)getActivity()).getDate();
+        Date startDate = ((CreateEventInterface)getActivity()).getStartDate();
         Calendar c = Calendar.getInstance();
         c.setTime(startDate);
         Calendar today = Calendar.getInstance();
@@ -72,7 +72,7 @@ public class CreateEventPage2EventTime extends Fragment {
         // Watch for changes to the date spinner.
         startSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	Date startDate = ((CreateEventInterface)getActivity()).getDate();
+            	Date startDate = ((CreateEventInterface)getActivity()).getStartDate();
             	Calendar c = Calendar.getInstance();
             	c.setTime(startDate);
             	Calendar today = Calendar.getInstance();
@@ -81,7 +81,7 @@ public class CreateEventPage2EventTime extends Fragment {
             		c.add(Calendar.DATE, 1);
             	else
             		c.add(Calendar.DATE, -1);
-            	((CreateEventInterface)getActivity()).setDate(c.getTime());
+            	((CreateEventInterface)getActivity()).setStartDate(c.getTime());
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}
@@ -89,7 +89,7 @@ public class CreateEventPage2EventTime extends Fragment {
         
         endSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	Date startDate = ((CreateEventInterface)getActivity()).getDate();
+            	Date startDate = ((CreateEventInterface)getActivity()).getStartDate();
             	Calendar c = Calendar.getInstance();
             	c.setTime(startDate);
             	Calendar today = Calendar.getInstance();
