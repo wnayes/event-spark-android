@@ -32,8 +32,6 @@ import com.actionbarsherlock.view.MenuItem;
 
 import com.google.android.gms.maps.model.LatLng;
 
-//import com.appchallenge.android.APICalls;
-
 /**
  * Wizard activity for creating new events.
  */
@@ -60,9 +58,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		return this.title;
 	}
 
-	
 	/**
-	 * 
+	 * The category the event fits into.
 	 */
 	private String type = "";
 	public void setType(String type) {
@@ -71,6 +68,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	public String getType() {
 		return this.type;
 	}
+
 	/**
 	 * The description of the event provided by the user.
 	 */
@@ -240,33 +238,26 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
-			// Prepare the date inputs to be in seconds.
-			long startTime = this.startDate.getTime() / 1000;
-			long endTime = this.endDate.getTime() / 1000;
-			Event newEvent = new Event(title, type, description, startTime, endTime, mapLocation);
-
 			// Perform an asynchrounous API call to create the new event.
+			Event newEvent = new Event(title, type, description, this.startDate, this.endDate, mapLocation);
 			createEventAPICaller apiCall = new createEventAPICaller();
-			//Toast.makeText(context, newEvent.toJSON(), duration).show();
 			apiCall.execute(newEvent);
 			return true;
 		}
 
         return super.onOptionsItemSelected(item);
     }
-    
+
     @Override
     public void onBackPressed() {
-    	// check if page 2 is open
-    	    
-    	    if(mPager.getCurrentItem() != 0){
-    	    	mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-    	    }
-    	    else{
-    	        super.onBackPressed(); 
-    	    }
-    	}
-    
+        // Have the back button go back one page instead of exit.
+        if (mPager.getCurrentItem() != 0) {
+            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+            return;
+        }
+        super.onBackPressed(); 
+    }
+
     /**
      * Shows the time picker to allow changing the Event time.
      * @param v

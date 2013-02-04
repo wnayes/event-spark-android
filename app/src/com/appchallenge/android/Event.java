@@ -1,5 +1,7 @@
 package com.appchallenge.android;
 
+import java.util.Date;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,8 +27,8 @@ public class Event {
 			this.title = jsonObject.get("title").toString();
 			//this.type = jsonObject.get("type").toString();
 			this.description = jsonObject.getString("description").toString();
-			this.startTime = jsonObject.getLong("start_date");
-			this.endTime = jsonObject.getLong("end_date");
+			this.startDate = new Date(jsonObject.getLong("start_date") * 1000);
+			this.endDate = new Date(jsonObject.getLong("end_date") * 1000);
 			double lat = jsonObject.getDouble("latitude");
 			double lng = jsonObject.getDouble("longitude");
 			this.location = new LatLng(lat, lng);
@@ -44,14 +46,14 @@ public class Event {
      * @param type
      * @param location
      */
-    public Event(String name, String type, String description, long startTime, long endTime, LatLng location) {
+    public Event(String name, String type, String description, Date startDate, Date endDate, LatLng location) {
     	this.id = -1;
         this.title = name;
         this.type = type;
         this.description = description;
         this.location = location;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     /**
@@ -95,19 +97,19 @@ public class Event {
     }
 
     /**
-     *  @return The start time of event in seconds.
+     *  @return The start date and time of the event.
      */
-    private long startTime;
-    public long getStartTime() {
-    	return this.startTime;
+    private Date startDate;
+    public Date getStartDate() {
+    	return this.startDate;
     }
 
     /**
-     *  @return The end time in seconds
+     *  @return The end date and time of the event
      */
-    private long endTime;
-    public long getEndTime() {
-    	return this.endTime;
+    private Date endDate;
+    public Date getEndDate() {
+    	return this.endDate;
     }
 
     /**
@@ -120,8 +122,8 @@ public class Event {
 			event.put("title", this.title);
 			event.put("type", this.type);
 			event.put("description", this.description);
-			event.put("start_date", this.startTime);
-			event.put("end_date", this.endTime);
+			event.put("start_date", this.startDate.getTime() / 1000);
+			event.put("end_date", this.endDate.getTime() / 1000);
 			event.put("latitude", this.location.latitude);
 			event.put("longitude", this.location.longitude);
 			
@@ -150,5 +152,4 @@ public class Event {
     public MarkerOptions toMarker(Boolean isDraggable) {
         return this.toMarker().draggable(isDraggable);
     }
-
 }
