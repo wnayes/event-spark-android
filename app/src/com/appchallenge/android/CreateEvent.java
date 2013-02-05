@@ -227,14 +227,19 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_next) {
-			// Advance to the next step in the wizard. If there is no
-            // next step, setCurrentItem will do nothing.
+			// Advance to the next step in the wizard after performing error checking.
 			if (mPager.getCurrentItem() == 0 && this.title == "") {
 				Toast.makeText(context, "Please enter a title for the event!", duration).show();
 				return true;
 			}
 
-			// TODO add error checking for valid times.
+			if (mPager.getCurrentItem() == 1) {
+				if (this.startDate.after(this.endDate) || this.endDate.before(new Date())) {
+					Toast.makeText(context, "Please enter a valid timespan!", duration).show();
+					return true;
+				}
+			}
+
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
