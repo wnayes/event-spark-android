@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 //import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -32,12 +33,14 @@ public class CreateEventPage3EventLocation extends SupportMapFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+    	String info = String.format("Move the marker to your location");
     	View view = super.onCreateView(inflater, container, savedInstanceState);
     	LatLng location = ((CreateEventInterface)getActivity()).getLocation();
     	getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
     	final Marker marker = getMap().addMarker(new MarkerOptions()
     	                       .position(location)
     	                       .title(((CreateEventInterface)getActivity()).getEventTitle())
+    	                       .snippet(info)
     	                       .draggable(true));
     	getMap().setOnMarkerDragListener(new OnMarkerDragListener(){
     					
@@ -53,6 +56,8 @@ public class CreateEventPage3EventLocation extends SupportMapFragment {
 			@Override
 			public void onMarkerDrag(Marker arg0){}
     	});
+    	marker.showInfoWindow();
+    	
     	
         return view;
     }
