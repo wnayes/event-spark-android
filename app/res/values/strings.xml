@@ -10,32 +10,26 @@
     <string name="menu_settings">Settings</string>
 
     <!-- Create Event wizard -->
-    
     <string name="event_create_image_flavor_text">Create Event Wizard</string>
     
-    <string name="event_create_instructions_1">Welcome to the Create Event Wizard!</string>
-    <string name="event_create_instructions_2">
-        This page lets you set the title, type, and description about the event.\n
-        Try to make your title something short and catchy.\n</string>
-        
-    <string name="event_time_page_sentence_1">Here you can set the start and end time of the event.</string>
-    
+    <string name="create_event_pagedescription_1">Hosting or attending a great event?\nLet others know by first entering some details!</string>
+    <string name="create_event_pagedescription_2">When can others find and attend this event?</string>
+
     <string name="event_location_page_sentence_1">Here you can move the marker to select your current position.</string>
     
     <string name="title_activity_create_event">Create Event</string>
-    <string name="event_name_page_title">Tell us about your event!</string>
     <string name="event_name_hint">What is it called?</string>
     <string name="event_description_hint">Any more details?</string>
     <string name="event_time_page_title">Event Time</string>
-    <string name="event_time_start">Enter Start Time:</string>
-    <string name="event_time_end">Enter End Time:</string>
-    <string name="change">Change</string>
+    <string name="event_time_start">Start Time</string>
+    <string name="event_time_end">End Time</string>
     <string name="action_back">Back</string>
     <string name="action_next">Next</string>
     <string name="action_finish">Submit</string>
     
     <!-- Event Details page -->
     <string name="title_activity_event_details">Event Details</string>
+    <string name="event_description_empty">No description given.</string>
 
     <!-- Strings and Arrays for the types spinner -->
     <string name="event_select_type">Select Type</string>

@@ -11,21 +11,18 @@
       android:focusableInTouchMode="true">
 
       <ImageView
-          android:id="@+id/imageView1"
+          android:id="@+id/logoBanner"
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
-          android:src="@drawable/temp2" 
+          android:layout_marginBottom="8sp"
+          android:src="@drawable/logo" 
           android:contentDescription="@string/event_create_image_flavor_text"/>
       
       <TextView 
           android:id="@+id/event_create_instructions_1"
-          style="@style/eventHoundTheme.sentence"
-          android:text="@string/event_create_instructions_1" />
-      
-      <TextView 
-          android:id="@+id/event_create_instructions_2"
-          style="@style/eventHoundTheme.sentence"
-          android:text="@string/event_create_instructions_2" />
+          android:text="@string/create_event_pagedescription_1"
+          android:gravity="center"
+          style="@style/eventHoundTheme.sentence" />
 
       <EditText android:id="@+id/event_name"
           style="@style/eventHoundTheme"

@@ -18,7 +18,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -30,8 +29,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
-import com.appchallenge.android.LocationFinder.GetLastLocation;
 
 /**
  * Displays a user's location and surrounding events.
@@ -183,7 +180,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			}
 			return true;
 		} else {
-			switch(item.getItemId()) {
+			switch (item.getItemId()) {
 			    case R.id.academics:
 				    filterSearch("Academics");
 				    break;
@@ -203,7 +200,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			    	filterSearch("Other");
 			    	break;
 			}
-			
 			return true;
 		}
 
@@ -332,8 +328,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		eventDetails.putExtra("id", selectedEvent.getId());
 		eventDetails.putExtra("title", selectedEvent.getTitle());
 		eventDetails.putExtra("description", selectedEvent.getDescription());
-		eventDetails.putExtra("startDate", selectedEvent.getStartTime());
-		eventDetails.putExtra("endDate", selectedEvent.getEndTime());
+		eventDetails.putExtra("type", selectedEvent.getType());
+		eventDetails.putExtra("startDate", selectedEvent.getStartDate());
+		eventDetails.putExtra("endDate", selectedEvent.getEndDate());
 		eventDetails.putExtra("latitude", selectedEvent.getLocation().latitude);
 		eventDetails.putExtra("longitude", selectedEvent.getLocation().longitude);
 		startActivity(eventDetails);

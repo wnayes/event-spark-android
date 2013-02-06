@@ -4,26 +4,28 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
         
         <ImageView
-          android:id="@+id/imageView1"
+          android:id="@+id/logoBanner"
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
-          android:layout_marginBottom="16sp"
-          android:src="@drawable/temp2" 
+          android:layout_marginBottom="8sp"
+          android:src="@drawable/logo" 
           android:contentDescription="@string/event_create_image_flavor_text"/>
         
         <TextView
-            android:text="@string/event_time_page_sentence_1"
+            android:text="@string/create_event_pagedescription_2"
+            android:gravity="center"
             style="@style/eventHoundTheme.sentence" />
         
         <TextView
             android:text="@string/event_time_start"
-            style="@style/eventHoundTheme" />
+            android:gravity="center"
+            style="@style/eventHoundTheme.smallHeading" />
         
         <!-- Event time controls -->
 
@@ -45,7 +47,8 @@
 
         <TextView
             android:text="@string/event_time_end"
-            style="@style/eventHoundTheme" />
+            android:gravity="center"
+            style="@style/eventHoundTheme.smallHeading" />
         
         <LinearLayout android:id="@+id/time_controls"
             android:orientation="horizontal"
