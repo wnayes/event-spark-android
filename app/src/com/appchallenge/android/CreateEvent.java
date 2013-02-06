@@ -61,11 +61,11 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	/**
 	 * The category the event fits into.
 	 */
-	private String type = "";
-	public void setType(String type) {
+	private Event.Type type;
+	public void setType(Event.Type type) {
 		this.type = type;
 	}
-	public String getType() {
+	public Event.Type getType() {
 		return this.type;
 	}
 

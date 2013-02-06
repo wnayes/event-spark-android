@@ -328,6 +328,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		eventDetails.putExtra("id", selectedEvent.getId());
 		eventDetails.putExtra("title", selectedEvent.getTitle());
 		eventDetails.putExtra("description", selectedEvent.getDescription());
+		eventDetails.putExtra("type", selectedEvent.getType());
 		eventDetails.putExtra("startDate", selectedEvent.getStartDate());
 		eventDetails.putExtra("endDate", selectedEvent.getEndDate());
 		eventDetails.putExtra("latitude", selectedEvent.getLocation().latitude);
