@@ -34,6 +34,7 @@ public class Event {
 			double lat = jsonObject.getDouble("latitude");
 			double lng = jsonObject.getDouble("longitude");
 			this.location = new LatLng(lat, lng);
+			this.attendance = jsonObject.getInt("attending");
 		} catch (JSONException e) {
 			Log.e(Event.class.toString(), "Failed parsing eventJSON in Event constructor.");
 			e.printStackTrace();
@@ -49,7 +50,10 @@ public class Event {
      * @param location
      */
     public Event(String name, Type type, String description, Date startDate, Date endDate, LatLng location) {
+    	// Defaults
     	this.id = -1;
+    	this.attendance = 1;
+
         this.title = name;
         this.type = type;
         this.description = description;
@@ -181,6 +185,15 @@ public class Event {
     public Date getEndDate() {
     	return this.endDate;
     }
+    
+    /**
+     * @return The number of users that have claimed they will attend
+     * the event from our app.
+     */
+    private int attendance;
+    public int getAttendance() {
+    	return this.attendance;
+    }
 
     /**
      * @return The Event stringified into a JSON object.
@@ -196,6 +209,7 @@ public class Event {
 			event.put("end_date", this.endDate.getTime() / 1000);
 			event.put("latitude", this.location.latitude);
 			event.put("longitude", this.location.longitude);
+			event.put("attending", this.attendance);
 		} catch (JSONException e) {
 			Log.e(Event.class.toString(), "Could not stringify existing Event object!");
 			e.printStackTrace();

@@ -19,7 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class EventDetails extends SherlockFragmentActivity implements EventDetailsInfoTab.InfoTabListener {
+public class EventDetails extends SherlockFragmentActivity implements EventDetailsInfoTab.InfoTabListener,
+                                                                      EventDetailsAttendanceTab.AttendanceTabListener,
+                                                                      EventDetailsLocationTab.LocationTabListener {
 	private int id;
 	
 	// Methods implementing InfoTabListener
@@ -42,8 +44,23 @@ public class EventDetails extends SherlockFragmentActivity implements EventDetai
 	public Date getEventEndDate() {
 		return this.endDate;
 	}
-
+	
+	// Methods implementing AttendanceTabListener
+	private int attendance;
+	public int getEventAttendance() {
+		return this.attendance;
+	}
+	
+	// Methods implementing LocationTabListener
 	private LatLng location;
+	public LatLng getEventLocation() {
+		return this.location;
+	}
+
+	private LatLng userLocation;
+	public LatLng getUserLocation() {
+		return this.userLocation;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +76,9 @@ public class EventDetails extends SherlockFragmentActivity implements EventDetai
 		this.endDate = (Date)intent.getSerializableExtra("endDate");
 		this.location = new LatLng(intent.getDoubleExtra("latitude", 0),
 		                           intent.getDoubleExtra("longitude", 0));
+		this.userLocation = new LatLng(intent.getDoubleExtra("userLatitude", 0),
+				                       intent.getDoubleExtra("userLongitude", 0));
+		this.attendance = intent.getIntExtra("attendance", 1);
 
 		// The home button takes the user back to the map display.
 		ActionBar bar = getSupportActionBar();
@@ -82,7 +102,11 @@ public class EventDetails extends SherlockFragmentActivity implements EventDetai
 		bar.addTab(attendTab);
 		bar.addTab(infoTab);
 		bar.addTab(locationTab);
-		bar.selectTab(infoTab);
+		
+		if (savedInstanceState != null)
+			bar.selectTab(bar.getTabAt(savedInstanceState.getInt("currentTab", 1)));
+		else
+		    bar.selectTab(infoTab);
 	}
 
 	@Override
@@ -102,6 +126,13 @@ public class EventDetails extends SherlockFragmentActivity implements EventDetai
 	      default:
 	         return super.onOptionsItemSelected(item);
 	   }
+	}
+	
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		// Prevent the current tab from being lost on rotation
+		savedInstanceState.putInt("currentTab", getSupportActionBar().getSelectedTab().getPosition());
+		
+		super.onSaveInstanceState(savedInstanceState);
 	}
 
 	/**

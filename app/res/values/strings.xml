@@ -30,6 +30,8 @@
     <!-- Event Details page -->
     <string name="title_activity_event_details">Event Details</string>
     <string name="event_description_empty">No description given.</string>
+    <string name="event_attendance_description">users have attended this event\nusing EventHound.</string>
+    <string name="event_get_directions">Get Directions</string>
 
     <!-- Strings and Arrays for the types spinner -->
     <string name="event_select_type">Select Type</string>

@@ -41,7 +41,7 @@ public class EventDetailsInfoTab extends Fragment {
 	    endCalendar.setTime(listener.getEventEndDate());
 
 	    String dateString = "";
-	    if (endCalendar.after(today)) {
+	    if (endCalendar.before(today)) {
 	    	dateString += "This event has ended.";
 	    	((TextView)infoView.findViewById(R.id.event_details_date_description)).setText(dateString);
 		    return infoView;
@@ -65,7 +65,7 @@ public class EventDetailsInfoTab extends Fragment {
 	}
 
 	/**
-	 * Interface allowing the tab fragments to receive Event information from
+	 * Interface allowing the info tab fragment to receive Event information from
 	 * the parent activity.
 	 */
 	public interface InfoTabListener {
