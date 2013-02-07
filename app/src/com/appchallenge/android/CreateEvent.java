@@ -17,6 +17,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -216,7 +217,15 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     public boolean onOptionsItemSelected(MenuItem item) {    
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
-    	
+
+        // Close the keyboard after each page change.
+        try {
+        	InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(this.getCurrentFocus().getApplicationWindowToken(), 0);
+        } catch (Exception e) {
+        	Log.w("CreateEvent.onOptionsItemSelected", "hideSoftInputFromWindow threw an error.");
+        }
+
         if (item.getItemId() == android.R.id.home) {
 			// See http://developer.android.com/design/patterns/navigation.html for more.
 			NavUtils.navigateUpTo(this, new Intent(this, EventViewer.class));

@@ -190,7 +190,7 @@ public class Event {
     	try {
     		event.put("id", this.id);
 			event.put("title", this.title);
-			event.put("type", this.type);
+			event.put("type", this.type.getValue());
 			event.put("description", this.description);
 			event.put("start_date", this.startDate.getTime() / 1000);
 			event.put("end_date", this.endDate.getTime() / 1000);

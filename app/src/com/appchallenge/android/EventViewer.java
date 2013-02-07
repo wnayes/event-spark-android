@@ -1,5 +1,6 @@
 package com.appchallenge.android;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 
@@ -22,6 +23,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,11 +31,13 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.appchallenge.android.Event.Type;
+import com.appchallenge.android.TypeFilterDialogFragment.TypeFilterDialogListener;
 
 /**
  * Displays a user's location and surrounding events.
  */
-public class EventViewer extends SherlockFragmentActivity implements LocationListener, LocationSource, OnInfoWindowClickListener {
+public class EventViewer extends SherlockFragmentActivity implements LocationListener, LocationSource, OnInfoWindowClickListener, TypeFilterDialogListener {
     /**
      * Object representing the Google Map display of our Events.
      * Note that this may be null if the Google Play services APK is not available.
@@ -68,12 +72,29 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * target Event.
      */
     HashMap<Marker, Integer> eventMarkerMap = new HashMap<Marker, Integer>();
+    
+    /**
+     * Collection of event Types used for filtering events. The user
+     * can choose to remove these using the TypeFilterDialogFragment from the
+     * action bar.
+     */
+    ArrayList<Event.Type> filterTypes = new ArrayList<Event.Type>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
-        
+
+        // Instantiate the list of visible types.
+        if (filterTypes.size() == 0) {
+        	filterTypes.add(Event.Type.ACADEMICS);
+        	filterTypes.add(Event.Type.ATHLETICS);
+        	filterTypes.add(Event.Type.ENTERTAINMENT);
+        	filterTypes.add(Event.Type.PROMOTIONS);
+        	filterTypes.add(Event.Type.SOCIAL);
+        	filterTypes.add(Event.Type.OTHER);
+        }
+
         // We may be reloading due to a configuration change.
         // Load any available information from the previous instance.
         if (savedInstanceState != null) {
@@ -97,7 +118,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         }
 
         setUpMapIfNeeded();
-        
+
         if (savedInstanceState != null) {
         	// Feed the map listener it's previous to restore the location indicator.
         	if (savedInstanceState.containsKey("currentLatitude") &&
@@ -124,11 +145,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         super.onResume();
         setUpMapIfNeeded();
         mMap.setMyLocationEnabled(true);
-    }
-    
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
     
     @Override
@@ -179,45 +195,14 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
 			}
 			return true;
-		} else {
-			switch (item.getItemId()) {
-			    case R.id.academics:
-				    filterSearch("Academics");
-				    break;
-			    case R.id.athletics:
-			    	filterSearch("Athletics");
-				    break;
-			    case R.id.entertainmnet:
-			    	filterSearch("Entertainment");
-			    	break;
-			    case R.id.promotions:
-			    	filterSearch("Promotions");
-			    	break;
-			    case R.id.social:
-			    	filterSearch("Social");
-			    	break;
-			    case R.id.other:
-			    	filterSearch("Other");
-			    	break;
-			}
+		} else if (item.getItemId() == R.id.menu_type_filter) {
+			// Show dialog allowing the user to view only certain event types.
+			DialogFragment typeFilterDialog = new TypeFilterDialogFragment();
+			typeFilterDialog.show(getSupportFragmentManager(), "typeFilterDialog");
 			return true;
 		}
 
-        //return super.onOptionsItemSelected(item);
-    }
-    
-    public void filterSearch(String type) {
-    	
-    	setUpMapIfNeeded();
-    	mMap.clear();
-        eventMarkerMap.clear();
-        for (Event event : this.currentEvents) {
-        	if (event.getType().equals(type)){
-    		    Marker m = mMap.addMarker(event.toMarker());
-    		    eventMarkerMap.put(m, event.getId());
-        	}
-    	}
-    	
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -347,11 +332,36 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	mMap.clear();
         eventMarkerMap.clear();
         for (Event event : this.currentEvents) {
-    		Marker m = mMap.addMarker(event.toMarker());
-    		eventMarkerMap.put(m, event.getId());
+        	// Only display events that match the currently filtered type list.
+        	if (filterTypes.contains(event.getType())) {
+    		    Marker m = mMap.addMarker(event.toMarker());
+    		    eventMarkerMap.put(m, event.getId());
+        	}
     	}
     }
-    
+
+    /**
+	 * Interface method for receiving a filter list of event types from
+	 * a TypeFilterDialogFragment.
+	 */
+	public void onDialogOKClick(DialogFragment dialog, ArrayList<Event.Type> selectedTypes) {
+		Log.d("EventViewer.onDialogOKClick", "Received list of selected types: " + selectedTypes.toString());
+		
+		// Replace the previous type filter list with the newly created one.
+		filterTypes = selectedTypes;
+		
+		// Force reloading the markers to perform the filter.
+		this.reloadEventMarkers();
+	}
+	
+	/**
+	 * Interface method for passing the current Type filter to a
+	 * TypeFilterDialogFragment for initializing the checkboxes.
+	 */
+	public ArrayList<Type> receiveCurrentFilterList() {
+		return this.filterTypes;
+	}
+
     private AlertDialog noLocationSourceDialog;
     private void showNoLocationSourceDialog() {
     	if (noLocationSourceDialog != null) {

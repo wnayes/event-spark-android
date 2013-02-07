@@ -1,5 +1,7 @@
 package com.appchallenge.android;
 
+import com.appchallenge.android.Event.Type;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -65,7 +67,7 @@ public class CreateEventPage1EventName extends Fragment {
         typeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
             	// Grab the enum by matching the indices of this spinner to the enumerated types.
-            	int index = (position >= 5 ? 0 : position + 1);
+            	int index = (position == Type.values().length - 1 ? 0 : position + 1);
             	((CreateEventInterface)getActivity()).setType(Event.Type.typeIndices[index]);
             }
             // Interface requirements

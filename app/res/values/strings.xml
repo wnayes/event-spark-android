@@ -34,6 +34,11 @@
     <!-- Strings and Arrays for the types spinner -->
     <string name="event_select_type">Select Type</string>
     <string name="event_spinner_title">Select Type of Event:</string>
+    
+    <!-- Dialogs -->
+    <string name="filter_types_title">Filter By Type</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
     <string-array name="type_array">
         <item>Academics</item>
