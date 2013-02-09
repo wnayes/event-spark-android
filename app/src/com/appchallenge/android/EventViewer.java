@@ -309,7 +309,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		}
 		
 		// Pass information about the event to the details activity.
-		Intent eventDetails = new Intent(EventViewer.this, EventDetails.class);
+		Intent eventDetails = new Intent(EventViewer.this, EventDetails_2.class);
 		eventDetails.putExtra("id", selectedEvent.getId());
 		eventDetails.putExtra("title", selectedEvent.getTitle());
 		eventDetails.putExtra("description", selectedEvent.getDescription());

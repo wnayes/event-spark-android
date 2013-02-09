@@ -47,7 +47,7 @@
             android:value="@string/maps_api_key_debug" />
 
         <activity
-            android:name="com.appchallenge.android.EventDetails"
+            android:name="com.appchallenge.android.EventDetails_2"
             android:label="@string/title_activity_event_details" >
         </activity>
     </application>

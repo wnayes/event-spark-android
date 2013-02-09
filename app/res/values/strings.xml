@@ -32,6 +32,7 @@
     <string name="event_description_empty">No description given.</string>
     <string name="event_attendance_description">users have attended this event\nusing EventHound.</string>
     <string name="event_get_directions">Get Directions</string>
+    <string name="join_event">Join</string>
 
     <!-- Strings and Arrays for the types spinner -->
     <string name="event_select_type">Select Type</string>
@@ -59,5 +60,6 @@
     <!-- Other strings -->
     <string name="lorem_ipsum"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et magna ut erat elementum cursus in quis ipsum. Nam faucibus ultrices eros, vel tempor leo semper sit amet. Duis magna quam, congue vitae interdum nec, condimentum ut lectus. Sed commodo venenatis eros a dignissim. Nunc adipiscing turpis nec magna venenatis at ultricies ipsum bibendum. Sed volutpat urna quis nisi vulputate egestas. Etiam eu dui a enim lacinia dapibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.\n\nPhasellus orci mi, eleifend nec congue id, volutpat at neque. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer semper velit vel leo rutrum sed fermentum elit porta.]]></string>
     <string name="hello_world">Hello world!</string>
+    <string name="event_holder">Show</string>
 
 </resources>

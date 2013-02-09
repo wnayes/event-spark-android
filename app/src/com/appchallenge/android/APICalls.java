@@ -18,6 +18,79 @@ public class APICalls {
 	 * Performs the HTTP REST API request for a JSON listing of the
      * events nearest to the user's location.
      */
+	
+	public static int getAttendance(int id) {
+		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/getAttend/";
+		RestClient client = new RestClient(getAttendUrl);
+		
+		client.AddParam("id", Integer.toString(id));
+		
+		try {
+            client.Execute(RestClient.RequestMethod.GET);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    	Log.d("APICalls.getAttendance", (client.getResponse() == null) ? "" : client.getResponse());
+
+        // Parse the given Events and create an ArrayList.
+    	int attending = 0;
+    	
+    	try {
+            JSONObject eventJSON = new JSONObject(client.getResponse());
+            attending = Integer.parseInt((eventJSON.get("attending").toString()));
+            
+            if (!eventJSON.has("attending")) {
+            	Log.e("APICalls.getAttendance", "'attending' key not present");
+            	return (Integer) null;
+            }
+
+    	} catch (JSONException e) {
+            Log.e(APICalls.class.toString(), "Error parsing list of Events in getAttendance()");
+            e.printStackTrace();
+            return (Integer) null;
+        }
+    	
+    	return attending;
+		
+	}
+	
+	
+	public static int joinAttendance(int id) {
+		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/attend/";
+		RestClient client = new RestClient(getAttendUrl);
+		
+		client.AddParam("id", Integer.toString(id));
+		
+		try {
+            client.Execute(RestClient.RequestMethod.POST);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    	Log.d("APICalls.joinAttendance", (client.getResponse() == null) ? "" : client.getResponse());
+
+        // Parse the given Events and create an ArrayList.
+    	int attending = 0;
+    	
+    	try {
+            JSONObject eventJSON = new JSONObject(client.getResponse());            
+            if (!eventJSON.has("text")) {
+            	Log.e("APICalls.joinAttendance", "'text' key not present");
+            	return (Integer) null;
+            }
+            attending = 1;
+
+    	} catch (JSONException e) {
+            Log.e(APICalls.class.toString(), "Error parsing list of Events in joinAttendance()");
+            e.printStackTrace();
+            return (Integer) null;
+        }
+    	
+    	return attending;
+		
+	}
+	
     public static Event[] getEventsNearLocation(LatLng location) {
         String getEventsUrl = "http://saypoint.dreamhosters.com/api/events/search/";
         RestClient client = new RestClient(getEventsUrl);
