@@ -9,7 +9,7 @@
     <!-- Refresh event listing. -->
     <item android:id="@+id/menu_refresh_events"
           android:icon="@drawable/refresh"
-          android:title="@string/menu_refresh_events"
+          android:title="@string/refresh"
           android:showAsAction="ifRoom" />
     
     <!-- Show the event type filter dialog. -->

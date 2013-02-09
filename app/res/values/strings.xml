@@ -6,7 +6,7 @@
     <!-- Event Viewer -->
     <string name="title_activity_event_viewer">EventViewer</string>
     <string name="menu_create_event">Create Event</string>
-    <string name="menu_refresh_events">Refresh</string>
+    <string name="refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
 
     <!-- Create Event wizard -->
@@ -31,8 +31,10 @@
     <string name="title_activity_event_details">Event Details</string>
     <string name="event_description_empty">No description given.</string>
     <string name="event_attendance_description">users have attended this event\nusing EventHound.</string>
+
     <string name="event_get_directions">Get Directions</string>
     <string name="join_event">Join</string>
+
 
     <!-- Strings and Arrays for the types spinner -->
     <string name="event_select_type">Select Type</string>

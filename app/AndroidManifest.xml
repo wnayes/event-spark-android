@@ -41,6 +41,10 @@
             android:name="com.appchallenge.android.CreateEvent"
             android:label="@string/title_activity_create_event" >
         </activity>
+        <activity
+            android:name="com.appchallenge.android.EventDetails"
+            android:label="@string/title_activity_event_details" >
+        </activity>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
@@ -50,6 +54,7 @@
             android:name="com.appchallenge.android.EventDetails_2"
             android:label="@string/title_activity_event_details" >
         </activity>
+
     </application>
 
 </manifest>
