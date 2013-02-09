@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+    
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/event_holder"
+            android:textSize="25sp"
+            android:layout_marginBottom="20sp" />
+
+         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+    
+            <TextView
+                android:id="@+id/attending"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/event_holder"
+                android:gravity="center"
+                android:textSize="17sp"/>
+         
+            <Button
+                android:id="@+id/join_event"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/join_event"
+                android:onClick="joinEvent"
+                android:layout_weight="1.25" />
+
+            <Button
+                android:id="@+id/get_directions"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/event_get_directions"
+                android:layout_weight="1" />
+
+         </LinearLayout>        
+         
+         <TextView
+            android:id="@+id/end_date"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/event_holder" />
+    
+         <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/event_holder" />
+    
+    </LinearLayout>
+
+</ScrollView>
