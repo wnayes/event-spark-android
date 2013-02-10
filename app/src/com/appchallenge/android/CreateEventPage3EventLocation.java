@@ -7,6 +7,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -31,36 +33,35 @@ public class CreateEventPage3EventLocation extends SupportMapFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-    	String info = String.format("Move the marker to your location");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	View view = super.onCreateView(inflater, container, savedInstanceState);
     	LatLng location = ((CreateEventInterface)getActivity()).getLocation();
     	getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
-    	final Marker marker = getMap().addMarker(new MarkerOptions()
-    	                       .position(location)
-    	                       .title(((CreateEventInterface)getActivity()).getEventTitle())
-    	                       .snippet(info)
-    	                       .draggable(true));
-    	getMap().setOnMarkerDragListener(new OnMarkerDragListener(){
-    					
+
+    	// Match the marker color to the event type.
+    	float typeColor = ((CreateEventInterface)getActivity()).getType().color();
+    	BitmapDescriptor markerColor = BitmapDescriptorFactory.defaultMarker(typeColor);
+    	
+        MarkerOptions m = new MarkerOptions().position(location)
+                                             .title(((CreateEventInterface)getActivity()).getEventTitle())
+                                             .snippet("Move the marker to the event.")
+                                             .icon(markerColor)
+                                             .draggable(true);
+        final Marker marker = getMap().addMarker(m);
+
+        // Set a listener to update the marker location when dragged by the user.
+    	getMap().setOnMarkerDragListener(new OnMarkerDragListener() {		
 			@Override
 			public void onMarkerDragEnd(Marker arg0) {
-				LatLng new_location = marker.getPosition();
-	    		((CreateEventInterface)getActivity()).setLocation(new_location);
+	    		((CreateEventInterface)getActivity()).setLocation(marker.getPosition());
 			}
 			
-			//Unused Functions
-			@Override
-			public void onMarkerDragStart(Marker arg0){}			
-			@Override
-			public void onMarkerDrag(Marker arg0){}
+			// Unused interface methods
+			public void onMarkerDragStart(Marker arg0) {}
+			public void onMarkerDrag(Marker arg0) {}
     	});
+
     	marker.showInfoWindow();
-    	
-    	
         return view;
     }
-
-
 }

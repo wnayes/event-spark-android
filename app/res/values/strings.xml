@@ -34,7 +34,10 @@
 
     <string name="event_get_directions">Get Directions</string>
     <string name="join_event">Join</string>
-
+    <plurals name="users_attending">
+        <item quantity="one">One user is attending.</item>
+        <item quantity="other">%d users are attending.</item>
+    </plurals>
 
     <!-- Strings and Arrays for the types spinner -->
     <string name="event_select_type">Select Type</string>

@@ -18,6 +18,13 @@
             android:layout_height="wrap_content"
             android:textSize="25sp"/>
         
+        <!-- Attendance Description -->
+        <TextView
+            android:id="@+id/event_details_attendance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"/>
+        
         <!-- Date Description -->
         <TextView
             android:id="@+id/event_details_date_description"

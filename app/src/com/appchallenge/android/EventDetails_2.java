@@ -23,35 +23,25 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class EventDetails_2 extends SherlockFragmentActivity {
 
-	private int id;
-	private String title;
-	private String description;
-	private Date startDate;
-	private Date endDate;
-	private LatLng location;
+	private Event event;
 	private LatLng userLocation;
-	private int attendance;	
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.event_details_2);
         
 		Intent intent = getIntent();
-		this.id = intent.getIntExtra("id", -1);
-		this.title = intent.getStringExtra("title");
-		this.description = intent.getStringExtra("description");
-		this.startDate = (Date)intent.getSerializableExtra("startDate");
-		this.endDate = (Date)intent.getSerializableExtra("endDate");
-		this.location = new LatLng(intent.getDoubleExtra("latitude", 0),
-		                           intent.getDoubleExtra("longitude", 0));
+		this.event = intent.getParcelableExtra("event");
 		this.userLocation = new LatLng(intent.getDoubleExtra("userLatitude", 0),
 				                       intent.getDoubleExtra("userLongitude", 0));
-		this.attendance = APICalls.getAttendance(this.id);
-		Log.d("this", Integer.toString(this.attendance));
-		((TextView) findViewById(R.id.title)).setText(this.title);
-		((TextView) findViewById(R.id.description)).setText(this.description);
-		((TextView) findViewById(R.id.attending)).setText("Attending: " + Integer.toString(this.attendance));
-		((TextView) findViewById(R.id.end_date)).setText("End Date: " + this.endDate.toString());
+		
+		// This network operation was called on the main thread.
+		//this.attendance = APICalls.getAttendance(this.id);
+		Log.d("this", Integer.toString(this.event.getAttendance()));
+		((TextView) findViewById(R.id.title)).setText(this.event.getTitle());
+		((TextView) findViewById(R.id.description)).setText(this.event.getDescription());
+		((TextView) findViewById(R.id.attending)).setText("Attending: " + Integer.toString(this.event.getAttendance()));
+		((TextView) findViewById(R.id.end_date)).setText("End Date: " + this.event.getEndDate().toString());
 		
 		
 		Button button = (Button) findViewById(R.id.get_directions);
@@ -59,7 +49,7 @@ public class EventDetails_2 extends SherlockFragmentActivity {
             public void onClick(View v) {
             	// Prepare maps url query url parameters.
             	LatLng startLoc = userLocation;
-            	LatLng endLoc = location;
+            	LatLng endLoc = event.getLocation();
             	String startCoords = ((Double)startLoc.latitude).toString() + "," + ((Double)startLoc.longitude).toString();
             	String endCoords = ((Double)endLoc.latitude).toString() + "," + ((Double)endLoc.longitude).toString();
             	String url = "http://maps.google.com/maps?saddr=" + startCoords + "&daddr=" + endCoords;
@@ -71,7 +61,7 @@ public class EventDetails_2 extends SherlockFragmentActivity {
             }
         });
 		
-		Log.d("id", Integer.toString(this.id));
+		Log.d("id", Integer.toString(this.event.getId()));
 	}
 	
 	@Override
@@ -89,7 +79,7 @@ public class EventDetails_2 extends SherlockFragmentActivity {
 	         finish();
 	         return true;
 	      case R.id.menu_refresh_events:
-	    	 APICalls.getAttendance(this.id);
+	    	 APICalls.getAttendance(this.event.getId());
 	    	 return true;
 	      default:
 	         return super.onOptionsItemSelected(item);
@@ -105,7 +95,7 @@ public class EventDetails_2 extends SherlockFragmentActivity {
 	
 	public void joinEvent (View v) {
 		loadAttendeesCaller attendees = new loadAttendeesCaller();
-		attendees.execute(this.id);
+		attendees.execute(this.event.getId());
 		int join = 0;
 		try {
 			join = attendees.get();
@@ -122,9 +112,9 @@ public class EventDetails_2 extends SherlockFragmentActivity {
 			Toast.makeText(context, "Failed to join event", duration).show();
 		}
 		else {
-		this.attendance = APICalls.getAttendance(this.id);
-		((TextView) findViewById(R.id.attending)).setText("Attending: " + Integer.toString(this.attendance));
-	
+			// Main thread networking call.
+		    //this.attendance = APICalls.getAttendance(this.id);
+		    ((TextView) findViewById(R.id.attending)).setText("Attending: " + Integer.toString(this.event.getAttendance()));
 		}
 		
 	}
@@ -155,13 +145,6 @@ public class EventDetails_2 extends SherlockFragmentActivity {
 				(Toast.makeText(getApplicationContext(), "Could load attending!", Toast.LENGTH_LONG)).show();
 				return;
 			}
-			
-			// Add the event to the event viewer.
-			
 		}
 	}
-		
-	
-	
-	
 }

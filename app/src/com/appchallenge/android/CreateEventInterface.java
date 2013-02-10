@@ -1,6 +1,8 @@
 package com.appchallenge.android;
 
 import java.util.Date;
+
+import com.appchallenge.android.Event.Type;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -23,7 +25,7 @@ public interface CreateEventInterface {
 	public LatLng getLocation();
 	public void setLocation(LatLng location);
 	
-	public Event.Type getType();
-	public void setType(Event.Type type);
+	public Type getType();
+	public void setType(Type type);
 
 }

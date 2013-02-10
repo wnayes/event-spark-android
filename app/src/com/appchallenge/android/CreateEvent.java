@@ -149,29 +149,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         // Set the map location to use the location given from the EventViewer.
         if (mapLocation == null) {
             Intent receivedIntent = getIntent();
-            mapLocation = new LatLng(receivedIntent.getDoubleExtra("latitude", 0),
-                                     receivedIntent.getDoubleExtra("longitude", 0));
-        }
-
-        // Set the initial date values for the event.
-        if ((savedInstanceState != null) && savedInstanceState.containsKey("startDate") && savedInstanceState.containsKey("endDate")) {
-        	this.startDate = new Date(savedInstanceState.getLong("startDate"));
-        	this.endDate = new Date(savedInstanceState.getLong("endDate"));
-        }
-        else if (this.startDate == null && this.endDate == null) {
-        	this.startDate = new Date();
-        	Calendar c = Calendar.getInstance();
-           	c.add(Calendar.HOUR_OF_DAY, 3);
-            this.endDate = c.getTime();
-            Log.d("set startDate", ((Long)this.startDate.getTime()).toString());
-            Log.d("set endDate", ((Long)this.endDate.getTime()).toString());
-        }
-
-        // Set the map location to use the location given from the EventViewer.
-        if (mapLocation == null) {
-            Intent receivedIntent = getIntent();
-            mapLocation = new LatLng(receivedIntent.getDoubleExtra("latitude", 0),
-                                     receivedIntent.getDoubleExtra("longitude", 0));
+            mapLocation = receivedIntent.getParcelableExtra("location");
         }
 
         // Instantiate a ViewPager and a PagerAdapter.
@@ -410,8 +388,10 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 				return;
 			}
 			
-			// Add the event to the event viewer.
-			
+			// Pass the new event to the event viewer.
+			Intent intent = new Intent(CreateEvent.this, EventViewer.class);
+			intent.putExtra("event", result);
+			CreateEvent.this.setResult(RESULT_OK, intent);
 			CreateEvent.this.finish();
 		}
 	}

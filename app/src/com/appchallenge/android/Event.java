@@ -5,6 +5,8 @@ import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -16,7 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Representation of an Event, client-side.
  * Can be built either from a JSONObject containing event details or from scratch.
  */
-public class Event {
+public class Event implements Parcelable {
     /**
      * Create an Event from API-generated JSON.
      */
@@ -235,5 +237,52 @@ public class Event {
      */
     public MarkerOptions toMarker(Boolean isDraggable) {
         return this.toMarker().draggable(isDraggable);
+    }
+
+    // Methods implementing Parcelable.
+	public int describeContents() { return 0; }
+
+	/**
+	 * Writes the contents of an Event to a Parcel.
+	 */
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(this.id);
+		dest.writeString(this.title);
+		dest.writeInt(this.type.getValue());
+		dest.writeString(this.description);
+		dest.writeDouble(this.location.latitude);
+		dest.writeDouble(this.location.longitude);
+		dest.writeLong(this.startDate.getTime());
+		dest.writeLong(this.endDate.getTime());
+		dest.writeInt(this.attendance);
+	}
+	
+	/**
+	 * Static field used to regenerate object, individually or as arrays
+	 */
+	public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
+	    public Event createFromParcel(Parcel pc) {
+	        return new Event(pc);
+	    }
+	    public Event[] newArray(int size) {
+	        return new Event[size];
+	    }
+    };
+
+	/**
+	 * Constructor to recreate an event from a Parcel.
+	 * Must read the contents in the same order they were added in @writeToParcel.
+	 * @param pc
+	 */
+    public Event(Parcel pc){
+    	this.id = pc.readInt();
+    	this.title = pc.readString();
+    	this.type = Type.typeIndices[pc.readInt()];
+    	this.description = pc.readString();
+    	this.location = new LatLng(pc.readDouble(), pc.readDouble());
+    	this.startDate = new Date(pc.readLong());
+    	this.endDate = new Date(pc.readLong());
+    	this.attendance = pc.readInt();
     }
 }

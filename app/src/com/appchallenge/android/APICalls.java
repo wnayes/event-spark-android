@@ -42,13 +42,13 @@ public class APICalls {
             
             if (!eventJSON.has("attending")) {
             	Log.e("APICalls.getAttendance", "'attending' key not present");
-            	return (Integer) null;
+            	return 0;
             }
 
     	} catch (JSONException e) {
             Log.e(APICalls.class.toString(), "Error parsing list of Events in getAttendance()");
             e.printStackTrace();
-            return (Integer) null;
+            return 0;
         }
     	
     	return attending;
@@ -77,21 +77,21 @@ public class APICalls {
             JSONObject eventJSON = new JSONObject(client.getResponse());            
             if (!eventJSON.has("text")) {
             	Log.e("APICalls.joinAttendance", "'text' key not present");
-            	return (Integer) null;
+            	return 0;
             }
             attending = 1;
 
     	} catch (JSONException e) {
             Log.e(APICalls.class.toString(), "Error parsing list of Events in joinAttendance()");
             e.printStackTrace();
-            return (Integer) null;
+            return 0;
         }
     	
     	return attending;
 		
 	}
 	
-    public static Event[] getEventsNearLocation(LatLng location) {
+    public static ArrayList<Event> getEventsNearLocation(LatLng location) {
         String getEventsUrl = "http://saypoint.dreamhosters.com/api/events/search/";
         RestClient client = new RestClient(getEventsUrl);
 
@@ -133,8 +133,7 @@ public class APICalls {
         }
 
     	Log.d("APICalls.getEventsNearLocation", "Found " + events.size() + " events.");
-
-        return (Event[])events.toArray(new Event[events.size()]);
+        return events;
     }
 
     /**

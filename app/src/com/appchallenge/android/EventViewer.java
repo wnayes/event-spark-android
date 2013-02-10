@@ -1,9 +1,12 @@
 package com.appchallenge.android;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -64,7 +67,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     /**
      * Array of Events we have downloaded for the user.
      */
-    private Event[] currentEvents;
+    private ArrayList<Event> currentEvents;
     
     /**
      * Maps the existing markers to their corresponding Event ID.
@@ -104,9 +107,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
             String[] JSONEvents = savedInstanceState.getStringArray("currentEvents");
             if (JSONEvents != null) {
-            	this.currentEvents = new Event[JSONEvents.length];
+            	this.currentEvents = new ArrayList<Event>();
                 for (int i = 0; i < JSONEvents.length; ++i)
-            	    this.currentEvents[i] = new Event(JSONEvents[i]);
+            	    this.currentEvents.add(new Event(JSONEvents[i]));
                 reloadEventMarkers();
             }
             
@@ -161,6 +164,31 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         super.onStop();
     }
 
+    /**
+     * Receives the result of the event creation wizard.
+     */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	Log.d("EventViewer.onActivityResult", "Received intent back from creation wizard.");
+    	if (resultCode == RESULT_OK) {
+    		// Show the user the newly created event.
+    		Event event = data.getParcelableExtra("event");
+    		if (event == null)
+    			return;
+    		
+    		// Display the new marker
+    		this.currentEvents.add(event);
+    		Marker m = mMap.addMarker(event.toMarker());
+		    eventMarkerMap.put(m, event.getId());
+		    
+		    // Pan and zoom to this new marker.
+		    CameraUpdate viewEvent = CameraUpdateFactory.newLatLngZoom(event.getLocation(), 18);
+		    mMap.animateCamera(viewEvent);
+		    
+		    // Show the info window for the new event.
+		    m.showInfoWindow();
+    	}
+    }
+
     private Menu _menu;
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -177,13 +205,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
 
 			// Pass the current location to the wizard so the maps appear synced.
-			if (currentLocation != null) {
-                createEvent.putExtra("latitude", currentLocation.latitude);
-			    createEvent.putExtra("longitude", currentLocation.longitude);
-			}
+			if (currentLocation != null)
+                createEvent.putExtra("location", this.currentLocation);
 
 			// Launch the wizard for creating a new event.
-			startActivity(createEvent);
+			startActivityForResult(createEvent, 0);
 			return true;
 		} else if (item.getItemId() == R.id.menu_refresh_events) {
 			// Refresh the event listing.
@@ -225,9 +251,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	// Our Events cannot be directly put into the Bundle, but
     	// they can be stringified back into JSON first.
     	if (this.currentEvents != null) {
-            String[] JSONEvents = new String[this.currentEvents.length];
-            for (int i = 0; i < this.currentEvents.length; ++i) {
-    	    	JSONEvents[i] = this.currentEvents[i].toJSON();
+            String[] JSONEvents = new String[this.currentEvents.size()];
+            for (int i = 0; i < this.currentEvents.size(); ++i) {
+    	    	JSONEvents[i] = this.currentEvents.get(i).toJSON();
             }
             savedInstanceState.putStringArray("currentEvents", JSONEvents);
     	}
@@ -309,18 +335,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		}
 		
 		// Pass information about the event to the details activity.
-		Intent eventDetails = new Intent(EventViewer.this, EventDetails_2.class);
-		eventDetails.putExtra("id", selectedEvent.getId());
-		eventDetails.putExtra("title", selectedEvent.getTitle());
-		eventDetails.putExtra("description", selectedEvent.getDescription());
-		eventDetails.putExtra("type", selectedEvent.getType());
-		eventDetails.putExtra("startDate", selectedEvent.getStartDate());
-		eventDetails.putExtra("endDate", selectedEvent.getEndDate());
-		eventDetails.putExtra("latitude", selectedEvent.getLocation().latitude);
-		eventDetails.putExtra("longitude", selectedEvent.getLocation().longitude);
-		eventDetails.putExtra("userLatitude", currentLocation.latitude);
-		eventDetails.putExtra("userLongitude", currentLocation.longitude);
-		eventDetails.putExtra("attendance", selectedEvent.getAttendance());
+		Intent eventDetails = new Intent(EventViewer.this, EventDetails.class);
+		eventDetails.putExtra("event", selectedEvent);
+		eventDetails.putExtra("userLocation", this.currentLocation);
 		startActivity(eventDetails);
 	}
 
@@ -328,7 +345,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * Adds the current Events tracked in this activity to the map.
      */
     private void reloadEventMarkers() {
-    	if (this.currentEvents == null || this.currentEvents.length == 0)
+    	if (this.currentEvents == null || this.currentEvents.size() == 0)
     		return;
 
     	setUpMapIfNeeded();
@@ -455,13 +472,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	/**
 	 * Performs an asynchronous API call to find nearby events.
 	 */
-	private class getEventsNearLocationAPICaller extends AsyncTask<LatLng, Void, Event[]> {
+	private class getEventsNearLocationAPICaller extends AsyncTask<LatLng, Void, ArrayList<Event>> {
 		/**
 		 * Quick access to the refresh button in the actionbar.
 		 */
 		MenuItem refreshItem;
 
-		@Override
 		protected void onPreExecute() {
 			// Establish progress UI changes.
 			if (_menu != null) {
@@ -471,13 +487,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			}
 		}
 
-		@Override
-		protected Event[] doInBackground(LatLng... location) {
+		protected ArrayList<Event> doInBackground(LatLng... location) {
 			return APICalls.getEventsNearLocation(location[0]);
 		}
 
-		@Override
-		protected void onPostExecute(Event[] result) {
+		@SuppressWarnings("unchecked")
+		protected void onPostExecute(ArrayList<Event> result) {
 			// Remove progress UI.
 			if (refreshItem != null)
 			    refreshItem.setActionView(null);
@@ -492,7 +507,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 				return;
 			}
 
-			currentEvents = result.clone();
+			currentEvents = (ArrayList<Event>)result.clone();
 			reloadEventMarkers();
 		}
 	}

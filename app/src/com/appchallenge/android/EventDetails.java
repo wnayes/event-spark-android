@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -26,13 +25,7 @@ import android.widget.TextView;
 
 public class EventDetails extends SherlockFragmentActivity {
 	// Private members containing the Event information.
-	private int id;
-	private String title;
-	private String description;
-	private Date startDate;
-	private Date endDate;
-	private int attendance;
-	private LatLng location;
+	private Event event;
 	private LatLng userLocation;
 
 	@Override
@@ -42,39 +35,35 @@ public class EventDetails extends SherlockFragmentActivity {
 
 		// Receive Event information to display via Intent.
 		Intent intent = getIntent();
-		this.id = intent.getIntExtra("id", -1);
-		this.title = intent.getStringExtra("title");
-		this.description = intent.getStringExtra("description");
-		this.startDate = (Date)intent.getSerializableExtra("startDate");
-		this.endDate = (Date)intent.getSerializableExtra("endDate");
-		this.location = new LatLng(intent.getDoubleExtra("latitude", 0),
-		                           intent.getDoubleExtra("longitude", 0));
-		this.userLocation = new LatLng(intent.getDoubleExtra("userLatitude", 0),
-				                       intent.getDoubleExtra("userLongitude", 0));
-		this.attendance = intent.getIntExtra("attendance", 1);
+		this.event = intent.getParcelableExtra("event");
+		this.userLocation = intent.getParcelableExtra("userLocation");
 
 		// The home button takes the user back to the map display.
 		ActionBar bar = getSupportActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
 		
 		// Display the Event title and description.
-	    ((TextView)findViewById(R.id.event_details_title)).setText(this.title);
+	    ((TextView)findViewById(R.id.event_details_title)).setText(this.event.getTitle());
 	    TextView descBox = (TextView)findViewById(R.id.event_details_description);
-	    if (this.description.length() == 0) {
+	    if (this.event.getDescription().length() == 0) {
 	    	descBox.setText(R.string.event_description_empty);
 	    	descBox.setTypeface(null, Typeface.ITALIC);
 	    }
 	    else {
-	    	descBox.setText(this.description);
+	    	descBox.setText(this.event.getDescription());
 	    	descBox.setTypeface(null, Typeface.NORMAL);
 	    }
+	    
+	    // Inform how many users have attended the event using our app.
+	    String attending = getResources().getQuantityString(R.plurals.users_attending, this.event.getAttendance(), this.event.getAttendance());
+	    ((TextView)findViewById(R.id.event_details_attendance)).setText(attending);
 	    
 	    // Display different date strings based on the time of the event.
 	    Calendar today = Calendar.getInstance();
 	    Calendar startCalendar = Calendar.getInstance();
-	    startCalendar.setTime(this.startDate);
+	    startCalendar.setTime(this.event.getStartDate());
 	    Calendar endCalendar = Calendar.getInstance();
-	    endCalendar.setTime(this.endDate);
+	    endCalendar.setTime(this.event.getEndDate());
 
 	    String dateString = "";
 	    if (endCalendar.before(today)) {
@@ -118,7 +107,7 @@ public class EventDetails extends SherlockFragmentActivity {
 	        case R.id.menu_get_directions:
 	        	// Prepare maps url query url parameters.
             	String startCoords = ((Double)this.userLocation.latitude).toString() + "," + ((Double)this.userLocation.longitude).toString();
-            	String endCoords = ((Double)this.location.latitude).toString() + "," + ((Double)this.location.longitude).toString();
+            	String endCoords = ((Double)this.event.getLocation().latitude).toString() + "," + ((Double)this.event.getLocation().longitude).toString();
             	String url = "http://maps.google.com/maps?saddr=" + startCoords + "&daddr=" + endCoords;
             	Log.d("EventDetailsLocationTab", "Get directions, " + url);
 
