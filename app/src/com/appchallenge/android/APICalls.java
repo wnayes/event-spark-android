@@ -175,4 +175,38 @@ public class APICalls {
 
         return new Event(result);
     }
+
+
+	public static int report(int id) {
+		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/report/";
+		RestClient client = new RestClient(getAttendUrl);
+		
+		client.AddParam("id", Integer.toString(id));
+		
+		try {
+            client.Execute(RestClient.RequestMethod.POST);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    	Log.d("APICalls.report", (client.getResponse() == null) ? "" : client.getResponse());
+
+        // Parse the given Events and create an ArrayList.
+    	
+    	try {
+            JSONObject eventJSON = new JSONObject(client.getResponse());
+            if (!eventJSON.has("text")) {
+            	Log.e("APICalls.report", "'text' key not present");
+            	return 0;
+            }
+
+    	} catch (JSONException e) {
+            Log.e(APICalls.class.toString(), "Error parsing list of Events in report()");
+            e.printStackTrace();
+            return 0;
+        }
+    	
+    	return 1;
+		
+	}
 }
