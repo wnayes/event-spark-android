@@ -58,6 +58,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/event_holder" />
+         
+         <Button
+                android:id="@+id/event_report"
+                android:layout_width="150sp"
+                android:layout_height="match_parent"
+                android:text="@string/event_report"
+                android:onClick="report" />
     
     </LinearLayout>
 
