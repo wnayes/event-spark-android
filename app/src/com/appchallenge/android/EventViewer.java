@@ -1,6 +1,5 @@
 package com.appchallenge.android;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,7 +39,10 @@ import com.appchallenge.android.TypeFilterDialogFragment.TypeFilterDialogListene
 /**
  * Displays a user's location and surrounding events.
  */
-public class EventViewer extends SherlockFragmentActivity implements LocationListener, LocationSource, OnInfoWindowClickListener, TypeFilterDialogListener {
+public class EventViewer extends SherlockFragmentActivity implements LocationListener,
+                                                                     LocationSource,
+                                                                     OnInfoWindowClickListener,
+                                                                     TypeFilterDialogListener {
     /**
      * Object representing the Google Map display of our Events.
      * Note that this may be null if the Google Play services APK is not available.
@@ -62,7 +64,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * Currently defaulted to Minneapolis, MN.
      */
     private LatLng currentMapLocation = new LatLng(44.9764164, -93.2323474);
-    private float currentMapZoom = 12;
+    private float currentMapZoom = 15;
 
     /**
      * Array of Events we have downloaded for the user.
@@ -81,7 +83,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * can choose to remove these using the TypeFilterDialogFragment from the
      * action bar.
      */
-    ArrayList<Event.Type> filterTypes = new ArrayList<Event.Type>();
+    ArrayList<Type> filterTypes = new ArrayList<Type>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,29 +92,20 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
         // Instantiate the list of visible types.
         if (filterTypes.size() == 0) {
-        	filterTypes.add(Event.Type.ACADEMICS);
-        	filterTypes.add(Event.Type.ATHLETICS);
-        	filterTypes.add(Event.Type.ENTERTAINMENT);
-        	filterTypes.add(Event.Type.PROMOTIONS);
-        	filterTypes.add(Event.Type.SOCIAL);
-        	filterTypes.add(Event.Type.OTHER);
+        	for (Type type : Type.typeIndices)
+        	    filterTypes.add(type);
         }
 
         // We may be reloading due to a configuration change.
         // Load any available information from the previous instance.
         if (savedInstanceState != null) {
-            currentMapLocation = new LatLng(savedInstanceState.getDouble("currentMapLatitude"),
-                                            savedInstanceState.getDouble("currentMapLongitude"));
+            currentMapLocation = savedInstanceState.getParcelable("currentMapLocation");
             currentMapZoom = savedInstanceState.getFloat("currentMapZoom");
 
-            String[] JSONEvents = savedInstanceState.getStringArray("currentEvents");
-            if (JSONEvents != null) {
-            	this.currentEvents = new ArrayList<Event>();
-                for (int i = 0; i < JSONEvents.length; ++i)
-            	    this.currentEvents.add(new Event(JSONEvents[i]));
-                reloadEventMarkers();
-            }
-            
+            // Restore the Event collection and markers.
+            this.currentEvents = savedInstanceState.getParcelableArrayList("currentEvents");
+            reloadEventMarkers();
+
             // Restore any closed dialogs.
             if (savedInstanceState.getBoolean("internetDialogOpen", false))
             	this.displayConnectivityDialog();
@@ -124,14 +117,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
         if (savedInstanceState != null) {
         	// Feed the map listener it's previous to restore the location indicator.
-        	if (savedInstanceState.containsKey("currentLatitude") &&
-                savedInstanceState.containsKey("currentLongitude")) {
+        	if (savedInstanceState.containsKey("currentUserLocation")) {
         		Location oldLoc = new Location("savedState");
-	            oldLoc.setLatitude(savedInstanceState.getDouble("currentLatitude"));
-	            oldLoc.setLongitude(savedInstanceState.getDouble("currentLongitude"));
-	            oldLoc.setAccuracy(savedInstanceState.getFloat("currentAccuracy", 0));
-
-	            currentLocation = new LatLng(oldLoc.getLatitude(), oldLoc.getLongitude());
+        		this.currentLocation = savedInstanceState.getParcelable("currentUserLocation");
+	            oldLoc.setLatitude(this.currentLocation.latitude);
+	            oldLoc.setLongitude(this.currentLocation.longitude);
+	            oldLoc.setAccuracy(savedInstanceState.getFloat("currentUserLocationAccuracy", 0));
 
                 if (mListener != null)
 	                mListener.onLocationChanged(oldLoc);
@@ -239,25 +230,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * the savedInstanceState Bundle.
      */
     public void onSaveInstanceState(Bundle savedInstanceState) {
-    	savedInstanceState.putDouble("currentMapLatitude", mMap.getCameraPosition().target.latitude);
-    	savedInstanceState.putDouble("currentMapLongitude",  mMap.getCameraPosition().target.longitude);
+    	savedInstanceState.putParcelable("currentMapLocation", mMap.getCameraPosition().target);
     	savedInstanceState.putFloat("currentMapZoom", mMap.getCameraPosition().zoom);
     	if (currentLocation != null) {
-    	    savedInstanceState.putDouble("currentLatitude", currentLocation.latitude);
-    	    savedInstanceState.putDouble("currentLongitude", currentLocation.longitude);
-    	    savedInstanceState.putFloat("currentAccuracy", mMap.getMyLocation().getAccuracy());
+    	    savedInstanceState.putParcelable("currentUserLocation", this.currentLocation);
+    	    savedInstanceState.putFloat("currentUserLocationAccuracy", mMap.getMyLocation().getAccuracy());
     	}
 
-    	// Our Events cannot be directly put into the Bundle, but
-    	// they can be stringified back into JSON first.
-    	if (this.currentEvents != null) {
-            String[] JSONEvents = new String[this.currentEvents.size()];
-            for (int i = 0; i < this.currentEvents.size(); ++i) {
-    	    	JSONEvents[i] = this.currentEvents.get(i).toJSON();
-            }
-            savedInstanceState.putStringArray("currentEvents", JSONEvents);
-    	}
-    	
+    	// Keep the collection of Events when changing configuration.
+    	savedInstanceState.putParcelableArrayList("currentEvents", this.currentEvents);
+
     	// Dialogs get thrown under the bus on configuration changes, so their
         // state must be remembered.
     	if (internetDialog != null && internetDialog.isShowing())
