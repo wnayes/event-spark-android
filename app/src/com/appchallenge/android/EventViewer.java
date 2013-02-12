@@ -192,7 +192,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
-        if (item.getItemId() == R.id.menu_create_event) {
+    	int currentId = item.getItemId();
+        if (currentId == R.id.menu_create_event) {
 			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
 
 			// Pass the current location to the wizard so the maps appear synced.
@@ -202,7 +203,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			// Launch the wizard for creating a new event.
 			startActivityForResult(createEvent, 0);
 			return true;
-		} else if (item.getItemId() == R.id.menu_refresh_events) {
+		} else if (currentId == R.id.menu_refresh_events) {
 			// Refresh the event listing.
 			if (!isOnline()) {
 				// Tell the user to connect to the Internet.
@@ -212,11 +213,15 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
 			}
 			return true;
-		} else if (item.getItemId() == R.id.menu_type_filter) {
+		} else if (currentId == R.id.menu_type_filter) {
 			// Show dialog allowing the user to view only certain event types.
 			DialogFragment typeFilterDialog = new TypeFilterDialogFragment();
 			typeFilterDialog.show(getSupportFragmentManager(), "typeFilterDialog");
 			return true;
+		} else if (currentId == R.id.menu_settings) {
+			// Show the settings activity.
+			Intent settings = new Intent(EventViewer.this, Settings.class);
+			startActivity(settings);
 		}
 
         return super.onOptionsItemSelected(item);

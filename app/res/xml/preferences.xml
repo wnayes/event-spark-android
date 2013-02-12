@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:summary="Receive updates of new events."
+        android:title="Event Notifications" >
+        <CheckBoxPreference
+            android:key="notificationsEnabled"
+            android:summary="Receive updates of new events."
+            android:title="Enable Event Notifications" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

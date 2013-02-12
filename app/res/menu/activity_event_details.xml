@@ -11,11 +11,5 @@
           android:icon="@drawable/refresh"
           android:title="@string/refresh"
           android:showAsAction="ifRoom"/>
-    <!-- For a back button when someone photoshops one
-    <item android:id="@+id/menu_back"
-          android:icon="@drawable/back"
-          android:title="@string/action_back"
-          android:showAsAction="ifRoom" />
-    -->
 
 </menu>

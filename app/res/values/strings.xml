@@ -38,6 +38,9 @@
         <item quantity="one">One user is attending.</item>
         <item quantity="other">%d users are attending.</item>
     </plurals>
+    
+    <!-- Settings page -->
+    <string name="title_activity_settings">Settings</string>
 
     <!-- Strings and Arrays for the types spinner -->
     <string name="event_select_type">Select Type</string>
