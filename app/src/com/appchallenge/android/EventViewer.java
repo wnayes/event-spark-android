@@ -1,9 +1,7 @@
 package com.appchallenge.android;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Timer;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,7 +13,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -107,8 +104,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             reloadEventMarkers();
 
             // Restore any closed dialogs.
-            if (savedInstanceState.getBoolean("internetDialogOpen", false))
-            	this.displayConnectivityDialog();
             if (savedInstanceState.getBoolean("noLocationSourceDialogOpen", false))
             	this.showNoLocationSourceDialog();
         }
@@ -144,10 +139,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     @Override
     protected void onStop() {
     	// Prevent dialogs from leaking and remaining open.
-    	if (internetDialog != null && internetDialog.isShowing()) {
-    		internetDialog.cancel();
-    		internetDialog = null;
-    	}
     	if (noLocationSourceDialog != null && noLocationSourceDialog.isShowing()) {
     		noLocationSourceDialog.cancel();
     		noLocationSourceDialog = null;
@@ -205,13 +196,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			return true;
 		} else if (currentId == R.id.menu_refresh_events) {
 			// Refresh the event listing.
-			if (!isOnline()) {
-				// Tell the user to connect to the Internet.
-				this.displayConnectivityDialog();
-			}
-			else if (currentLocation != null) {
+			if (!isOnline())
+				this.displayConnectivityMessage();
+			else if (currentLocation != null)
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
-			}
 			return true;
 		} else if (currentId == R.id.menu_type_filter) {
 			// Show dialog allowing the user to view only certain event types.
@@ -247,8 +235,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     	// Dialogs get thrown under the bus on configuration changes, so their
         // state must be remembered.
-    	if (internetDialog != null && internetDialog.isShowing())
-    		savedInstanceState.putBoolean("internetDialogOpen", true);
     	if (noLocationSourceDialog != null && noLocationSourceDialog.isShowing())
     		savedInstanceState.putBoolean("noLocationSourceDialogOpen", true);
 
@@ -437,23 +423,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     }
 
 	/**
-	 * Shows a dialog informing the user that an internet connection is not available.
+	 * Shows a message informing the user that an internet connection is not available.
 	 */
-	private AlertDialog internetDialog;
-	public void displayConnectivityDialog() {
-		if (internetDialog != null) {
-			internetDialog.cancel();
-		}
-		internetDialog = new AlertDialog.Builder(this).create();
-		internetDialog.setTitle("Internet Connection Needed");
-		internetDialog.setMessage("Connect your device to an Internet source and try again!");
-		internetDialog.setIcon(android.R.drawable.ic_dialog_alert);
-		internetDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-	        }
-	    });
-		internetDialog.show();
+	public void displayConnectivityMessage() {
+        Toast.makeText(getApplicationContext(),
+                       "Please connect to the Internet and try again!", 
+                       Toast.LENGTH_SHORT).show();
 	}
 
 	/**
