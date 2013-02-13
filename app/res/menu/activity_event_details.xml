@@ -11,5 +11,10 @@
           android:icon="@drawable/refresh"
           android:title="@string/refresh"
           android:showAsAction="ifRoom"/>
+    
+    <!-- Report event item. -->
+    <item android:id="@+id/menu_report_event"
+          android:title="@string/event_report"
+          android:showAsAction="never"/>
 
 </menu>

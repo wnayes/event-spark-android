@@ -2,7 +2,6 @@ package com.appchallenge.android;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -14,14 +13,11 @@ import com.google.android.gms.maps.model.LatLng;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class EventDetails extends SherlockFragmentActivity {
 	// Private members containing the Event information.
@@ -42,6 +38,13 @@ public class EventDetails extends SherlockFragmentActivity {
 		ActionBar bar = getSupportActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
 		
+		this.updateEventDetails();
+	}
+
+	/**
+	 * Updates the UI with the latest copy of the Event we have.
+	 */
+	private void updateEventDetails() {
 		// Display the Event title and description.
 	    ((TextView)findViewById(R.id.event_details_title)).setText(this.event.getTitle());
 	    TextView descBox = (TextView)findViewById(R.id.event_details_description);
@@ -87,10 +90,13 @@ public class EventDetails extends SherlockFragmentActivity {
 	    ((TextView)findViewById(R.id.event_details_date_description)).setText(dateString);
 	}
 
-	@Override
+	private Menu _menu;
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_event_details, menu);
+		
+		// Keep a reference to the menu for later uses (refresh indicator change).
+        this._menu = menu;
 		return true;
 	}
 
@@ -102,7 +108,8 @@ public class EventDetails extends SherlockFragmentActivity {
 	            finish();
 	            return true;
 	        case R.id.menu_refresh_event:
-	        	
+	        	// Grab a new copy of the event.
+	        	new updateEventDetailsAPICaller().execute(this.event.getId());
 	        	return true;
 	        case R.id.menu_get_directions:
 	        	// Prepare maps url query url parameters.
@@ -115,8 +122,52 @@ public class EventDetails extends SherlockFragmentActivity {
             	Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
                 return true;
+	        case R.id.menu_report_event:
+	        	
+	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
+	}
+	
+	/**
+	 * Performs an asynchronous API call receive any updates of the event we are viewing.
+	 */
+	private class updateEventDetailsAPICaller extends AsyncTask<Integer, Void, Event> {
+		/**
+		 * Quick access to the refresh button in the actionbar.
+		 */
+		MenuItem refreshItem;
+
+		protected void onPreExecute() {
+			// Establish progress UI changes.
+			if (_menu != null) {
+		        refreshItem = _menu.findItem(R.id.menu_refresh_event);
+		        if (refreshItem != null)
+			        refreshItem.setActionView(R.layout.actionbar_refresh_progress);
+			}
+		}
+
+		protected Event doInBackground(Integer... id) {
+			return APICalls.getEvent(id[0]);
+		}
+
+		protected void onPostExecute(Event result) {
+			// Remove progress UI.
+			if (refreshItem != null)
+			    refreshItem.setActionView(null);
+			refreshItem = null;
+
+			// If the event can't be found, no UI refresh should occur.
+			if (result == null) {
+				Toast.makeText(getApplicationContext(),
+                               "The event could not be found or no longer exists!",
+                               Toast.LENGTH_LONG).show();
+				return;
+			}
+
+			event = result;
+			updateEventDetails();
+		}
 	}
 }
