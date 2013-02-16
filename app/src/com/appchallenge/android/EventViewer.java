@@ -7,6 +7,8 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,6 +29,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -39,6 +42,8 @@ import com.appchallenge.android.TypeFilterDialogFragment.TypeFilterDialogListene
 public class EventViewer extends SherlockFragmentActivity implements LocationListener,
                                                                      LocationSource,
                                                                      OnInfoWindowClickListener,
+                                                                     OnMarkerClickListener,
+                                                                     OnMapClickListener,
                                                                      TypeFilterDialogListener {
     /**
      * Object representing the Google Map display of our Events.
@@ -281,6 +286,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	mMap.setMyLocationEnabled(true);
     	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapLocation, currentMapZoom));
     	mMap.setOnInfoWindowClickListener(this);
+    	mMap.setOnMarkerClickListener(this);
+    	mMap.setOnMapClickListener(this);
     }
 
     /**
@@ -472,5 +479,67 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			currentEvents = (ArrayList<Event>)result.clone();
 			reloadEventMarkers();
 		}
+	}
+	
+	private ActionMode mActionMode;
+	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+	    // Called when the action mode is created; startActionMode() was called
+	    @Override
+	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	        // Inflate a menu resource providing context menu items
+	        MenuInflater inflater = mode.getMenuInflater();
+	        inflater.inflate(R.menu.map_marker_context_menu, menu);
+	        return true;
+	    }
+
+	    // Called each time the action mode is shown. Always called after onCreateActionMode, but
+	    // may be called multiple times if the mode is invalidated.
+	    @Override
+	    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+	        return false; // Return false if nothing is done
+	    }
+
+	    // Called when the user selects a contextual menu item
+	    @Override
+	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+	        switch (item.getItemId()) {
+//	            case R.id.menu_share:
+//	                shareCurrentItem();
+//	                mode.finish(); // Action picked, so close the CAB
+//	                return true;
+	            default:
+	                return false;
+	        }
+	    }
+
+	    // Called when the user exits the action mode
+	    @Override
+	    public void onDestroyActionMode(ActionMode mode) {
+	        mActionMode = null;
+	    }
+	};
+
+	@Override
+	public boolean onMarkerClick(Marker marker) {
+		Log.d("onMarkerClick", "EventViewer marker clicked. Info window shown: " + marker.isInfoWindowShown());
+		if (mActionMode != null) {
+			// This case can occur if the user taps an already selected marker.
+			mActionMode.finish();
+            return false;
+		}
+
+        // Start the contextual actionbar using the ActionMode.Callback defined above
+        mActionMode = this.startActionMode(mActionModeCallback);
+		return false;
+	}
+
+	@Override
+	public void onMapClick(LatLng point) {
+		Log.d("onMapClick", "EventViewer map clicked!");
+		// Clicking the map normally only closes any info windows.
+		// We must close the contextual action bar menu as well.
+		if (mActionMode != null)
+			mActionMode.finish();
 	}
 }
