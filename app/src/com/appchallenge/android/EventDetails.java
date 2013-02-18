@@ -76,15 +76,17 @@ public class EventDetails extends SherlockFragmentActivity {
 	    else {
 		    if (startCalendar.after(today)) {
 		    	if (startCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR))
-		    		dateString += "Begins today at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(startCalendar.getTime()) + ". ";
+		    		dateString += DateFormat.getTimeInstance(DateFormat.SHORT).format(startCalendar.getTime()) + " Today — ";
 		    	else
-		    		dateString += "Begins tomorrow at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(startCalendar.getTime()) + ". ";
+		    		dateString += DateFormat.getTimeInstance(DateFormat.SHORT).format(startCalendar.getTime()) + " Tomorrow — ";
 		    }
+		    else
+		    	dateString += "Now — ";
 	
 		    if (endCalendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR))
-	    		dateString += "Ends today at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(endCalendar.getTime()) + ".";
+	    		dateString += DateFormat.getTimeInstance(DateFormat.SHORT).format(endCalendar.getTime()) + " Today";
 	    	else
-	    		dateString += "Ends tomorrow at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(endCalendar.getTime()) + ".";
+	    		dateString += DateFormat.getTimeInstance(DateFormat.SHORT).format(endCalendar.getTime()) + " Tomorrow";
 	    }
 	    
 	    ((TextView)findViewById(R.id.event_details_date_description)).setText(dateString);
