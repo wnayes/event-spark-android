@@ -38,6 +38,7 @@ public class CreateEventPage1EventName extends Fragment {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                                                                              R.array.type_array,
                                                                              android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(adapter);
 
         // Read the title and description from the parent Activity.
