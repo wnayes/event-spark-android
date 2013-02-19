@@ -24,6 +24,7 @@ public class Event implements Parcelable {
     public Event(String eventJSON) {
         try {
         	JSONObject jsonObject = new JSONObject(eventJSON);
+        	this.ownerId = jsonObject.has("owner_id") ? jsonObject.getString("owner_id") : "";
         	if (jsonObject.has("event"))
         		jsonObject = jsonObject.getJSONObject("event");
         	this.id = jsonObject.getInt("id");
@@ -54,6 +55,7 @@ public class Event implements Parcelable {
     	// Defaults
     	this.id = -1;
     	this.attendance = 1;
+    	this.ownerId = "";
 
         this.title = name;
         this.type = type;
@@ -69,6 +71,14 @@ public class Event implements Parcelable {
     private int id;
     public int getId() {
     	return this.id;
+    }
+    
+    /**
+     * @return The secret owner id of an Event. Only exists for events a user has made themselves.
+     */
+    private String ownerId;
+    public String getOwnerId() {
+    	return this.ownerId;
     }
 
     /**
@@ -225,7 +235,7 @@ public class Event implements Parcelable {
      */
     public MarkerOptions toMarker() {
         return new MarkerOptions().title(this.title)
-                                  .snippet(this.description)
+                                  .snippet("Click to view more info.")
                                   .position(this.location)
                                   .icon(BitmapDescriptorFactory.defaultMarker(this.type.color()));
     }
@@ -247,6 +257,7 @@ public class Event implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(this.id);
+		dest.writeString(this.ownerId);
 		dest.writeString(this.title);
 		dest.writeInt(this.type.getValue());
 		dest.writeString(this.description);
@@ -276,6 +287,7 @@ public class Event implements Parcelable {
 	 */
     public Event(Parcel pc){
     	this.id = pc.readInt();
+    	this.ownerId = pc.readString();
     	this.title = pc.readString();
     	this.type = Type.typeIndices[pc.readInt()];
     	this.description = pc.readString();

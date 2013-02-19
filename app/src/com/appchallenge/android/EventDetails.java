@@ -127,6 +127,9 @@ public class EventDetails extends SherlockFragmentActivity {
 	        case R.id.menu_report_event:
 	        	
 	        	return true;
+            case R.id.menu_attend_event:
+	        	
+	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
