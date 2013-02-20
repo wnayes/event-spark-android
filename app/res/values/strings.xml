@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AppChallenge</string>
+    <string name="app_name">EventHound</string>
 
     <!-- Event Viewer -->
-    <string name="title_activity_event_viewer">EventViewer</string>
+    <string name="title_activity_event_viewer">EventHound</string>
     <string name="menu_create_event">Create Event</string>
     <string name="refresh">Refresh</string>
     <string name="menu_settings">Settings</string>

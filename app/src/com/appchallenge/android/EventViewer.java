@@ -7,8 +7,6 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -29,7 +27,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -84,6 +81,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * action bar.
      */
     ArrayList<Type> filterTypes = new ArrayList<Type>();
+    
+    /**
+     * Provides access to our local sqlite database.
+     */
+    private LocalDatabase localDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +142,15 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     }
     
     @Override
+    protected void onPause() {
+    	super.onPause();
+
+    	// Close our database helper if necessary.
+    	if (localDB != null)
+            localDB.close();
+    }
+    
+    @Override
     protected void onStop() {
     	// Prevent dialogs from leaking and remaining open.
     	if (noLocationSourceDialog != null && noLocationSourceDialog.isShowing()) {
@@ -154,24 +165,30 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	Log.d("EventViewer.onActivityResult", "Received intent back from creation wizard.");
-    	if (resultCode == RESULT_OK) {
-    		// Show the user the newly created event.
-    		Event event = data.getParcelableExtra("event");
-    		if (event == null)
-    			return;
-    		
-    		// Display the new marker
-    		this.currentEvents.add(event);
-    		Marker m = mMap.addMarker(event.toMarker());
-		    eventMarkerMap.put(m, event.getId());
-		    
-		    // Pan and zoom to this new marker.
-		    CameraUpdate viewEvent = CameraUpdateFactory.newLatLngZoom(event.getLocation(), 18);
-		    mMap.animateCamera(viewEvent);
-		    
-		    // Show the info window for the new event.
-		    m.showInfoWindow();
-    	}
+    	if (resultCode != RESULT_OK)
+    		return;
+    	
+    	// Show the user the newly created event.
+    	Event event = data.getParcelableExtra("event");
+    	if (event == null)
+    		return;
+    	
+    	// Save this event's owner_id to our local storage.
+    	if (localDB == null)
+    		localDB = new LocalDatabase(this);
+    	localDB.takeOwnership(event);
+
+    	// Display the new marker
+    	this.currentEvents.add(event);
+    	Marker m = mMap.addMarker(event.toMarker());
+    	eventMarkerMap.put(m, event.getId());
+
+    	// Pan and zoom to this new marker.
+    	CameraUpdate viewEvent = CameraUpdateFactory.newLatLngZoom(event.getLocation(), 18);
+    	mMap.animateCamera(viewEvent);
+
+    	// Show the info window for the new event.
+    	m.showInfoWindow();
     }
 
     private Menu _menu;

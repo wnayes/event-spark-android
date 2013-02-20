@@ -48,7 +48,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter mPagerAdapter;
-    
+
     /**
      * The title of the event provided by the user.
      */
