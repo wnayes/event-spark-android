@@ -24,7 +24,7 @@ public class Event implements Parcelable {
     public Event(String eventJSON) {
         try {
         	JSONObject jsonObject = new JSONObject(eventJSON);
-        	this.ownerId = jsonObject.has("owner_id") ? jsonObject.getString("owner_id") : "";
+        	this.secretId = jsonObject.has("secret_id") ? jsonObject.getString("secret_id") : "";
         	if (jsonObject.has("event"))
         		jsonObject = jsonObject.getJSONObject("event");
         	this.id = jsonObject.getInt("id");
@@ -55,7 +55,7 @@ public class Event implements Parcelable {
     	// Defaults
     	this.id = -1;
     	this.attendance = 1;
-    	this.ownerId = "";
+    	this.secretId = "";
 
         this.title = name;
         this.type = type;
@@ -76,9 +76,9 @@ public class Event implements Parcelable {
     /**
      * @return The secret owner id of an Event. Only exists for events a user has made themselves.
      */
-    private String ownerId;
-    public String getOwnerId() {
-    	return this.ownerId;
+    private String secretId;
+    public String getSecretId() {
+    	return this.secretId;
     }
 
     /**
@@ -257,7 +257,7 @@ public class Event implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(this.id);
-		dest.writeString(this.ownerId);
+		dest.writeString(this.secretId);
 		dest.writeString(this.title);
 		dest.writeInt(this.type.getValue());
 		dest.writeString(this.description);
@@ -287,7 +287,7 @@ public class Event implements Parcelable {
 	 */
     public Event(Parcel pc){
     	this.id = pc.readInt();
-    	this.ownerId = pc.readString();
+    	this.secretId = pc.readString();
     	this.title = pc.readString();
     	this.type = Type.typeIndices[pc.readInt()];
     	this.description = pc.readString();

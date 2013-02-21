@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Base64;
 
 /**
  * Provides access to the user's personal user ID.
@@ -21,7 +22,7 @@ public class Identity {
     	
     	// If this is the first time requesting an identity, create one.
     	if (userId.isEmpty()) {
-    		userId = UUID.randomUUID().toString();
+    		userId = Base64.encodeToString(UUID.randomUUID().toString().getBytes(), Base64.NO_PADDING);
     		SharedPreferences.Editor userIdEdit = userIdStorage.edit();
     		userIdEdit.putString(USER_ID_KEY_NAME, userId);
     		userIdEdit.apply();

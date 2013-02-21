@@ -58,14 +58,14 @@ public class LocalDatabase extends SQLiteOpenHelper {
 	public void takeOwnership(Event event) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
-		if (event.getOwnerId().isEmpty() || event.getId() < 1) {
+		if (event.getSecretId().isEmpty() || event.getId() < 1) {
     		Log.e("EventViewer.onActivityResult", "Event does not have the proper private members.");
     		return;
     	}
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_ID, event.getId());
-		values.put(KEY_OWNERID, event.getOwnerId());
+		values.put(KEY_OWNERID, event.getSecretId());
 
 		db.insert(USERS_EVENTS_TABLE_NAME, null, values);
 		db.close();
