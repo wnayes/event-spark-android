@@ -1,7 +1,10 @@
 package com.appchallenge.android;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.apache.http.conn.ConnectTimeoutException;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -470,7 +473,19 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		}
 
 		protected ArrayList<Event> doInBackground(LatLng... location) {
-			return APICalls.getEventsNearLocation(location[0]);
+			// Perform the network call to retreive nearby events.
+			try {
+				return APICalls.getEventsNearLocation(location[0]);
+			} catch (ConnectTimeoutException cte) {
+				Toast.makeText(getApplicationContext(), "Connection could not be established. Please try again later!", Toast.LENGTH_LONG)
+			         .show();
+				cte.printStackTrace();
+			} catch (SocketTimeoutException ste) {
+				Toast.makeText(getApplicationContext(), "Issue receiving server data. Please try again later!", Toast.LENGTH_LONG)
+		             .show();
+				ste.printStackTrace();
+			}
+			return null;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -481,12 +496,13 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			refreshItem = null;
 
 			// Keep track of these events and populate the map.
-			if (result == null) {
-				Toast.makeText(getApplicationContext(), "No events found near you!", Toast.LENGTH_LONG)
-				     .show();
-				currentEvents = null;
-				eventMarkerMap.clear();
+			if (result == null)
 				return;
+			
+			if (result.size() == 0) {
+                Toast.makeText(getApplicationContext(), "No events found near you!", Toast.LENGTH_LONG)
+			         .show();
+                return;
 			}
 
 			currentEvents = (ArrayList<Event>)result.clone();

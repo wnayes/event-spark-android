@@ -2,6 +2,7 @@ package com.appchallenge.android;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -48,7 +49,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + USERS_EVENTS_TABLE_NAME);
 		onCreate(db);
 	}
-	
+
 	/** CRUD (Create, Read, Update, Delete) Procedures */
 
     /**
@@ -60,6 +61,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		
 		if (event.getSecretId().isEmpty() || event.getId() < 1) {
     		Log.e("EventViewer.onActivityResult", "Event does not have the proper private members.");
+    		db.close();
     		return;
     	}
 
@@ -69,5 +71,35 @@ public class LocalDatabase extends SQLiteOpenHelper {
 
 		db.insert(USERS_EVENTS_TABLE_NAME, null, values);
 		db.close();
+	}
+
+	/**
+	 * Locates the secret id of an event we own.
+	 * @param event
+	 * @return The secret id as a string, or the empty string if we do not have ownership.
+	 */
+	public String getEventSecretId(Event event) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String secretId = "";
+
+		Integer id = event.getId();
+		if (id < 1) {
+    		Log.e("EventViewer.onActivityResult", "Event needs an id.");
+    		db.close();
+    		return secretId;
+    	}
+
+        Cursor result = db.query(USERS_EVENTS_TABLE_NAME,
+                                 new String[] {KEY_OWNERID},
+                                 "id = ?",
+                                 new String[] {id.toString()},
+                                 null, null, null);
+
+        // Read the secretId if it was found.
+        if (result.moveToFirst())
+        	secretId = result.getString(0);
+
+        db.close();
+        return secretId;
 	}
 }

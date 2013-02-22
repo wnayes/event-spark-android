@@ -18,9 +18,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
-
-//Possibly Obsolete
 
 /**
  * REST client library for Java.
@@ -28,49 +29,63 @@ import org.apache.http.protocol.HTTP;
  * See: http://lukencode.com/2010/04/27/calling-web-services-in-android-using-httpclient/
  */
 public class RestClient {
-	
 	public enum RequestMethod {
 		GET, POST
 	}
 
-    private ArrayList <NameValuePair> params;
-    private ArrayList <NameValuePair> headers;
-
-    private String url;
-
-    private int responseCode;
-    private String message;
-
     private String response;
-
     public String getResponse() {
         return response;
     }
 
+    private String message;
     public String getErrorMessage() {
         return message;
     }
 
+    private int responseCode;
     public int getResponseCode() {
         return responseCode;
     }
 
+    private String url;
     public RestClient(String url) {
         this.url = url;
         params = new ArrayList<NameValuePair>();
         headers = new ArrayList<NameValuePair>();
     }
 
+    private ArrayList <NameValuePair> params;
     public void AddParam(String name, String value) {
         params.add(new BasicNameValuePair(name, value));
     }
 
+    private ArrayList <NameValuePair> headers;
     public void AddHeader(String name, String value) {
         headers.add(new BasicNameValuePair(name, value));
     }
+    
+    /**
+     * The time in milliseconds we will wait to establish a connection.
+     */
+    private int connectionTimeout = 0;
+    
+    /**
+     * The time we will wait to receive data from the server.
+     */
+    private int socketTimeout = 0;
+    
+    /**
+     * Sets the connection and socket timeouts for our http requests.
+     * @param connectionTimeout
+     * @param socketTimeout
+     */
+    public void SetTimeout(int connectionTimeout, int socketTimeout) {
+    	this.connectionTimeout = connectionTimeout;
+    	this.socketTimeout = socketTimeout;
+    }
 
-    public void Execute(RequestMethod method) throws Exception
-    {
+    public void Execute(RequestMethod method) throws Exception {
         switch(method) {
             case GET:
             {
@@ -114,10 +129,16 @@ public class RestClient {
     }
 
     private void executeRequest(HttpUriRequest request, String url) {
-        HttpClient client = new DefaultHttpClient();
+    	// Configure the request to timeout if necessary.
+    	HttpParams httpParameters = new BasicHttpParams();
+    	if (this.connectionTimeout != 0)
+    	    HttpConnectionParams.setConnectionTimeout(httpParameters, this.connectionTimeout);
+    	if (this.socketTimeout != 0)
+    	    HttpConnectionParams.setSoTimeout(httpParameters, socketTimeout);
+    	
+        HttpClient client = new DefaultHttpClient(httpParameters);
 
         HttpResponse httpResponse;
-
         try {
             httpResponse = client.execute(request);
             responseCode = httpResponse.getStatusLine().getStatusCode();

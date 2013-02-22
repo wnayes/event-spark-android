@@ -1,6 +1,9 @@
 package com.appchallenge.android;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+
+import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,19 +20,30 @@ public class APICalls {
     /**
 	 * Performs the HTTP REST API request for a JSON listing of the
      * events nearest to the user's location.
+     * @throws ConnectTimeoutException 
      */
-    public static ArrayList<Event> getEventsNearLocation(LatLng location) {
+    public static ArrayList<Event> getEventsNearLocation(LatLng location) throws SocketTimeoutException, ConnectTimeoutException {
         String getEventsUrl = "http://saypoint.dreamhosters.com/api/events/search/";
         RestClient client = new RestClient(getEventsUrl);
 
         // Add parameters
         client.AddParam("latitude", ((Double)location.latitude).toString());
         client.AddParam("longitude", ((Double)location.longitude).toString());
+        
+        // Prevent the search from stalling indefinitely.
+        client.SetTimeout(10000, 10000);
 
     	try {
             client.Execute(RestClient.RequestMethod.GET);
+    	} catch (SocketTimeoutException sce) {
+    		Log.e("APICalls.getEventsNearLocation", "Socket connection timeout.");
+    		throw sce;
+    	} catch (ConnectTimeoutException cte) {
+        	Log.e("APICalls.getEventsNearLocation", "HTTP Connection timeout.");
+        	throw cte;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
 
     	Log.d("APICalls.getEventsNearLocation", (client.getResponse() == null) ? "" : client.getResponse());

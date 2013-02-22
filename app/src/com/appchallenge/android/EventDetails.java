@@ -24,6 +24,11 @@ public class EventDetails extends SherlockFragmentActivity {
 	private Event event;
 	private LatLng userLocation;
 
+    /**
+     * Provides access to our local sqlite database.
+     */
+    private LocalDatabase localDB;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,9 +42,18 @@ public class EventDetails extends SherlockFragmentActivity {
 		// The home button takes the user back to the map display.
 		ActionBar bar = getSupportActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
-		
+
 		this.updateEventDetails();
 	}
+
+	@Override
+    protected void onPause() {
+    	super.onPause();
+
+    	// Close our database helper if necessary.
+    	if (localDB != null)
+            localDB.close();
+    }
 
 	/**
 	 * Updates the UI with the latest copy of the Event we have.
