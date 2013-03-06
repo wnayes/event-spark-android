@@ -21,7 +21,8 @@ public class Identity {
     	String userId = userIdStorage.getString(USER_ID_KEY_NAME, "");
     	
     	// If this is the first time requesting an identity, create one.
-    	if (userId.isEmpty()) {
+    	if (userId.length() == 0) {
+    		//Issues
     		userId = Base64.encodeToString(UUID.randomUUID().toString().getBytes(), Base64.NO_PADDING);
     		SharedPreferences.Editor userIdEdit = userIdStorage.edit();
     		userIdEdit.putString(USER_ID_KEY_NAME, userId);

@@ -10,6 +10,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gms.maps.model.LatLng;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -54,6 +55,7 @@ public class EventDetails extends SherlockFragmentActivity {
     	if (localDB != null)
             localDB.close();
     }
+	
 
 	/**
 	 * Updates the UI with the latest copy of the Event we have.
@@ -142,11 +144,50 @@ public class EventDetails extends SherlockFragmentActivity {
 	        	
 	        	return true;
             case R.id.menu_attend_event:
-	        	
+            	int value = localDB.joinAttending(this.event, Identity.getUserId(getApplicationContext()));
+            	if (value < 0) {
+            		Log.d("Error Accessing Database", "From joinAttending in EventDetails");
+            	}
+            	else if (value == 0){
+            		Toast.makeText(getApplicationContext(),
+                            "You are already attending the event",
+                            Toast.LENGTH_LONG).show();
+            	}else {
+            	 new attendEventAPICaller().execute(this.event.getId());
+            	}
 	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
+	}
+	
+	private class attendEventAPICaller extends AsyncTask<Integer, Integer, Integer> {
+		/**
+	     * Informs the user that the event is being created.
+	     */
+	    ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			// Set up progress indication.
+			dialog = ProgressDialog.show(EventDetails.this, "Finding Attendees...", "");
+		}
+
+		@Override
+		protected Integer doInBackground(Integer... attend) {
+			return APICalls.joinAttendance(attend[0]);
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+			
+			dialog.dismiss();
+			dialog = null;
+			if (result == null) {
+				(Toast.makeText(getApplicationContext(), "Couldn't load attending!", Toast.LENGTH_LONG)).show();
+				return;
+			}
+		}
 	}
 	
 	/**
