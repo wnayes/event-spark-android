@@ -196,11 +196,13 @@ public class APICalls {
     	return attending;
 	}
 
-	public static int joinAttendance(int id) {
+	public static int joinAttendance(String[] input) {
 		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/attend/";
 		RestClient client = new RestClient(getAttendUrl);
-
-		client.AddParam("id", Integer.toString(id));
+        Log.d("joinAttendance Check", input[0]);
+        Log.d("joinAttendance Check 2", input[1]);
+		client.AddParam("id", input[0]);
+		client.AddParam("user_id", input[1]);
 
 		try {
             client.Execute(RestClient.RequestMethod.POST);
@@ -213,13 +215,13 @@ public class APICalls {
     	int attending = 0;
     	try {
             JSONObject eventJSON = new JSONObject(client.getResponse());            
-            if (!eventJSON.has("text")) {
-            	Log.e("APICalls.joinAttendance", "'text' key not present");
-            	return 0;
+            if (!eventJSON.has("int")) {
+            	Log.e("APICalls.joinAttendance", "'int' key not present");
+            		return 0;
+            	
             }
 
-            // TODO: Receive updated attendance value.
-            attending = 1;
+            attending = Integer.parseInt((eventJSON.get("int").toString()));
 
     	} catch (JSONException e) {
             Log.e(APICalls.class.toString(), "Error parsing JSON in joinAttendance()");

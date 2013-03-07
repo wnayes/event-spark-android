@@ -27,13 +27,12 @@ public class LocalDatabase extends SQLiteOpenHelper {
     /** Column names in users_events. */
     private static final String KEY_ID = "id";
     private static final String KEY_OWNERID = "owner_id";
-    private static final String KEY_ATTENDING = "attending";
+   
     
     /** SQLITE command for creating the users_events table. */
     private static final String USERS_EVENTS_TABLE_CREATE = "CREATE TABLE " + USERS_EVENTS_TABLE_NAME + " (" +
                                                              KEY_ID + " INTEGER PRIMARY KEY, " +
-                                                             KEY_OWNERID + " TEXT, " + 
-                                                             KEY_ATTENDING + "TEXT);";
+                                                             KEY_OWNERID + " TEXT);";
 
     LocalDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -111,33 +110,5 @@ public class LocalDatabase extends SQLiteOpenHelper {
 	 * @return An int depending on what happened. 1 means success 0 means already in table
 	 *         -1 is an error
 	 */
-	public int joinAttending(Event event, String user_id) {
-		SQLiteDatabase db = this.getWritableDatabase();
-		
-		Integer eventId = event.getId();
-		
-		if (eventId < 1) {
-    		Log.e("EventDetails.joinAttending", "Event needs an id.");
-    		db.close();
-    		return -1;
-    	}
-		
-		Cursor result = db.query(USERS_EVENTS_TABLE_NAME,
-				                 new String[] {KEY_ATTENDING},
-				                 "id = ?",
-				                 new String[] {eventId.toString()},
-				                 null, null, null);
-		if (result.moveToFirst()) {
-			return 0;
-			
-		}
-		ContentValues values = new ContentValues();
-		values.put(KEY_ATTENDING, user_id);
-		db.update(USERS_EVENTS_TABLE_NAME,
-				  values,
-				  "id = ?",
-				  new String[] {eventId.toString()});
-		
-		return 1;
-	}
+
 }

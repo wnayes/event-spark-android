@@ -26,7 +26,8 @@ public class Identity {
     		userId = Base64.encodeToString(UUID.randomUUID().toString().getBytes(), Base64.NO_PADDING);
     		SharedPreferences.Editor userIdEdit = userIdStorage.edit();
     		userIdEdit.putString(USER_ID_KEY_NAME, userId);
-    		userIdEdit.apply();
+    		//userIdEdit.apply();
+    		userIdEdit.commit();
     	}
     	
     	return userId;

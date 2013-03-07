@@ -1,7 +1,9 @@
 package com.appchallenge.android;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -144,24 +146,37 @@ public class EventDetails extends SherlockFragmentActivity {
 	        	
 	        	return true;
             case R.id.menu_attend_event:
-            	int value = localDB.joinAttending(this.event, Identity.getUserId(getApplicationContext()));
-            	if (value < 0) {
-            		Log.d("Error Accessing Database", "From joinAttending in EventDetails");
-            	}
-            	else if (value == 0){
-            		Toast.makeText(getApplicationContext(),
-                            "You are already attending the event",
-                            Toast.LENGTH_LONG).show();
-            	}else {
-            	 new attendEventAPICaller().execute(this.event.getId());
-            	}
+            	
+            	String[] inputList = new String[2];
+            	inputList[0] = Integer.toString(this.event.getId());
+            	inputList[1] = Identity.getUserId(getApplicationContext());
+            	 attendEventAPICaller attend = new attendEventAPICaller();
+            	 attend.execute(inputList);
+			try {
+				int result = attend.get();
+				if (result == 0){
+					(Toast.makeText(getApplicationContext(), "You Are Already Going!", Toast.LENGTH_LONG)).show();
+				} else {
+					String attending = getResources().getQuantityString(R.plurals.users_attending, result, result);
+				    ((TextView)findViewById(R.id.event_details_attendance)).setText(attending);
+					(Toast.makeText(getApplicationContext(), "Joined the Event", Toast.LENGTH_LONG)).show();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            	 
+            	
 	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
 	}
 	
-	private class attendEventAPICaller extends AsyncTask<Integer, Integer, Integer> {
+	private class attendEventAPICaller extends AsyncTask<String[], Integer, Integer> {
 		/**
 	     * Informs the user that the event is being created.
 	     */
@@ -174,7 +189,7 @@ public class EventDetails extends SherlockFragmentActivity {
 		}
 
 		@Override
-		protected Integer doInBackground(Integer... attend) {
+		protected Integer doInBackground(String[]... attend) {
 			return APICalls.joinAttendance(attend[0]);
 		}
 
