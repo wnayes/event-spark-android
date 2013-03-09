@@ -196,13 +196,12 @@ public class APICalls {
     	return attending;
 	}
 
-	public static int joinAttendance(String[] input) {
-		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/attend/";
-		RestClient client = new RestClient(getAttendUrl);
-        Log.d("joinAttendance Check", input[0]);
-        Log.d("joinAttendance Check 2", input[1]);
-		client.AddParam("id", input[0]);
-		client.AddParam("user_id", input[1]);
+	public static String attendEvent(Integer eventId, String userId) {
+		String attendUrl = "http://saypoint.dreamhosters.com/api/events/attend/";
+		RestClient client = new RestClient(attendUrl);
+
+		client.AddParam("id", eventId.toString());
+		client.AddParam("user_id", userId);
 
 		try {
             client.Execute(RestClient.RequestMethod.POST);
@@ -210,26 +209,25 @@ public class APICalls {
             e.printStackTrace();
         }
 
-    	Log.d("APICalls.joinAttendance", (client.getResponse() == null) ? "" : client.getResponse());
+    	Log.d("APICalls.attendEvent", (client.getResponse() == null) ? "" : client.getResponse());
 
-    	int attending = 0;
     	try {
-            JSONObject eventJSON = new JSONObject(client.getResponse());            
-            if (!eventJSON.has("int")) {
-            	Log.e("APICalls.joinAttendance", "'int' key not present");
-            		return 0;
-            	
+            JSONObject eventJSON = new JSONObject(client.getResponse());
+            if (eventJSON.has("error"))
+				return null;
+            if (eventJSON.has("result")) {
+            	// Inform the UI whether we were able to attend.
+            	return eventJSON.getString("result");
             }
-
-            attending = Integer.parseInt((eventJSON.get("int").toString()));
-
+            else {
+            	Log.e("APICalls.attendEvent", "'result' key not present");
+            	return null;
+            }
     	} catch (JSONException e) {
-            Log.e(APICalls.class.toString(), "Error parsing JSON in joinAttendance()");
+            Log.e(APICalls.class.toString(), "Error parsing JSON in attendEvent()");
             e.printStackTrace();
-            return 0;
+            return null;
         }
-
-    	return attending;
 	}
 
 	public static int report(int id) {

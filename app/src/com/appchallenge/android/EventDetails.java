@@ -75,8 +75,7 @@ public class EventDetails extends SherlockFragmentActivity {
 	    }
 	    
 	    // Inform how many users have attended the event using our app.
-	    String attending = getResources().getQuantityString(R.plurals.users_attending, this.event.getAttendance(), this.event.getAttendance());
-	    ((TextView)findViewById(R.id.event_details_attendance)).setText(attending);
+	    this.updateAttendingText(this.event.getAttendance());
 	    
 	    // Display different date strings based on the time of the event.
 	    Calendar today = Calendar.getInstance();
@@ -107,6 +106,16 @@ public class EventDetails extends SherlockFragmentActivity {
 	    }
 	    
 	    ((TextView)findViewById(R.id.event_details_date_description)).setText(dateString);
+	}
+
+	/**
+	 * Separate method for updating the attending count. Allows us to set the
+	 * number without mutating the private event object.
+	 * @param attendingCount The number of users attending.
+	 */
+	private void updateAttendingText(int attendingCount) {
+		String attending = getResources().getQuantityString(R.plurals.users_attending, attendingCount, attendingCount);
+	    ((TextView)findViewById(R.id.event_details_attendance)).setText(attending);
 	}
 
 	private Menu _menu;
@@ -145,61 +154,57 @@ public class EventDetails extends SherlockFragmentActivity {
 	        	
 	        	return true;
             case R.id.menu_attend_event:
-            	
-            	String[] inputList = new String[2];
-            	inputList[0] = Integer.toString(this.event.getId());
-            	inputList[1] = Identity.getUserId(getApplicationContext());
-            	 attendEventAPICaller attend = new attendEventAPICaller();
-            	 attend.execute(inputList);
-			try {
-				int result = attend.get();
-				if (result == 0){
-					(Toast.makeText(getApplicationContext(), "You Are Already Going!", Toast.LENGTH_LONG)).show();
-				} else {
-					String attending = getResources().getQuantityString(R.plurals.users_attending, result, result);
-				    ((TextView)findViewById(R.id.event_details_attendance)).setText(attending);
-					(Toast.makeText(getApplicationContext(), "Joined the Event", Toast.LENGTH_LONG)).show();
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            	 
-            	
+                // Commit to attending the event.
+            	new attendEventAPICaller().execute(this.event.getId());
 	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
 	}
 	
-	private class attendEventAPICaller extends AsyncTask<String[], Integer, Integer> {
+	private class attendEventAPICaller extends AsyncTask<Integer, Void, String> {
 		/**
-	     * Informs the user that the event is being created.
-	     */
-	    ProgressDialog dialog;
+		 * Quick access to the attend button in the actionbar.
+		 */
+		MenuItem attendItem;
 
 		@Override
 		protected void onPreExecute() {
-			// Set up progress indication.
-			dialog = ProgressDialog.show(EventDetails.this, "Finding Attendees...", "");
+			// Establish progress UI changes.
+			if (_menu != null) {
+				attendItem = _menu.findItem(R.id.menu_attend_event);
+				if (attendItem != null)
+					attendItem.setActionView(R.layout.actionbar_refresh_progress);
+			}
 		}
 
 		@Override
-		protected Integer doInBackground(String[]... attend) {
-			return APICalls.joinAttendance(attend[0]);
+		protected String doInBackground(Integer... id) {
+			return APICalls.attendEvent(id[0], Identity.getUserId(getApplicationContext()));
 		}
 
 		@Override
-		protected void onPostExecute(Integer result) {
-			
-			dialog.dismiss();
-			dialog = null;
+		protected void onPostExecute(String result) {
+			// Remove progress UI.
+			if (attendItem != null)
+				attendItem.setActionView(null);
+			attendItem = null;
+
+			// Some sort of error occurred during the request.
 			if (result == null) {
-				(Toast.makeText(getApplicationContext(), "Couldn't load attending!", Toast.LENGTH_LONG)).show();
+				(Toast.makeText(getApplicationContext(), "Could not submit attendance request. Please try again!", Toast.LENGTH_LONG)).show();
 				return;
+			}
+
+			// Our request went through and we have not yet attended previously.
+			if (result.equals("OK")) {
+				updateAttendingText(event.getAttendance() + 1);
+				(Toast.makeText(getApplicationContext(), "Thanks for attending!", Toast.LENGTH_LONG)).show();
+			}
+			
+			// The user has already said they will attend the event.
+			else if (result.equals("PREVIOUSLY_ATTENDED")) {
+				(Toast.makeText(getApplicationContext(), "You have already indicated you will attend.", Toast.LENGTH_LONG)).show();
 			}
 		}
 	}

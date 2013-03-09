@@ -24,9 +24,9 @@ public class Identity {
     	if (userId.length() == 0) {
     		//Issues
     		userId = Base64.encodeToString(UUID.randomUUID().toString().getBytes(), Base64.NO_PADDING);
+    		userId = userId.substring(0, 22);
     		SharedPreferences.Editor userIdEdit = userIdStorage.edit();
     		userIdEdit.putString(USER_ID_KEY_NAME, userId);
-    		//userIdEdit.apply();
     		userIdEdit.commit();
     	}
     	
