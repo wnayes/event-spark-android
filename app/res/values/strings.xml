@@ -38,7 +38,6 @@
     <!-- Event Details page -->
     <string name="title_activity_event_details">Event Details</string>
     <string name="event_description_empty">No description given.</string>
-    <string name="event_attendance_description">users have attended this event\nusing EventHound.</string>
 
     <string name="event_get_directions">Get Directions</string>
     <string name="attend_event">Attend Event</string>
@@ -47,6 +46,10 @@
     <plurals name="users_attending">
         <item quantity="one">1 user is attending.</item>
         <item quantity="other">%d users are attending.</item>
+    </plurals>
+    <plurals name="users_you_attending">
+        <item quantity="one">You and 1 other user are attending.</item>
+        <item quantity="other">You and %d other users are attending.</item>
     </plurals>
     
     <!-- Settings page -->

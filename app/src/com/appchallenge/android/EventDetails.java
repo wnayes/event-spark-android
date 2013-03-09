@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,6 +26,11 @@ public class EventDetails extends SherlockFragmentActivity {
 	// Private members containing the Event information.
 	private Event event;
 	private LatLng userLocation;
+	
+	/**
+	 * Indicates whether we have attended the event already.
+	 */
+	private Boolean attended;
 
     /**
      * Provides access to our local sqlite database.
@@ -44,6 +50,13 @@ public class EventDetails extends SherlockFragmentActivity {
 		// The home button takes the user back to the map display.
 		ActionBar bar = getSupportActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
+		
+		// Learn whether we have already attended this event.
+		if (attended == null) {
+			if (localDB == null)
+	    		localDB = new LocalDatabase(this);
+			attended = localDB.getAttendanceStatus(event.getId());
+		}
 
 		this.updateEventDetails();
 	}
@@ -114,8 +127,24 @@ public class EventDetails extends SherlockFragmentActivity {
 	 * @param attendingCount The number of users attending.
 	 */
 	private void updateAttendingText(int attendingCount) {
-		String attending = getResources().getQuantityString(R.plurals.users_attending, attendingCount, attendingCount);
-	    ((TextView)findViewById(R.id.event_details_attendance)).setText(attending);
+		TextView attendingTextBox = ((TextView)findViewById(R.id.event_details_attendance));
+
+		// Change the string and image based on whether we are attending.
+		String attending;
+		Drawable icon;
+		if (this.attended) {
+			// Prevent the count from going negative.
+			int count = attendingCount - 1 < 0 ? 0 : attendingCount - 1;
+
+			attending = getResources().getQuantityString(R.plurals.users_you_attending, count, count);
+			icon = getResources().getDrawable(R.drawable.people);
+		}
+		else {
+			attending = getResources().getQuantityString(R.plurals.users_attending, attendingCount, attendingCount);
+			icon = getResources().getDrawable(R.drawable.person);
+		}
+		attendingTextBox.setText(attending);
+		attendingTextBox.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
 	}
 
 	private Menu _menu;
@@ -198,6 +227,13 @@ public class EventDetails extends SherlockFragmentActivity {
 
 			// Our request went through and we have not yet attended previously.
 			if (result.equals("OK")) {
+				// Remember this action in our local database.
+				attended = true;
+				if (localDB == null)
+				    localDB = new LocalDatabase(EventDetails.this);
+				localDB.trackAttendance(event.getId());
+
+				// Update the text display to reflect the changed number.
 				updateAttendingText(event.getAttendance() + 1);
 				(Toast.makeText(getApplicationContext(), "Thanks for attending!", Toast.LENGTH_LONG)).show();
 			}
