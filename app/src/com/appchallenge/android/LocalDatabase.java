@@ -17,18 +17,17 @@ import android.util.Log;
 public class LocalDatabase extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 2;
-    
+
     /** Name of the database we use to store our tables. */
     private static final String DATABASE_NAME = "eventLocalDatabase";
 
     /** Table for storing the owner_ids of events we have created. */
     private static final String USERS_EVENTS_TABLE_NAME = "users_events";
-    
+
     /** Column names in users_events. */
     private static final String KEY_ID = "id";
     private static final String KEY_OWNERID = "owner_id";
-   
-    
+
     /** SQLITE command for creating the users_events table. */
     private static final String USERS_EVENTS_TABLE_CREATE = "CREATE TABLE " + USERS_EVENTS_TABLE_NAME + " (" +
                                                              KEY_ID + " INTEGER PRIMARY KEY, " +
@@ -103,12 +102,4 @@ public class LocalDatabase extends SQLiteOpenHelper {
         db.close();
         return secretId;
 	}
-	/**
-	 * 
-	 * @param event
-	 * @param user_id
-	 * @return An int depending on what happened. 1 means success 0 means already in table
-	 *         -1 is an error
-	 */
-
 }

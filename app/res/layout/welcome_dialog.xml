@@ -14,12 +14,13 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:gravity="center"
+          android:paddingTop="20dp"
           android:paddingBottom="30dp"
-          android:paddingLeft="40dp"
-          android:paddingRight="40dp"
+          android:paddingLeft="20dp"
+          android:paddingRight="20dp"
           android:text="@string/title_welcome_dialog"
           android:textColor="#ffffff"
-          android:textSize="30sp" />
+          android:textSize="22sp" />
       
       <TextView
           android:id="@+id/welcome_dialog_one"
@@ -36,8 +37,11 @@
            android:id="@+id/welcome_dialog_two"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
+           android:drawablePadding="10dp"
+           android:drawableRight="@drawable/ic_action_new"
            android:paddingBottom="30dp"
            android:paddingLeft="20dp"
+           android:paddingRight="15dp"
            android:text="@string/welcome_dialog_two"
            android:textColor="#d9d9d9" />
           
@@ -45,22 +49,11 @@
            android:id="@+id/welcome_dialog_three"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:drawablePadding="10dp"
-           android:drawableRight="@drawable/ic_action_new"
            android:paddingBottom="30dp"
            android:paddingLeft="20dp"
            android:paddingRight="20dp"
            android:text="@string/welcome_dialog_three"
            android:textColor="#d9d9d9" />
-       
-       <TextView
-           android:id="@+id/welcome_dialog_four"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:paddingLeft="20dp"
-           android:paddingRight="20dp"
-           android:text="@string/welcome_dialog_four"
-           android:textColor="#d9d9d9" />
-         
+
 </LinearLayout>
 </ScrollView>
