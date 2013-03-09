@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.ConnectivityManager;
@@ -135,6 +136,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         // Grab the latest location information.
         if (savedInstanceState == null)
         	this.updateUserLocation();
+        
+        String WELCOME_DIALOG = "Welcome";
+    	String WELCOME_KEY = "DISPLAY";
+        //Displays the Welcome screen until don't show is pressed
+        SharedPreferences welcomeIndicator = getBaseContext().getSharedPreferences(WELCOME_DIALOG, 0);
+        String indicator = welcomeIndicator.getString(WELCOME_KEY, "");
+        if (indicator.length() == 0) {
+        	DialogFragment welcomeDialog = new WelcomeDialogFragment();
+    		welcomeDialog.show(getSupportFragmentManager(), "welcomeDialog");
+        }
     }
 
     @Override
@@ -233,6 +244,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			// Show the settings activity.
 			Intent settings = new Intent(EventViewer.this, Settings.class);
 			startActivity(settings);
+		} else if (currentId == R.id.menu_welcome_dialog) {
+			DialogFragment welcomeDialog = new WelcomeDialogFragment();
+    		welcomeDialog.show(getSupportFragmentManager(), "welcomeDialog");
+    		return true;
 		}
 
         return super.onOptionsItemSelected(item);

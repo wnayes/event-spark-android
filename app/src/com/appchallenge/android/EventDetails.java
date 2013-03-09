@@ -1,7 +1,6 @@
 package com.appchallenge.android;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 

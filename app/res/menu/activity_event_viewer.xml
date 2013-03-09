@@ -16,6 +16,11 @@
     <item android:id="@+id/menu_type_filter"
           android:title="Filter By Type"
           android:showAsAction="ifRoom" />
+    
+    <!-- Weclome Dialog Button -->
+    <item android:id="@+id/menu_welcome_dialog"
+          android:title="Getting Started"
+          android:showAsAction="never"/>
 
     <!-- Settings menu -->
     <item android:id="@+id/menu_settings"

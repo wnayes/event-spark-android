@@ -9,6 +9,14 @@
     <string name="refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
     <string name="view_details">View Details</string>
+    
+    <!-- Welcome Dialog -->
+    <string name="title_welcome_dialog">Welcome to Event Hawk!</string>
+    <string name="welcome_dialog_one">To get sarted click on a marker to see more deatils.</string>
+    <string name="welcome_dialog_two">Click on the event bubble to see the full event.</string>
+    <string name="welcome_dialog_three">To add your own event click the plus in the corner.</string>
+    <string name="welcome_dialog_four">For more settings and features view the options menu.</string>
+    <string name="welcome_dialog_never_display">Don\'t Show Again</string>
 
     <!-- Create Event wizard -->
     <string name="event_create_image_flavor_text">Create Event Wizard</string>
