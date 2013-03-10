@@ -9,6 +9,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
+import com.appchallenge.android.ReportDialogFragment.ReportReason;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.ProgressDialog;
@@ -18,11 +20,12 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EventDetails extends SherlockFragmentActivity {
+public class EventDetails extends SherlockFragmentActivity implements ReportDialogListener {
 	// Private members containing the Event information.
 	private Event event;
 	private LatLng userLocation;
@@ -180,7 +183,9 @@ public class EventDetails extends SherlockFragmentActivity {
                 startActivity(intent);
                 return true;
 	        case R.id.menu_report_event:
-	        	
+	        	// Show dialog allowing the user to report an event.
+				DialogFragment reportDialog = new ReportDialogFragment();
+				reportDialog.show(getSupportFragmentManager(), "reportDialog");
 	        	return true;
             case R.id.menu_attend_event:
                 // Commit to attending the event.
@@ -189,6 +194,13 @@ public class EventDetails extends SherlockFragmentActivity {
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
+	}
+	
+	/**
+	 * Receives the ReportReason from the report dialog and submits the report.
+	 */
+	public void onReportDialogOKClick(DialogFragment dialog, ReportReason reason) {
+		// TODO Report the event.
 	}
 	
 	private class attendEventAPICaller extends AsyncTask<Integer, Void, String> {

@@ -375,7 +375,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	 * Interface method for receiving a filter list of event types from
 	 * a TypeFilterDialogFragment.
 	 */
-	public void onDialogOKClick(DialogFragment dialog, ArrayList<Event.Type> selectedTypes) {
+	public void onTypeFilterDialogOKClick(DialogFragment dialog, ArrayList<Event.Type> selectedTypes) {
 		Log.d("EventViewer.onDialogOKClick", "Received list of selected types: " + selectedTypes.toString());
 		
 		// Replace the previous type filter list with the newly created one.

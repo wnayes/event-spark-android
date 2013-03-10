@@ -61,6 +61,8 @@
     
     <!-- Dialogs -->
     <string name="filter_types_title">Filter By Type</string>
+    <string name="event_report_title">What is wrong with this event?</string>
+    <string name="report">Report</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
@@ -71,6 +73,12 @@
         <item>Promotions</item>
         <item>Social</item>
         <item>Other</item>
+    </string-array>
+    
+    <string-array name="report_reasons">
+        <item>Inaccurate details</item>
+        <item>Offensive details</item>
+        <item>Promotes illegal activity</item>
     </string-array>
 
     <string-array name="relative_days">

@@ -23,7 +23,7 @@ public class TypeFilterDialogFragment extends DialogFragment {
 	 */
 	public interface TypeFilterDialogListener {
 		public ArrayList<Type> receiveCurrentFilterList();
-		public void onDialogOKClick(DialogFragment dialog, ArrayList<Type> selectedTypes);
+		public void onTypeFilterDialogOKClick(DialogFragment dialog, ArrayList<Type> selectedTypes);
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class TypeFilterDialogFragment extends DialogFragment {
 	    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 	        @Override
 	        public void onClick(DialogInterface dialog, int id) {
-	            mListener.onDialogOKClick(TypeFilterDialogFragment.this, selectedTypes);
+	            mListener.onTypeFilterDialogOKClick(TypeFilterDialogFragment.this, selectedTypes);
 	            dialog.dismiss();
 	        }
 	    });
