@@ -230,11 +230,13 @@ public class APICalls {
         }
 	}
 
-	public static int report(int id) {
-		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/report/";
-		RestClient client = new RestClient(getAttendUrl);
+	public static String reportEvent(Integer eventId, Integer reasonCode, String userId) {
+		String getReportUrl = "http://saypoint.dreamhosters.com/api/events/report/";
+		RestClient client = new RestClient(getReportUrl);
 
-		client.AddParam("id", Integer.toString(id));
+		client.AddParam("id", eventId.toString());
+		client.AddParam("user_id", userId);
+		client.AddParam("reason", reasonCode.toString());
 
 		try {
             client.Execute(RestClient.RequestMethod.POST);
@@ -242,20 +244,24 @@ public class APICalls {
             e.printStackTrace();
         }
 
-    	Log.d("APICalls.report", (client.getResponse() == null) ? "" : client.getResponse());
+    	Log.d("APICalls.reportEvent", (client.getResponse() == null) ? "" : client.getResponse());
 
     	try {
             JSONObject eventJSON = new JSONObject(client.getResponse());
-            if (!eventJSON.has("text")) {
-            	Log.e("APICalls.report", "'text' key not present");
-            	return 0;
+            if (eventJSON.has("error"))
+				return null;
+            if (eventJSON.has("result")) {
+            	// Inform the UI whether we were able to report.
+            	return eventJSON.getString("result");
+            }
+            else {
+            	Log.e("APICalls.attendEvent", "'result' key not present");
+            	return null;
             }
     	} catch (JSONException e) {
-            Log.e(APICalls.class.toString(), "Error parsing list of Events in report()");
+            Log.e(APICalls.class.toString(), "Error parsing response in reportEvent()");
             e.printStackTrace();
-            return 0;
+            return null;
         }
-
-    	return 1;
 	}
 }

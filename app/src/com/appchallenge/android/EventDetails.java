@@ -13,6 +13,7 @@ import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
 import com.appchallenge.android.ReportDialogFragment.ReportReason;
 import com.google.android.gms.maps.model.LatLng;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -200,9 +201,54 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	 * Receives the ReportReason from the report dialog and submits the report.
 	 */
 	public void onReportDialogOKClick(DialogFragment dialog, ReportReason reason) {
-		// TODO Report the event.
+        new reportEventAPICaller().execute(this.event.getId(), reason.ordinal());
 	}
 	
+	/**
+	 * Performs an async call to report an event for a violation.
+	 */
+	private class reportEventAPICaller extends AsyncTask<Integer, Void, String> {
+		@Override
+		protected void onPreExecute() {
+			// TODO: Establish progress UI changes?
+		}
+
+		@Override
+		protected String doInBackground(Integer... values) {
+			// Values contains [0] id, [1] ReportReason
+			return APICalls.reportEvent(values[0], values[1], Identity.getUserId(getApplicationContext()));
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO: Remove progress UI.
+
+			// Some sort of error occurred during the request.
+			if (result == null) {
+				(Toast.makeText(getApplicationContext(), "Could not submit report. Please try again!", Toast.LENGTH_LONG)).show();
+				return;
+			}
+
+			// Our request went through and we have not previously reported the event.
+			if (result.equals("OK")) {
+				// Display a message thanking the user for the report.
+				AlertDialog.Builder builder = new AlertDialog.Builder(EventDetails.this);
+                builder.setMessage("Thank you for submitting a report.");
+                builder.setPositiveButton(R.string.ok, null);
+				AlertDialog dialog = builder.create();
+				dialog.show();
+			}
+			
+			// The user has already submitted a report.
+			else if (result.equals("PREVIOUSLY_REPORTED")) {
+				(Toast.makeText(getApplicationContext(), "You have already submitted a report. We will investigate the event as soon as possible.", Toast.LENGTH_LONG)).show();
+			}
+		}
+	}
+
+	/**
+	 * Performs an async call to submit attendance to an event.
+	 */
 	private class attendEventAPICaller extends AsyncTask<Integer, Void, String> {
 		/**
 		 * Quick access to the attend button in the actionbar.
