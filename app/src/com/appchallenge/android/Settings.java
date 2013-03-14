@@ -30,9 +30,9 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
 		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 		
 		if (sharedPreferences.getBoolean(key, false)) {
-			// Start every 30 seconds
+			// Start every 60 seconds
 			Calendar cal = Calendar.getInstance();
-			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30*1000, pintent); 
+			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 60*1000, pintent); 
 		}
 		else {
 			alarm.cancel(pintent);
