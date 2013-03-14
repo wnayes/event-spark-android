@@ -16,7 +16,7 @@ import android.util.Log;
  */
 public class LocalDatabase extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     /** Name of the database we use to store our tables. */
     private static final String DATABASE_NAME = "eventLocalDatabase";
@@ -38,10 +38,37 @@ public class LocalDatabase extends SQLiteOpenHelper {
     private static final String LOCAL_ATTENDANCE_TABLE_NAME = "local_attendance";
 
     // Uses KEY_ID of the same value from `users_events`.
+    // private static final String KEY_ID = "id";
 
     /** SQLITE command for creating the local attendance table. */
     private static final String LOCAL_ATTENDANCE_TABLE_CREATE = "CREATE TABLE " + LOCAL_ATTENDANCE_TABLE_NAME + " (" +
                                                                  KEY_ID + " INTEGER PRIMARY KEY);";
+    
+    /* *********************************** */
+    /** Table for keeping a local "cache" of events we have downloaded. */
+    private static final String EVENT_CACHE_TABLE_NAME = "event_cache";
+
+    /** Column names in event_cache. */
+    //private static final String KEY_ID = "id";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_LONGITUDE = "longitude";
+    private static final String KEY_LATITUDE = "latitude";
+    private static final String KEY_STARTDATE = "start_date";
+    private static final String KEY_ENDDATE = "end_date";
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_ATTENDING = "attending";
+
+    /** SQLITE command for creating the event_cache table. */
+    private static final String EVENT_CACHE_TABLE_CREATE = "CREATE TABLE " + EVENT_CACHE_TABLE_NAME + " (" +
+                                                            KEY_ID + " INTEGER PRIMARY KEY, " +
+                                                            KEY_DESCRIPTION + " TEXT, " +
+                                                            KEY_LONGITUDE + " REAL, " +
+                                                            KEY_LATITUDE + " REAL, " +
+                                                            KEY_STARTDATE + " INTEGER, " +
+                                                            KEY_ENDDATE + " INTEGER, " +
+                                                            KEY_TYPE + " INTEGER, " +
+                                                            KEY_ATTENDING + " INTEGER);";
+    
 
     LocalDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -52,6 +79,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
     	// Create the tables for the database.
         db.execSQL(USERS_EVENTS_TABLE_CREATE);
         db.execSQL(LOCAL_ATTENDANCE_TABLE_CREATE);
+        db.execSQL(EVENT_CACHE_TABLE_CREATE);
     }
 
 	@Override
@@ -59,6 +87,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		// Drop the existing copy of the table and create it again.
 		db.execSQL("DROP TABLE IF EXISTS " + USERS_EVENTS_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + LOCAL_ATTENDANCE_TABLE_NAME);
+		db.execSQL("DROP TABLE IF EXISTS " + EVENT_CACHE_TABLE_NAME);
 		onCreate(db);
 	}
 

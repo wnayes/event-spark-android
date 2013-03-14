@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.http.conn.ConnectTimeoutException;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Service;
@@ -17,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 
 public class NotificationService extends Service implements LocationListener {
