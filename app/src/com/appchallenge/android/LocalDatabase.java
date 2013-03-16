@@ -1,5 +1,7 @@
 package com.appchallenge.android;
 
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -76,6 +78,8 @@ public class LocalDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+    	Log.d("LocalDatabase.onCreate", "localDB tables being recreated.");
+
     	// Create the tables for the database.
         db.execSQL(USERS_EVENTS_TABLE_CREATE);
         db.execSQL(LOCAL_ATTENDANCE_TABLE_CREATE);
@@ -84,6 +88,8 @@ public class LocalDatabase extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		Log.d("LocalDatabase.onUpgrade", "localDB tables being dropped.");
+
 		// Drop the existing copy of the table and create it again.
 		db.execSQL("DROP TABLE IF EXISTS " + USERS_EVENTS_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + LOCAL_ATTENDANCE_TABLE_NAME);
@@ -191,5 +197,53 @@ public class LocalDatabase extends SQLiteOpenHelper {
 
         db.close();
         return false;
+	}
+
+	/**
+	 * Inserts any new events that we have not yet cached.
+	 * @param latestEvents An ArrayList received from the backend.
+	 * @return A sublist containing events found to be actually new.
+	 */
+	public ArrayList<Event> updateLocalEventCache(ArrayList<Event> latestEvents) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		// Read a list of the ids we currently have cached.
+		Cursor result = db.rawQuery("SELECT id FROM " + EVENT_CACHE_TABLE_NAME, null);
+		
+		ArrayList<Integer> cachedEventIds = new ArrayList<Integer>();
+		if (result.moveToFirst()) {
+			do {
+				cachedEventIds.add(result.getInt(0));
+			} while (result.moveToNext());
+		}
+		result.close();
+		
+		// Check if we have found a new event by id.
+		for (int i = latestEvents.size() - 1; i >= 0 ; --i) {
+			int newId = latestEvents.get(i).getId();
+			for (int j = cachedEventIds.size() - 1; j >= 0 ; --j) {
+				if (cachedEventIds.get(j) == newId)
+					latestEvents.remove(i);
+			}
+		}
+		
+		// The remaining events in `latestEvents` have new ids, so they should be added
+		// to the event cache.
+		for (Event newEvent : latestEvents) {
+			ContentValues values = new ContentValues();
+			values.put(KEY_ID, newEvent.getId());
+			values.put(KEY_DESCRIPTION, newEvent.getDescription());
+			values.put(KEY_LONGITUDE, newEvent.getLocation().longitude);
+			values.put(KEY_LATITUDE, newEvent.getLocation().latitude);
+			values.put(KEY_STARTDATE, newEvent.getStartDate().getTime() / 1000);
+			values.put(KEY_ENDDATE, newEvent.getEndDate().getTime() / 1000);
+			values.put(KEY_TYPE, newEvent.getType().getValue());
+			values.put(KEY_ATTENDING, newEvent.getAttendance());
+			
+			db.insert(EVENT_CACHE_TABLE_NAME, null, values);
+		}
+		
+		db.close();
+		return latestEvents;
 	}
 }

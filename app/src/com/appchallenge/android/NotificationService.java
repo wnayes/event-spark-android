@@ -8,13 +8,18 @@ import org.apache.http.conn.ConnectTimeoutException;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 
@@ -23,6 +28,11 @@ public class NotificationService extends Service implements LocationListener {
 	 * Storage for the events we receive from the backend.
 	 */
 	ArrayList<Event> latestEvents;
+
+	/**
+     * Provides access to our local sqlite database.
+     */
+    private LocalDatabase localDB;
 
 	@Override
 	public void onCreate() {
@@ -46,14 +56,42 @@ public class NotificationService extends Service implements LocationListener {
 
 	@Override
 	public void onDestroy() {
+		Log.d("NotificationService.onDestroy", "NotificationService stopping.");
 	    super.onDestroy();
-	    Log.d("NotificationService.onDestroy", "NotificationService stopping.");
+	    if (localDB != null)
+	    	localDB.close();
+	    
 	}
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		// We do not need to bind anything to this service.
-		return null;
+	// We do not need to bind anything to this service.
+	public IBinder onBind(Intent intent) { return null; }
+
+	/**
+	 * Creates our service notifications from a list of new events.
+	 * @param newEvents Events the user has not seen before and should be notified about.
+	 * @return A builder for our notification that can be given to the Android system.
+	 */
+	private NotificationCompat.Builder buildNotification(ArrayList<Event> newEvents) {
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+		mBuilder.setSmallIcon(R.drawable.logo);
+		mBuilder.setContentTitle(getResources().getQuantityString(R.plurals.new_events_nearby, newEvents.size(), newEvents.size()));
+		mBuilder.setContentText(newEvents.get(0).getTitle());
+		mBuilder.setAutoCancel(true);
+
+		// Creates an explicit intent for an Activity in your app
+		Intent resultIntent = new Intent(this, EventViewer.class);
+
+		// The stack builder object will contain an artificial back stack for the started Activity.
+		// This ensures that navigating backward from the Activity leads out of your application to the Home screen.
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+
+		// Adds the back stack for the Intent (but not the Intent itself)
+		stackBuilder.addParentStack(EventViewer.class);
+		// Adds the Intent that starts the Activity to the top of the stack
+		stackBuilder.addNextIntent(resultIntent);
+		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+		mBuilder.setContentIntent(resultPendingIntent);
+		return mBuilder;
 	}
 
 	// Method implementations for LocationListener.
@@ -62,7 +100,7 @@ public class NotificationService extends Service implements LocationListener {
 		Log.d("NotificationService.onLocationChanged", "NotificationService received location information.");
 
 		// We are in a Service so this blocking call should not cause UI responsiveness issues.
-		// If it does, 
+		// If it does, a solution might be listening for the AsyncTask to finish.
 		getEventsNearLocationAPICaller caller = new getEventsNearLocationAPICaller();
 		try {
 			latestEvents = caller.execute(new LatLng(loc.getLatitude(), loc.getLongitude())).get();
@@ -76,6 +114,20 @@ public class NotificationService extends Service implements LocationListener {
 		}
 
 		Log.d("NotificationService.onLocationChanged", "NotificationService received new event information.");
+		
+		if (localDB == null)
+			localDB = new LocalDatabase(this);
+
+		// Inform the local cache of these new events.
+		ArrayList<Event> newEvents = localDB.updateLocalEventCache(latestEvents);
+		Log.d("NotificationService.onLocationChanged", "We found " + newEvents.size() + " new events.");
+		
+		// If we have received some events we had not previously cached, notify the user as necessary.
+		if (newEvents.size() > 0) {
+			NotificationCompat.Builder builder = this.buildNotification(newEvents);
+		    NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		    mNotificationManager.notify(0, builder.build());
+		}
 
 		stopSelf();
 	}
@@ -105,12 +157,11 @@ public class NotificationService extends Service implements LocationListener {
 			return null;
 		}
 
-		@SuppressWarnings("unchecked")
 		protected void onPostExecute(ArrayList<Event> result) {
-			if (result == null || result.size() == 0)
-				return;
-
-			latestEvents = (ArrayList<Event>)result.clone();
+//			if (result == null || result.size() == 0)
+//				return;
+//			Log.d("NotificationService.onPostExecute", "NotificationService ONPOSTEXECUTE.");
+//			latestEvents = (ArrayList<Event>)result.clone();
 		}
 	}
 }
