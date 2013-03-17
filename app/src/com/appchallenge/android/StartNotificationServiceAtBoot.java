@@ -28,7 +28,7 @@ public class StartNotificationServiceAtBoot extends BroadcastReceiver {
     			// Start the NotificationService on a fixed interval.
     			Calendar cal = Calendar.getInstance();
     			AlarmManager alarm = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-    			Integer interval = Integer.getInteger(prefs.getString("notificationCheckInterval", "300000"));
+    			Integer interval = Integer.parseInt(prefs.getString("notificationCheckInterval", "300000"));
     			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), interval, pintent); 
     		}
         }
