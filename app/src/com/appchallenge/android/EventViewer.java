@@ -70,7 +70,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     /**
      * Array of Events we have downloaded for the user.
      */
-    private ArrayList<Event> currentEvents;
+    private ArrayList<Event> currentEvents = new ArrayList<Event>();
     
     /**
      * Maps the existing markers to their corresponding Event ID.

@@ -12,30 +12,35 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class Settings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class Settings extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
     }
+    
+    @Override
+    protected void onPause() {
+    	Log.d("Settings.onPause", "Settings activity has been paused.");
 
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		Log.d("Settings.onSharedPreferenceChanged", key + ": " + sharedPreferences.getBoolean(key, false));
-		
-		Intent intent = new Intent(this, NotificationService.class);
+    	// Apply any settings changes.
+    	Intent intent = new Intent(this, NotificationService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
 
 		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-		
-		if (sharedPreferences.getBoolean(key, false)) {
-			// Start every 60 seconds
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (prefs.getBoolean("notificationsEnabled", false)) {
+			// Start the NotificationService on a fixed interval.
+			Integer interval = Integer.parseInt(prefs.getString("notificationCheckInterval", "300000"));
+			Log.d("notificationCheckInterval", interval.toString());
 			Calendar cal = Calendar.getInstance();
-			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 60*1000, pintent); 
+			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), interval, pintent); 
 		}
 		else {
 			alarm.cancel(pintent);
 		}
-	}
+
+    	super.onPause();
+    }
 }

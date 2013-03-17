@@ -25,10 +25,11 @@ public class StartNotificationServiceAtBoot extends BroadcastReceiver {
     		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
     		if (prefs.getBoolean("notificationsEnabled", false)) {
-    			// Start every 60 seconds
+    			// Start the NotificationService on a fixed interval.
     			Calendar cal = Calendar.getInstance();
     			AlarmManager alarm = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-    			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 60*1000, pintent); 
+    			Integer interval = Integer.getInteger(prefs.getString("notificationCheckInterval", "300000"));
+    			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), interval, pintent); 
     		}
         }
     }
