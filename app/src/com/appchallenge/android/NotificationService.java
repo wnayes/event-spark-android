@@ -8,16 +8,19 @@ import org.apache.http.conn.ConnectTimeoutException;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -84,6 +87,11 @@ public class NotificationService extends Service implements LocationListener {
 		mBuilder.setContentTitle(title);
 		mBuilder.setContentText(newEvents.get(0).getTitle());
 		mBuilder.setAutoCancel(true);
+
+		// Enable vibrate if the user requested it.
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (prefs.getBoolean("notificationVibrate", false))
+		    mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
 
 		// Create an explicit intent for an Activity in your app
         Intent resultIntent;
@@ -153,7 +161,7 @@ public class NotificationService extends Service implements LocationListener {
 		if (newEvents.size() > 0) {
 			NotificationCompat.Builder builder = this.buildNotification(newEvents);
 		    NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		    mNotificationManager.notify(0, builder.build());
+		    mNotificationManager.notify(564534231, builder.build());
 		}
 
 		stopSelf();
@@ -169,6 +177,7 @@ public class NotificationService extends Service implements LocationListener {
 	private class getEventsNearLocationAPICaller extends AsyncTask<LatLng, Void, ArrayList<Event>> {
 
 		protected void onPreExecute() {}
+		protected void onPostExecute(ArrayList<Event> result) {}
 
 		protected ArrayList<Event> doInBackground(LatLng... location) {
 			// Perform the network call to retreive nearby events.
@@ -182,13 +191,6 @@ public class NotificationService extends Service implements LocationListener {
 				ste.printStackTrace();
 			}
 			return null;
-		}
-
-		protected void onPostExecute(ArrayList<Event> result) {
-//			if (result == null || result.size() == 0)
-//				return;
-//			Log.d("NotificationService.onPostExecute", "NotificationService ONPOSTEXECUTE.");
-//			latestEvents = (ArrayList<Event>)result.clone();
 		}
 	}
 }

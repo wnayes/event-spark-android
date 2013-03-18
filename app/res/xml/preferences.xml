@@ -8,6 +8,11 @@
             android:key="notificationsEnabled"
             android:summary="Receive updates of new events."
             android:title="Enable Event Notifications" />
+        <CheckBoxPreference
+            android:key="notificationVibrate"
+            android:title="Vibrate with Notifications"
+            android:defaultValue="false"
+            android:dependency="notificationsEnabled" />
         <ListPreference
 	        android:dependency="notificationsEnabled"
 	        android:key="notificationCheckInterval"
