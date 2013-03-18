@@ -29,6 +29,12 @@ public class NotificationService extends Service implements LocationListener {
 	 */
 	ArrayList<Event> latestEvents;
 
+    /**
+     * Location of the user for this service instance.
+     * This value is kept for passing through intents from notifications.
+     */
+    LatLng userLocation;
+
 	/**
      * Provides access to our local sqlite database.
      */
@@ -74,19 +80,38 @@ public class NotificationService extends Service implements LocationListener {
 	private NotificationCompat.Builder buildNotification(ArrayList<Event> newEvents) {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 		mBuilder.setSmallIcon(R.drawable.logo);
-		mBuilder.setContentTitle(getResources().getQuantityString(R.plurals.new_events_nearby, newEvents.size(), newEvents.size()));
+		String title = getResources().getQuantityString(R.plurals.new_events_nearby, newEvents.size(), newEvents.size());
+		mBuilder.setContentTitle(title);
 		mBuilder.setContentText(newEvents.get(0).getTitle());
 		mBuilder.setAutoCancel(true);
 
-		// Creates an explicit intent for an Activity in your app
-		Intent resultIntent = new Intent(this, EventViewer.class);
+		// Create an explicit intent for an Activity in your app
+        Intent resultIntent;
+
+		// Create a "big view" style that shows the names of the first few events when expanded (>4.1 only)
+		if (newEvents.size() > 1) {
+		    NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+		    inboxStyle.setBigContentTitle(title);
+		    for (int i = 0; i < newEvents.size(); ++i)
+                inboxStyle.addLine(newEvents.get(i).getTitle());
+		    mBuilder.setStyle(inboxStyle);
+
+		    // With multiple events, send the user to the map.
+		    resultIntent = new Intent(this, EventViewer.class);
+		}
+		else {
+			// A single event notification should send the user to the event details page directly.
+			resultIntent = new Intent(this, EventDetails.class);
+			resultIntent.putExtra("event", newEvents.get(0));
+			resultIntent.putExtra("userLocation", this.userLocation);
+		}
 
 		// The stack builder object will contain an artificial back stack for the started Activity.
 		// This ensures that navigating backward from the Activity leads out of your application to the Home screen.
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
 		// Adds the back stack for the Intent (but not the Intent itself)
-		stackBuilder.addParentStack(EventViewer.class);
+		stackBuilder.addParentStack(newEvents.size() > 1 ? EventViewer.class : EventDetails.class);
 		// Adds the Intent that starts the Activity to the top of the stack
 		stackBuilder.addNextIntent(resultIntent);
 		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -99,11 +124,13 @@ public class NotificationService extends Service implements LocationListener {
 	public void onLocationChanged(Location loc) {
 		Log.d("NotificationService.onLocationChanged", "NotificationService received location information.");
 
+		this.userLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
+
 		// We are in a Service so this blocking call should not cause UI responsiveness issues.
 		// If it does, a solution might be listening for the AsyncTask to finish.
 		getEventsNearLocationAPICaller caller = new getEventsNearLocationAPICaller();
 		try {
-			latestEvents = caller.execute(new LatLng(loc.getLatitude(), loc.getLongitude())).get();
+			latestEvents = caller.execute(this.userLocation).get();
 		}
         catch (InterruptedException e) { e.printStackTrace(); stopSelf(); }
         catch (ExecutionException e) { e.printStackTrace(); stopSelf(); }

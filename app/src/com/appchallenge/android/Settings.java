@@ -22,12 +22,16 @@ public class Settings extends PreferenceActivity {
     @Override
     protected void onPause() {
     	Log.d("Settings.onPause", "Settings activity has been paused.");
-
     	// Apply any settings changes.
+
     	Intent intent = new Intent(this, NotificationService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
 
 		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+		// Cancel any notification alarms we may have set. If the settings specify it,
+		// we will add a new alarm below.
+		alarm.cancel(pintent);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if (prefs.getBoolean("notificationsEnabled", false)) {
@@ -36,9 +40,6 @@ public class Settings extends PreferenceActivity {
 			Log.d("notificationCheckInterval", interval.toString());
 			Calendar cal = Calendar.getInstance();
 			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis() + interval, interval, pintent); 
-		}
-		else {
-			alarm.cancel(pintent);
 		}
 
     	super.onPause();
