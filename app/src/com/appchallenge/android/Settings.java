@@ -35,7 +35,7 @@ public class Settings extends PreferenceActivity {
 			Integer interval = Integer.parseInt(prefs.getString("notificationCheckInterval", "300000"));
 			Log.d("notificationCheckInterval", interval.toString());
 			Calendar cal = Calendar.getInstance();
-			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), interval, pintent); 
+			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis() + interval, interval, pintent); 
 		}
 		else {
 			alarm.cancel(pintent);

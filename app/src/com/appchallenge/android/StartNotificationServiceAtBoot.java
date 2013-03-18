@@ -29,7 +29,7 @@ public class StartNotificationServiceAtBoot extends BroadcastReceiver {
     			Calendar cal = Calendar.getInstance();
     			AlarmManager alarm = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
     			Integer interval = Integer.parseInt(prefs.getString("notificationCheckInterval", "300000"));
-    			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), interval, pintent); 
+    			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis() + interval, interval, pintent); 
     		}
         }
     }
