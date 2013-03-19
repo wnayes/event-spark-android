@@ -62,6 +62,12 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// Downgrades are performed in the same manner as upgrades.
+		this.onUpgrade(db, oldVersion, newVersion);
+	}
+
 	/** CRUD (Create, Read, Update, Delete) Procedures */
 
     /**
