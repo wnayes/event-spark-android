@@ -11,13 +11,19 @@
           android:icon="@drawable/refresh"
           android:title="@string/refresh"
           android:showAsAction="ifRoom"/>
-    
+
+    <!-- Share event details. -->
+    <item android:id="@+id/share"
+          android:title="@string/share"
+          android:showAsAction="ifRoom"
+          android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider"/>
+
     <!-- Retrieve directions to event. -->
     <item android:id="@+id/menu_get_directions"
           android:icon="@drawable/location_directions"
           android:title="@string/event_get_directions"
           android:showAsAction="ifRoom"/>
-    
+
     <!-- Report event item. -->
     <item android:id="@+id/menu_report_event"
           android:title="@string/event_report"

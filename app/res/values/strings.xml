@@ -38,7 +38,7 @@
     <!-- Event Details page -->
     <string name="title_activity_event_details">Event Details</string>
     <string name="event_description_empty">No description given.</string>
-
+    <string name="share">Share</string>
     <string name="event_get_directions">Get Directions</string>
     <string name="attend_event">Attend Event</string>
     <string name="join_event">Attend Event</string>

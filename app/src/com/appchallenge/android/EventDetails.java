@@ -9,6 +9,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.ShareActionProvider;
 import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
 import com.appchallenge.android.ReportDialogFragment.ReportReason;
 import com.google.android.gms.maps.model.LatLng;
@@ -40,6 +41,11 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
      * Provides access to our local sqlite database.
      */
     private LocalDatabase localDB;
+
+    /**
+     * Used to provide the sharing feature in the action bar.
+     */
+    private ShareActionProvider mShareActionProvider;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +161,13 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_event_details, menu);
-		
+
+		// Establish the "Share" action provider.
+        this.mShareActionProvider = (ShareActionProvider)menu.findItem(R.id.share).getActionProvider();
+        Intent intent = this.getEventShareIntent();
+        if (intent != null && this.mShareActionProvider != null)
+            this.mShareActionProvider.setShareIntent(intent);
+
 		// Keep a reference to the menu for later uses (refresh indicator change).
         this._menu = menu;
 		return true;
@@ -196,7 +208,21 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	            return super.onOptionsItemSelected(item);
 	   }
 	}
-	
+
+	/**
+     *Returns a Share intent for use with the Share action provider.
+     */
+    private Intent getEventShareIntent() {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, event.getTitle());
+        String text = event.getTitle() + "\n\nTime: " +
+                      ((TextView)findViewById(R.id.event_details_date_description)).getText().toString() +
+                      "\n\n" + event.getDescription();
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        return intent;
+    }
+
 	/**
 	 * Receives the ReportReason from the report dialog and submits the report.
 	 */
