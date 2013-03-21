@@ -118,6 +118,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
         	secretId = result.getString(0);
 
         db.close();
+        result.close();
         return secretId;
 	}
 

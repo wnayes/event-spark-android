@@ -17,6 +17,11 @@
           android:title="Filter By Type"
           android:showAsAction="ifRoom" />
     
+    <!-- Edit Your Events -->
+    <item android:id="@+id/edit_my_events"
+          android:title="Edit My Events"
+          android:showAsAction="never" />
+    
     <!-- Weclome Dialog Button -->
     <item android:id="@+id/menu_welcome_dialog"
           android:title="Getting Started"

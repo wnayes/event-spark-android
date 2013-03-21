@@ -143,6 +143,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         SharedPreferences welcomeIndicator = getBaseContext().getSharedPreferences(WELCOME_DIALOG, 0);
         String indicator = welcomeIndicator.getString(WELCOME_KEY, "");
         if (indicator.length() == 0) {
+        	SharedPreferences.Editor editor = welcomeIndicator.edit();
+		    editor.putString(WELCOME_KEY, "no");
+		    editor.commit();
         	DialogFragment welcomeDialog = new WelcomeDialogFragment();
     		welcomeDialog.show(getSupportFragmentManager(), "welcomeDialog");
         }
@@ -193,6 +196,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	localDB.takeOwnership(event);
 
     	// Display the new marker
+    	if (currentEvents == null) {
+    		currentEvents = new ArrayList<Event>();
+    	}
     	this.currentEvents.add(event);
     	Marker m = mMap.addMarker(event.toMarker());
     	eventMarkerMap.put(m, event.getId());
@@ -217,14 +223,29 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+    	
     	int currentId = item.getItemId();
         if (currentId == R.id.menu_create_event) {
+        	//Makes sure null cannot get passed as an location
+        	
+        	if (this.currentLocation == null) {
+        		this.updateUserLocation();
+        		//Checks if the have enabled location since event start, if the have let continue
+        		if(this.currentLocation !=null) {
+        			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
+        			// Pass the current location to the wizard so the maps appear synced.
+        			createEvent.putExtra("location", this.currentLocation);
+        			// Launch the wizard for creating a new event.
+        			startActivityForResult(createEvent, 0);
+        			return true;
+        		}
+        		
+        	    return true;
+        	}
 			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
 
 			// Pass the current location to the wizard so the maps appear synced.
-			if (currentLocation != null)
-                createEvent.putExtra("location", this.currentLocation);
-
+			createEvent.putExtra("location", this.currentLocation);
 			// Launch the wizard for creating a new event.
 			startActivityForResult(createEvent, 0);
 			return true;
@@ -248,6 +269,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			DialogFragment welcomeDialog = new WelcomeDialogFragment();
     		welcomeDialog.show(getSupportFragmentManager(), "welcomeDialog");
     		return true;
+		} else if (currentId == R.id.edit_my_events) {
+			if (this.currentEvents != null) {
+				Intent eventEdit = new Intent(EventViewer.this, EventEdit.class);
+				eventEdit.putParcelableArrayListExtra("currentEvents", this.currentEvents);
+				startActivity(eventEdit);
+				return true;
+			}  else {
+				Context context = getApplicationContext();
+				Toast.makeText(context, "No Events Found Near You to Edit.", Toast.LENGTH_LONG).show();
+			}
 		}
 
         return super.onOptionsItemSelected(item);
@@ -392,6 +423,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	public ArrayList<Type> receiveCurrentFilterList() {
 		return this.filterTypes;
 	}
+	
+
 
     private AlertDialog noLocationSourceDialog;
     private void showNoLocationSourceDialog() {
@@ -402,7 +435,13 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	noLocationSourceDialog.setTitle("Location Source Needed");
     	noLocationSourceDialog.setMessage("Turn on GPS or your cellular connection and try again!");
     	noLocationSourceDialog.setIcon(android.R.drawable.ic_dialog_alert);
-    	noLocationSourceDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+    	noLocationSourceDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Enable", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) {
+                startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                dialog.cancel();
+	        }
+	    });
+    	noLocationSourceDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancle", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
 	        }
@@ -416,6 +455,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	// Show a dialog indicating to turn on some location source.
         	showNoLocationSourceDialog();
         }
+        locationFinder.getLocation(this);
     }
 
 	@Override

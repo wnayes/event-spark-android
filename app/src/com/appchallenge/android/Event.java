@@ -64,6 +64,21 @@ public class Event implements Parcelable {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+    
+    public Event(int id, String name, Type type, String description, Date startDate, Date endDate, LatLng location) {
+    	// Defaults
+    	this.id = id;
+    	this.attendance = 1;
+    	this.secretId = "";
+
+        this.title = name;
+        this.type = type;
+        this.description = description;
+        this.location = location;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
 
     /**
      * @return The internal id of an Event.

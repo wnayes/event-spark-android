@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/event_edit_scroll_form">"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
+        
+        <!-- Event Title -->
+        <TextView
+            android:text="@string/event_edit_title"
+            android:gravity="left"
+            style="@style/eventHoundTheme.smallHeading" />
+        <EditText
+            android:id="@+id/event_edit_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text|textCapSentences"
+	        android:maxLength="60"
+            android:paddingBottom="8dp"/>
+        
+        <!-- Type Spinner -->
+        <TextView 
+            android:text="@string/event_edit_type"
+            android:gravity="left"
+            style="@style/eventHoundTheme.smallHeading" />
+        <Spinner
+          android:id="@+id/event_edit_type_spinner"
+          android:entries="@array/type_array"
+          android:hint="@string/event_select_type"
+          android:prompt="@string/event_select_type"
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:layout_marginBottom="16dp" />
+        
+        
+        <TextView
+            android:text="@string/event_time_start"
+            android:gravity="left"
+            style="@style/eventHoundTheme.smallHeading" />
+        
+        <!-- Event time controls -->
+
+        <LinearLayout
+            android:id="@+id/LinearLayout01"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Spinner
+                style="@style/eventHoundTheme.spinner"
+                android:id="@+id/event_edit_start_spinner" />
+
+            <Button
+                android:id="@+id/event_edit_start_button"
+                style="@style/eventHoundTheme.button"
+                android:onClick="showEventTimeDialog"/>
+        </LinearLayout>
+
+        <TextView
+            android:text="@string/event_time_end"
+            android:gravity="left"
+            style="@style/eventHoundTheme.smallHeading" />
+        
+        <LinearLayout android:id="@+id/event_edit_end_time_controls"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Spinner
+                style="@style/eventHoundTheme.spinner"
+                android:id="@+id/event_edit_end_spinner" />
+            
+            <Button android:id="@+id/event_edit_end_button"
+                style="@style/eventHoundTheme.button"
+                android:onClick="showEventTimeDialog" />
+
+        </LinearLayout>
+        
+        <!-- Event Description -->
+        <TextView
+            android:text="@string/event_edit_description"
+            android:gravity="left"
+            style="@style/eventHoundTheme.smallHeading" />
+        <EditText
+            android:id="@+id/event_edit_description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:inputType="textMultiLine|textCapSentences"
+	        android:gravity="top|left"
+	        android:singleLine="false"
+	        android:hint="@string/event_description_hint"
+	        android:maxLength="300"/>
+
+    </LinearLayout>
+</ScrollView>

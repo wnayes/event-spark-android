@@ -49,15 +49,14 @@
             android:name="com.appchallenge.android.Settings"
             android:label="@string/title_activity_settings" >
         </activity>
+        <activity
+            android:name="com.appchallenge.android.EventEdit"
+            android:label="@string/event_edit_page_title" >
+        </activity>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/maps_api_key_debug" />
-
-        <activity
-            android:name="com.appchallenge.android.EventDetails_2"
-            android:label="@string/title_activity_event_details" >
-        </activity>
 
     </application>
 

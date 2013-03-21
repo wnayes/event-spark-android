@@ -234,7 +234,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
-			// Perform an asynchrounous API call to create the new event.
+			// Perform an asynchronous API call to create the new event.
 			Event newEvent = new Event(title, type, description, this.startDate, this.endDate, mapLocation);
 			createEventAPICaller apiCall = new createEventAPICaller();
 			apiCall.execute(newEvent);

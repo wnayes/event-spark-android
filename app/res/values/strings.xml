@@ -35,6 +35,14 @@
     <string name="action_next">Next</string>
     <string name="action_finish">Submit</string>
     
+    <!-- Event Edit Page -->
+    <string name="event_edit_page_title">Event Edit</string>
+    <string name="event_edit_title">Title:</string>
+    <string name="event_edit_type">Type:</string>
+    <string name="event_edit_description">Description:</string>
+    <string name="event_edit_submit">Submit</string>
+    <string name="event_edit_delete">Delete</string>
+    
     <!-- Event Details page -->
     <string name="title_activity_event_details">Event Details</string>
     <string name="event_description_empty">No description given.</string>

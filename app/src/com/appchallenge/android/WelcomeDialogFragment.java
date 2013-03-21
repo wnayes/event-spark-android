@@ -21,6 +21,13 @@ public class WelcomeDialogFragment extends DialogFragment {
 		
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
+				SharedPreferences welcomeIndicator = getActivity().getBaseContext().getSharedPreferences(WELCOME_DIALOG, 0);
+				String indicator = welcomeIndicator.getString(WELCOME_KEY, "");
+				if (indicator.length() != 0) {
+				    SharedPreferences.Editor editor = welcomeIndicator.edit();
+				    editor.remove(WELCOME_KEY);
+				    editor.commit();
+				}
 				dialog.dismiss();
 			}
 		});
@@ -28,14 +35,8 @@ public class WelcomeDialogFragment extends DialogFragment {
 		builder.setNegativeButton(R.string.welcome_dialog_never_display,new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				SharedPreferences welcomeIndicator = getActivity().getBaseContext().getSharedPreferences(WELCOME_DIALOG, 0);
-				String indicator = welcomeIndicator.getString(WELCOME_KEY, "");
-				if (indicator.length() == 0) {
-				    SharedPreferences.Editor editor = welcomeIndicator.edit();
-				    editor.putString(WELCOME_KEY, "no");
-				    editor.commit();
-				    dialog.dismiss();
-				}
+				
+				dialog.dismiss();
 			}
 		}); 
 
