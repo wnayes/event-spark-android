@@ -149,8 +149,8 @@ public class NotificationService extends Service implements LocationListener {
 		try {
 			latestEvents = caller.execute(this.userLocation).get();
 		}
-        catch (InterruptedException e) { e.printStackTrace(); stopSelf(); }
-        catch (ExecutionException e) { e.printStackTrace(); stopSelf(); }
+        catch (InterruptedException e) { e.printStackTrace(); stopSelf(); return; }
+        catch (ExecutionException e) { e.printStackTrace(); stopSelf(); return; }
 
 		if (latestEvents == null || latestEvents.size() == 0) {
 			stopSelf();
