@@ -17,6 +17,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -53,11 +55,18 @@ public class NotificationService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d("NotificationService.onStartCommand", "NotificationService received command.");
 
+		if (!this.isOnline()) {
+			Log.d("NotificationService.onStartCommand", "No internet connection for NotificationService.");
+			stopSelf();
+			return Service.START_NOT_STICKY;
+		}
+
 		LocationFinder locationFinder = new LocationFinder();
         boolean sourcesExist = locationFinder.getLocation(this);
         if (!sourcesExist) {
         	Log.d("NotificationService.onStartCommand", "NotificationService had no location sources!");
         	stopSelf();
+        	return Service.START_NOT_STICKY;
         }
 
         return Service.START_STICKY;
@@ -170,7 +179,19 @@ public class NotificationService extends Service implements LocationListener {
 	public void onProviderDisabled(String arg0) {}
 	public void onProviderEnabled(String provider) {}
 	public void onStatusChanged(String provider, int status, Bundle extras) {}
-	
+
+	/**
+	 * Determines if the device has internet connectivity.
+	 * @return Whether a data connection is available.
+	 */
+	private boolean isOnline() {
+        ConnectivityManager connectivityManager =
+          (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
+    }
+
 	/**
 	 * Performs an asynchronous API call to find nearby events.
 	 */
