@@ -9,6 +9,10 @@
     <string name="refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
     <string name="view_details">View Details</string>
+    <string name="loading_blurb">Please wait while we determine your location\nand grab the latest events.</string>
+    <string name="finding_location">Finding your location&#8230;</string>
+    <string name="searching_events">Searching for events&#8230;</string>
+    <string name="finished_loading">Ready to start!</string>
     
     <!-- Welcome Dialog -->
     <string name="title_welcome">Name Our App</string>

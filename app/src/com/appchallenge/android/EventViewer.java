@@ -26,9 +26,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -96,6 +99,24 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
 
+        // Restore the state of the initial screen.
+        if (savedInstanceState != null) {
+        	if (savedInstanceState.getBoolean("actionBarVisible", true))
+                getActionBar().show();
+            else
+            	getActionBar().hide();
+        	findViewById(R.id.initialScreen).setVisibility(savedInstanceState.getBoolean("initialScreenVisible", false)
+                                                           ? View.VISIBLE : View.GONE);
+        	findViewById(R.id.initialScreenActions).setVisibility(savedInstanceState.getBoolean("initialScreenActionsVisible", false)
+                                                                  ? View.VISIBLE : View.GONE);
+        	findViewById(R.id.initialScreenRetry).setVisibility(savedInstanceState.getBoolean("initialScreenRetryVisible", false)
+                                                                ? View.VISIBLE : View.GONE);
+        	findViewById(R.id.initialStatusLayout).setVisibility(savedInstanceState.getBoolean("initialScreenStatusVisible", false)
+                                                                 ? View.VISIBLE : View.GONE);
+        }
+        else
+        	getActionBar().hide();
+
         // Instantiate the list of visible types.
         if (filterTypes.size() == 0) {
         	for (Type type : Type.typeIndices)
@@ -134,8 +155,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         }
 
         // Grab the latest location information.
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
+        	((TextView)findViewById(R.id.statusText)).setText(R.string.finding_location);
         	this.updateUserLocation();
+        }
         
         String WELCOME_DIALOG = "Welcome";
     	String WELCOME_KEY = "DISPLAY";
@@ -315,7 +338,58 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	if (noLocationSourceDialog != null && noLocationSourceDialog.isShowing())
     		savedInstanceState.putBoolean("noLocationSourceDialogOpen", true);
 
+    	// Save the state of the initial screen.
+    	savedInstanceState.putBoolean("actionBarVisible", getActionBar().isShowing());
+    	savedInstanceState.putBoolean("initialScreenVisible", findViewById(R.id.initialScreen).isShown());
+    	savedInstanceState.putBoolean("initialScreenActionsVisible", findViewById(R.id.initialScreenActions).isShown());
+    	savedInstanceState.putBoolean("initialScreenRetryVisible", findViewById(R.id.initialScreenRetry).isShown());
+    	savedInstanceState.putBoolean("initialScreenStatusVisible", findViewById(R.id.initialStatusLayout).isShown());
+
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    /**
+     * Handles the user clicking the `View Events` button on the initial screen.
+     */
+    public void onViewEventsClick(View v) {
+    	Log.d("EventViewer", "User clicked View Events.");
+    	
+    	this.hideInitialScreen();
+    }
+
+    /**
+     * Handles the user clicking the `Create Event` button on the initial screen.
+     * Hides the initial screen and opens the create event wizard.
+     */
+    public void onCreateEventClick(View v) {
+    	Log.d("EventViewer", "User clicked Create Event.");
+
+		Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
+		createEvent.putExtra("location", this.currentLocation);
+		startActivityForResult(createEvent, 0);
+
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+		    public void run() {
+		     hideInitialScreen();
+		    }
+		}, 1000);
+
+    }
+
+    public void onRetryLoadClick(View v) {
+    	Log.d("EventViewer", "User clicked retry loading.");
+    	
+    	findViewById(R.id.initialScreenRetry).setVisibility(View.GONE);
+    }
+
+    private void hideInitialScreen() {
+    	getActionBar().show();
+    	findViewById(R.id.initialScreen).setVisibility(View.GONE);
+    }
+
+    private boolean initialScreenVisible() {
+    	return findViewById(R.id.initialScreen).getVisibility() == View.VISIBLE;
     }
 
     /**
@@ -460,6 +534,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         if (!sourcesExist) {
         	// Show a dialog indicating to turn on some location source.
         	showNoLocationSourceDialog();
+        	findViewById(R.id.initialScreenRetry).setVisibility(View.VISIBLE);
         }
     }
 
@@ -473,8 +548,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         if (location != null) {
         	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         	mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
-        	if (isOnline())
+        	if (isOnline()) {
+        		((TextView)findViewById(R.id.statusText)).setText(R.string.searching_events);
         	    new getEventsNearLocationAPICaller().execute(currentLocation);
+        	}
 
         	// Invalidate the action bar menu to enable location-based actions.
         	invalidateOptionsMenu();
@@ -557,6 +634,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			if (refreshItem != null)
 			    refreshItem.setActionView(null);
 			refreshItem = null;
+
+			if (initialScreenVisible()) {
+				findViewById(R.id.initialScreenActions).setVisibility(View.VISIBLE);
+				findViewById(R.id.initialStatusLayout).setVisibility(View.GONE);
+			}
 
 			// Keep track of these events and populate the map.
 			if (result == null)
