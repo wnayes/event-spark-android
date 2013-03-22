@@ -201,9 +201,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	localDB.updateLocalEventCache(container);
 
     	// Display the new marker
-    	if (currentEvents == null) {
-    		currentEvents = new ArrayList<Event>();
-    	}
     	this.currentEvents.add(event);
     	Marker m = mMap.addMarker(event.toMarker());
     	eventMarkerMap.put(m, event.getId());
@@ -428,8 +425,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	public ArrayList<Type> receiveCurrentFilterList() {
 		return this.filterTypes;
 	}
-	
-
 
     private AlertDialog noLocationSourceDialog;
     private void showNoLocationSourceDialog() {
@@ -446,7 +441,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
                 dialog.cancel();
 	        }
 	    });
-    	noLocationSourceDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancle", new DialogInterface.OnClickListener() {
+    	noLocationSourceDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
 	        }
