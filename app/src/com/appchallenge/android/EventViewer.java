@@ -70,7 +70,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     /**
      * Array of Events we have downloaded for the user.
      */
-    private ArrayList<Event> currentEvents;
+    private ArrayList<Event> currentEvents = new ArrayList<Event>();
     
     /**
      * Maps the existing markers to their corresponding Event ID.
@@ -194,6 +194,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	if (localDB == null)
     		localDB = new LocalDatabase(this);
     	localDB.takeOwnership(event);
+    	
+    	// Update the local event cache with this new event to avoid notifications about it.
+    	ArrayList<Event> container = new ArrayList<Event>();
+    	container.add(event);
+    	localDB.updateLocalEventCache(container);
 
     	// Display the new marker
     	if (currentEvents == null) {
@@ -561,6 +566,13 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			}
 
 			currentEvents = (ArrayList<Event>)result.clone();
+			
+			if (localDB == null)
+				localDB = new LocalDatabase(EventViewer.this);
+
+			// Inform the local cache of these new events.
+			localDB.updateLocalEventCache(result);
+			
 			reloadEventMarkers();
 		}
 	}

@@ -1,5 +1,7 @@
 package com.appchallenge.android;
 
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -16,7 +18,7 @@ import android.util.Log;
  */
 public class LocalDatabase extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     /** Name of the database we use to store our tables. */
     private static final String DATABASE_NAME = "eventLocalDatabase";
@@ -38,10 +40,37 @@ public class LocalDatabase extends SQLiteOpenHelper {
     private static final String LOCAL_ATTENDANCE_TABLE_NAME = "local_attendance";
 
     // Uses KEY_ID of the same value from `users_events`.
+    // private static final String KEY_ID = "id";
 
     /** SQLITE command for creating the local attendance table. */
     private static final String LOCAL_ATTENDANCE_TABLE_CREATE = "CREATE TABLE " + LOCAL_ATTENDANCE_TABLE_NAME + " (" +
                                                                  KEY_ID + " INTEGER PRIMARY KEY);";
+    
+    /* *********************************** */
+    /** Table for keeping a local "cache" of events we have downloaded. */
+    private static final String EVENT_CACHE_TABLE_NAME = "event_cache";
+
+    /** Column names in event_cache. */
+    //private static final String KEY_ID = "id";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_LONGITUDE = "longitude";
+    private static final String KEY_LATITUDE = "latitude";
+    private static final String KEY_STARTDATE = "start_date";
+    private static final String KEY_ENDDATE = "end_date";
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_ATTENDING = "attending";
+
+    /** SQLITE command for creating the event_cache table. */
+    private static final String EVENT_CACHE_TABLE_CREATE = "CREATE TABLE " + EVENT_CACHE_TABLE_NAME + " (" +
+                                                            KEY_ID + " INTEGER PRIMARY KEY, " +
+                                                            KEY_DESCRIPTION + " TEXT, " +
+                                                            KEY_LONGITUDE + " REAL, " +
+                                                            KEY_LATITUDE + " REAL, " +
+                                                            KEY_STARTDATE + " INTEGER, " +
+                                                            KEY_ENDDATE + " INTEGER, " +
+                                                            KEY_TYPE + " INTEGER, " +
+                                                            KEY_ATTENDING + " INTEGER);";
+    
 
     LocalDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -49,16 +78,22 @@ public class LocalDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+    	Log.d("LocalDatabase.onCreate", "localDB tables being recreated.");
+
     	// Create the tables for the database.
         db.execSQL(USERS_EVENTS_TABLE_CREATE);
         db.execSQL(LOCAL_ATTENDANCE_TABLE_CREATE);
+        db.execSQL(EVENT_CACHE_TABLE_CREATE);
     }
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		Log.d("LocalDatabase.onUpgrade", "localDB tables being dropped.");
+
 		// Drop the existing copy of the table and create it again.
 		db.execSQL("DROP TABLE IF EXISTS " + USERS_EVENTS_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + LOCAL_ATTENDANCE_TABLE_NAME);
+		db.execSQL("DROP TABLE IF EXISTS " + EVENT_CACHE_TABLE_NAME);
 		onCreate(db);
 	}
 
@@ -169,5 +204,53 @@ public class LocalDatabase extends SQLiteOpenHelper {
 
         db.close();
         return false;
+	}
+
+	/**
+	 * Inserts any new events that we have not yet cached.
+	 * @param latestEvents An ArrayList received from the backend.
+	 * @return A sublist containing events found to be actually new.
+	 */
+	public ArrayList<Event> updateLocalEventCache(ArrayList<Event> latestEvents) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		// Read a list of the ids we currently have cached.
+		Cursor result = db.rawQuery("SELECT id FROM " + EVENT_CACHE_TABLE_NAME, null);
+		
+		ArrayList<Integer> cachedEventIds = new ArrayList<Integer>();
+		if (result.moveToFirst()) {
+			do {
+				cachedEventIds.add(result.getInt(0));
+			} while (result.moveToNext());
+		}
+		result.close();
+		
+		// Check if we have found a new event by id.
+		for (int i = latestEvents.size() - 1; i >= 0 ; --i) {
+			int newId = latestEvents.get(i).getId();
+			for (int j = cachedEventIds.size() - 1; j >= 0 ; --j) {
+				if (cachedEventIds.get(j) == newId)
+					latestEvents.remove(i);
+			}
+		}
+		
+		// The remaining events in `latestEvents` have new ids, so they should be added
+		// to the event cache.
+		for (Event newEvent : latestEvents) {
+			ContentValues values = new ContentValues();
+			values.put(KEY_ID, newEvent.getId());
+			values.put(KEY_DESCRIPTION, newEvent.getDescription());
+			values.put(KEY_LONGITUDE, newEvent.getLocation().longitude);
+			values.put(KEY_LATITUDE, newEvent.getLocation().latitude);
+			values.put(KEY_STARTDATE, newEvent.getStartDate().getTime() / 1000);
+			values.put(KEY_ENDDATE, newEvent.getEndDate().getTime() / 1000);
+			values.put(KEY_TYPE, newEvent.getType().getValue());
+			values.put(KEY_ATTENDING, newEvent.getAttendance());
+			
+			db.insert(EVENT_CACHE_TABLE_NAME, null, values);
+		}
+		
+		db.close();
+		return latestEvents;
 	}
 }
