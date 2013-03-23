@@ -107,12 +107,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             	getActionBar().hide();
         	findViewById(R.id.initialScreen).setVisibility(savedInstanceState.getBoolean("initialScreenVisible", false)
                                                            ? View.VISIBLE : View.GONE);
-        	findViewById(R.id.initialScreenActions).setVisibility(savedInstanceState.getBoolean("initialScreenActionsVisible", false)
-                                                                  ? View.VISIBLE : View.GONE);
         	findViewById(R.id.initialScreenRetry).setVisibility(savedInstanceState.getBoolean("initialScreenRetryVisible", false)
                                                                 ? View.VISIBLE : View.GONE);
-        	findViewById(R.id.initialStatusLayout).setVisibility(savedInstanceState.getBoolean("initialScreenStatusVisible", false)
-                                                                 ? View.VISIBLE : View.GONE);
+        	findViewById(R.id.createEventButton).setVisibility(savedInstanceState.getBoolean("initialScreenCreateEventVisible", false)
+                                                               ? View.VISIBLE : View.GONE);
+        	findViewById(R.id.initialProgressLayout).setVisibility(savedInstanceState.getBoolean("initialScreenLocProgressVisible", false)
+                                                                   ? View.VISIBLE : View.GONE);
         }
         else
         	getActionBar().hide();
@@ -341,9 +341,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	// Save the state of the initial screen.
     	savedInstanceState.putBoolean("actionBarVisible", getActionBar().isShowing());
     	savedInstanceState.putBoolean("initialScreenVisible", findViewById(R.id.initialScreen).isShown());
-    	savedInstanceState.putBoolean("initialScreenActionsVisible", findViewById(R.id.initialScreenActions).isShown());
     	savedInstanceState.putBoolean("initialScreenRetryVisible", findViewById(R.id.initialScreenRetry).isShown());
-    	savedInstanceState.putBoolean("initialScreenStatusVisible", findViewById(R.id.initialStatusLayout).isShown());
+    	savedInstanceState.putBoolean("initialScreenCreateEventVisible", findViewById(R.id.createEventButton).isShown());
+    	savedInstanceState.putBoolean("initialScreenLocProgressVisible", findViewById(R.id.initialProgressLayout).isShown());
 
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -548,8 +548,13 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         if (location != null) {
         	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         	mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
+
+        	if (initialScreenVisible()) {
+				findViewById(R.id.createEventButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.initialProgressLayout).setVisibility(View.GONE);
+			}
+
         	if (isOnline()) {
-        		((TextView)findViewById(R.id.statusText)).setText(R.string.searching_events);
         	    new getEventsNearLocationAPICaller().execute(currentLocation);
         	}
 
@@ -634,11 +639,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			if (refreshItem != null)
 			    refreshItem.setActionView(null);
 			refreshItem = null;
-
-			if (initialScreenVisible()) {
-				findViewById(R.id.initialScreenActions).setVisibility(View.VISIBLE);
-				findViewById(R.id.initialStatusLayout).setVisibility(View.GONE);
-			}
 
 			// Keep track of these events and populate the map.
 			if (result == null)
