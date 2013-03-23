@@ -455,7 +455,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	// Show a dialog indicating to turn on some location source.
         	showNoLocationSourceDialog();
         }
-        locationFinder.getLocation(this);
     }
 
 	@Override
