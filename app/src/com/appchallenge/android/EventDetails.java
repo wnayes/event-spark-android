@@ -2,8 +2,6 @@ package com.appchallenge.android;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.concurrent.ExecutionException;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -15,7 +13,6 @@ import com.appchallenge.android.ReportDialogFragment.ReportReason;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;

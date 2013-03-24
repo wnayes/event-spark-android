@@ -146,8 +146,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	SharedPreferences.Editor editor = welcomeIndicator.edit();
 		    editor.putString(WELCOME_KEY, "no");
 		    editor.commit();
-        	DialogFragment welcomeDialog = new WelcomeDialogFragment();
-    		welcomeDialog.show(getSupportFragmentManager(), "welcomeDialog");
+		    Intent welcome = new Intent(EventViewer.this, Welcome.class);
+		    startActivity(welcome);
         }
     }
 
@@ -274,12 +274,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			Intent settings = new Intent(EventViewer.this, Settings.class);
 			startActivity(settings);
 		} else if (currentId == R.id.menu_welcome_dialog) {
-			DialogFragment welcomeDialog = new WelcomeDialogFragment();
-    		welcomeDialog.show(getSupportFragmentManager(), "welcomeDialog");
-    		return true;
+			Intent welcomeIntent = new Intent(EventViewer.this, Welcome.class);
+			startActivity(welcomeIntent);
+			return true;
 		} else if (currentId == R.id.edit_my_events) {
 			if (this.currentEvents != null) {
-				Intent eventEdit = new Intent(EventViewer.this, EventEdit.class);
+				Intent eventEdit = new Intent(EventViewer.this, EventEditList.class);
 				eventEdit.putParcelableArrayListExtra("currentEvents", this.currentEvents);
 				startActivity(eventEdit);
 				return true;

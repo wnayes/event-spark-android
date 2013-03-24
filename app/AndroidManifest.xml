@@ -50,8 +50,17 @@
             android:name="com.appchallenge.android.Settings"
             android:label="@string/title_activity_settings" >
         </activity>
+        <activity
+            android:name="com.appchallenge.android.Welcome"
+            android:label="@string/title_welcome" 
+            android:theme="@style/event.Transparent">
+        </activity>
 		<activity
             android:name="com.appchallenge.android.EventEdit"
+            android:label="@string/event_edit_page_title" >
+        </activity>
+        <activity
+            android:name="com.appchallenge.android.EventEditList"
             android:label="@string/event_edit_page_title" >
         </activity>
 
