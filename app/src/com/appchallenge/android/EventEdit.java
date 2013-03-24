@@ -1,10 +1,10 @@
 package com.appchallenge.android;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -36,6 +35,7 @@ import com.appchallenge.android.Event.Type;
 import com.google.android.gms.maps.model.LatLng;
 
 
+@SuppressLint("ValidFragment")
 public class EventEdit extends SherlockFragmentActivity implements CreateEventInterface{
 	
 	String title;
@@ -86,26 +86,31 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 		endDate = date;
 	}
 
+	LatLng location;
 	@Override
-	public LatLng getLocation() {return null;/* Not used */	}
+	public LatLng getLocation() {
+		return location;
+	}
 	@Override
-	public void setLocation(LatLng location) {/* Not used*/	}
+	public void setLocation(LatLng position) {
+		location = position;
+	}
 
 	Type type;
 	@Override
 	public Type getType() {
-		return this.type;
+		return type;
 	}
 
 	@Override
-	public void setType(Type type) {
-		this.type = type;		
+	public void setType(Type inType) {
+		type = inType;		
 	}
 
-	int id;
+	protected int id;
 	protected static Activity activity;
 	LocalDatabase localDB;
-	Event event;
+	protected Event event;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -123,7 +128,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	    
 		//Set id
 	    id = event.getId();
-	    
+	    this.setLocation(event.getLocation());
 	    //Set the title and description
 		EditText eventTitle = (EditText) findViewById(R.id.event_edit_title);
 		EditText description = (EditText) findViewById(R.id.event_edit_description);
@@ -134,16 +139,15 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
                                                                              android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(adapter);
-                
+        
         if (savedInstanceState != null) {
         	Log.d("Event Edit", "End");
         	eventTitle.setText(savedInstanceState.getString("title"));
-        	Log.d("Event Edit", "Title Set");
         	description.setText(savedInstanceState.getString("description"));
-        	Log.d("Event Edit", "Desc Set");
-        	//Log.d("Event Edit Type", getType().toString());
         	typeSpinner.setSelection(savedInstanceState.getInt("type"));
-        	Log.d("Event Edit", "End End");
+        	this.setTitle(savedInstanceState.getString("title"));
+        	this.setDescription(savedInstanceState.getString("description"));
+        	this.setType(Event.Type.typeIndices[savedInstanceState.getInt("type")]);
         } else {
 		    eventTitle.setText(event.getTitle());
 		    this.setTitle(event.getTitle());
@@ -319,15 +323,15 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
 		if (item.getItemId() == android.R.id.home){
-			NavUtils.navigateUpTo(this, new Intent(this, EventEditList.class));
+			onBackPressed();
         	return true;
 		} else if (item.getItemId() == R.id.event_edit_submit) {
-			Event tempEvent = new Event(id, title, type, desc, this.startDate, this.endDate, null);
+			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location);
 			updateEventAPICaller updateEvent = new updateEventAPICaller();
 			updateEvent.execute(tempEvent);
 			return true;
 		} else if (item.getItemId() == R.id.event_edit_delete) {
-			Event tempEvent = new Event(id, title, type, desc, this.startDate, this.endDate, null);
+			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location);
 			deleteEventAPICaller deleteEvent = new deleteEventAPICaller();
 			deleteEvent.execute(tempEvent);
 			//To-Do add network call
@@ -354,6 +358,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
     }
 
 	
+	@SuppressLint("ValidFragment")
 	public class StartTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -448,7 +453,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 		}
 	}
 
-	private class deleteEventAPICaller extends AsyncTask<Event, Void, Event> {
+	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
 		/**
 	     * Informs the user that the event is being created.
 	     */
@@ -461,25 +466,25 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 		}
 
 		@Override
-		protected Event doInBackground(Event... event) {
+		protected Boolean doInBackground(Event... event) {
 			return APICalls.deleteEvent(event[0], Identity.getUserId(getApplicationContext()));
 		}
 
 		@Override
-		protected void onPostExecute(Event result) {
+		protected void onPostExecute(Boolean result) {
 			// Close the wizard and any progress indication.
 			dialog.dismiss();
 			dialog = null;
-			if (result == null) {
+			if (result == false) {
 				(Toast.makeText(getApplicationContext(), "Could not delete event!", Toast.LENGTH_LONG)).show();
 				EventEdit.this.finish();
 				return;
 			}
 			
 			// Pass the new event to the event viewer.
-			Intent intent = new Intent(EventEdit.this, EventViewer.class);
-			intent.putExtra("event", result);
-		    EventEdit.this.setResult(RESULT_OK, intent);
+			//Intent intent = new Intent(EventEdit.this, EventViewer.class);
+			//intent.putExtra("event", result);
+		    //EventEdit.this.setResult(RESULT_OK, intent);
 			EventEdit.this.finish();
 		}
 	}

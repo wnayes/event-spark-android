@@ -47,5 +47,11 @@
     <style name="eventHoundTheme.sentence">
         <item name="android:textSize">12sp</item>
     </style>
+    
+    <style name="event.Transparent" parent="Theme.Sherlock.Light.DarkActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:background">#00000000</item>
+    </style>
 
 </resources>

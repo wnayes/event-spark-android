@@ -275,6 +275,9 @@ public class APICalls {
         client.AddParam("start_date", ((Long)(event.getStartDate().getTime() / 1000)).toString());
         client.AddParam("end_date", ((Long)(event.getEndDate().getTime() / 1000)).toString());
         client.AddParam("type", ((Integer)event.getType().getValue()).toString());
+        LatLng location = event.getLocation();
+        client.AddParam("latitude", ((Double)location.latitude).toString());
+        client.AddParam("longitude", ((Double)location.longitude).toString());
         client.AddParam("user_id", userId);
 
         try {
@@ -302,7 +305,7 @@ public class APICalls {
 
 	}
 	
-	public static Event deleteEvent(Event event, String userId) {
+	public static Boolean deleteEvent(Event event, String userId) {
     	String createEventUrl = "http://saypoint.dreamhosters.com/api/events/deleteEvent";
         RestClient client = new RestClient(createEventUrl);
 
@@ -326,16 +329,16 @@ public class APICalls {
         // Determine if an error has occurred.
         try {
 			if ((new JSONObject(result)).has("error"))
-				return null;
+				return false;
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return null;
+			return false;
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			return null;
+			return false;
 		} 
 
-        return new Event(result);
+        return true;
 
 	}
 
