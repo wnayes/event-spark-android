@@ -37,6 +37,8 @@
     
     <!-- Event Edit Page -->
     <string name="event_edit_page_title">Event Edit</string>
+    <string name="event_edit_header">Click on an Event to Edit it</string>
+    <string name="event_edit_no_events">No events you made were found.</string>
     <string name="event_edit_title">Title:</string>
     <string name="event_edit_type">Type:</string>
     <string name="event_edit_description">Description:</string>

@@ -273,7 +273,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     		return true;
 		} else if (currentId == R.id.edit_my_events) {
 			if (this.currentEvents != null) {
-				Intent eventEdit = new Intent(EventViewer.this, EventEdit.class);
+				Intent eventEdit = new Intent(EventViewer.this, EventEditList.class);
 				eventEdit.putParcelableArrayListExtra("currentEvents", this.currentEvents);
 				startActivity(eventEdit);
 				return true;

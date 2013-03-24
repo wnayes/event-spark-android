@@ -265,20 +265,20 @@ public class APICalls {
         }
 	}
 
-	public static Event updateEvent(Event event, String userId, String command) {
+	public static Event updateEvent(Event event, String userId) {
     	String createEventUrl = "http://saypoint.dreamhosters.com/api/events/updateEvent";
         RestClient client = new RestClient(createEventUrl);
 
+        client.AddParam("id", ((Integer)event.getId()).toString());
         client.AddParam("title", event.getTitle());
         client.AddParam("description", event.getDescription());
         client.AddParam("start_date", ((Long)(event.getStartDate().getTime() / 1000)).toString());
         client.AddParam("end_date", ((Long)(event.getEndDate().getTime() / 1000)).toString());
         client.AddParam("type", ((Integer)event.getType().getValue()).toString());
         client.AddParam("user_id", userId);
-        client.AddParam("command", command);
 
         try {
-            client.Execute(RestClient.RequestMethod.POST);
+            client.Execute(RestClient.RequestMethod.PUT);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -301,4 +301,42 @@ public class APICalls {
         return new Event(result);
 
 	}
+	
+	public static Event deleteEvent(Event event, String userId) {
+    	String createEventUrl = "http://saypoint.dreamhosters.com/api/events/deleteEvent";
+        RestClient client = new RestClient(createEventUrl);
+
+        client.AddParam("id", ((Integer)event.getId()).toString());
+        client.AddParam("title", event.getTitle());
+        client.AddParam("description", event.getDescription());
+        client.AddParam("start_date", ((Long)(event.getStartDate().getTime() / 1000)).toString());
+        client.AddParam("end_date", ((Long)(event.getEndDate().getTime() / 1000)).toString());
+        client.AddParam("type", ((Integer)event.getType().getValue()).toString());
+        client.AddParam("user_id", userId);
+
+        try {
+            client.Execute(RestClient.RequestMethod.DELETE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String result = client.getResponse();
+        Log.d("APICalls.deleteEvent", result == null ? "" : result);
+
+        // Determine if an error has occurred.
+        try {
+			if ((new JSONObject(result)).has("error"))
+				return null;
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		} 
+
+        return new Event(result);
+
+	}
+
 }
