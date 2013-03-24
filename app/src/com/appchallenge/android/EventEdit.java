@@ -108,6 +108,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	}
 
 	protected int id;
+	protected int attending;
 	protected static Activity activity;
 	LocalDatabase localDB;
 	protected Event event;
@@ -128,6 +129,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	    
 		//Set id
 	    id = event.getId();
+	    attending = event.getAttendance();
 	    this.setLocation(event.getLocation());
 	    //Set the title and description
 		EditText eventTitle = (EditText) findViewById(R.id.event_edit_title);
@@ -154,7 +156,8 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 		    description.setText(event.getDescription());
 		    this.setDescription(event.getDescription());
 		    //Set type;
-	        typeSpinner.setSelection(event.getType().getValue());
+		    int typeSelection = (event.getType().getValue() > 5) ? 0 : event.getType().getValue() - 1;
+	        typeSpinner.setSelection(typeSelection);
 	        this.setType(event.getType());
         }
 		
@@ -326,15 +329,16 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 			onBackPressed();
         	return true;
 		} else if (item.getItemId() == R.id.event_edit_submit) {
-			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location);
+			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location, attending);
+			Log.d("EventEdit Submit", tempEvent.toJSON());
 			updateEventAPICaller updateEvent = new updateEventAPICaller();
 			updateEvent.execute(tempEvent);
 			return true;
 		} else if (item.getItemId() == R.id.event_edit_delete) {
-			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location);
+			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location, attending);
+			Log.d("EventEdit Delete", tempEvent.toJSON());
 			deleteEventAPICaller deleteEvent = new deleteEventAPICaller();
 			deleteEvent.execute(tempEvent);
-			//To-Do add network call
 			return true;
 		} else if (item.getItemId() == R.id.action_back) {
 			onBackPressed();
@@ -476,7 +480,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 			dialog.dismiss();
 			dialog = null;
 			if (result == false) {
-				(Toast.makeText(getApplicationContext(), "Could not delete event!", Toast.LENGTH_LONG)).show();
+				(Toast.makeText(getApplicationContext(), "Event already deleted, or could not delete event!", Toast.LENGTH_LONG)).show();
 				EventEdit.this.finish();
 				return;
 			}

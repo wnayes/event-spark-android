@@ -279,6 +279,7 @@ public class APICalls {
         client.AddParam("latitude", ((Double)location.latitude).toString());
         client.AddParam("longitude", ((Double)location.longitude).toString());
         client.AddParam("user_id", userId);
+        client.AddParam("attending", ((Integer)event.getAttendance()).toString());
 
         try {
             client.Execute(RestClient.RequestMethod.PUT);
@@ -288,11 +289,19 @@ public class APICalls {
 
         String result = client.getResponse();
         Log.d("APICalls.updateEvent", result == null ? "" : result);
-
+        Event updatedEvent;
         // Determine if an error has occurred.
         try {
-			if ((new JSONObject(result)).has("error"))
+        	JSONObject eventJSON = new JSONObject(client.getResponse());
+			if ((eventJSON).has("error")) {
+				Log.d("APICalls.updateEvent", "A planned error occured");
 				return null;
+			}
+			if (!(eventJSON).has("event")) {
+				Log.d("APICalls.updateEvent", "Some unplanned error occured");
+				return null;
+			}
+			updatedEvent = new Event(eventJSON.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
@@ -300,8 +309,8 @@ public class APICalls {
 			e.printStackTrace();
 			return null;
 		} 
-
-        return new Event(result);
+        
+        return updatedEvent;
 
 	}
 	
@@ -310,11 +319,7 @@ public class APICalls {
         RestClient client = new RestClient(createEventUrl);
 
         client.AddParam("id", ((Integer)event.getId()).toString());
-        client.AddParam("title", event.getTitle());
-        client.AddParam("description", event.getDescription());
-        client.AddParam("start_date", ((Long)(event.getStartDate().getTime() / 1000)).toString());
-        client.AddParam("end_date", ((Long)(event.getEndDate().getTime() / 1000)).toString());
-        client.AddParam("type", ((Integer)event.getType().getValue()).toString());
+        Log.d("APICalls.deleteEvent Id Check", ((Integer)event.getId()).toString());
         client.AddParam("user_id", userId);
 
         try {

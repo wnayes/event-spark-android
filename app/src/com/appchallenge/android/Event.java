@@ -65,10 +65,23 @@ public class Event implements Parcelable {
         this.endDate = endDate;
     }
     
-    public Event(int id, String name, Type type, String description, Date startDate, Date endDate, LatLng location) {
-    	// Defaults
+    
+    /**
+     * 
+     * Create an event that already has an attendance
+     * @param id
+     * @param name
+     * @param type
+     * @param description
+     * @param startDate
+     * @param endDate
+     * @param location
+     * @param attendance
+     */
+    public Event(int id, String name, Type type, String description, Date startDate, Date endDate, LatLng location, int attendance) {
+    	
     	this.id = id;
-    	this.attendance = 1;
+    	this.attendance = attendance;
     	this.secretId = "";
 
         this.title = name;
@@ -311,4 +324,5 @@ public class Event implements Parcelable {
     	this.endDate = new Date(pc.readLong());
     	this.attendance = pc.readInt();
     }
+    
 }
