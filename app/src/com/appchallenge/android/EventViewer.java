@@ -217,7 +217,13 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.activity_event_viewer, menu);
-        
+
+        // Enable and make transparent certain menu items based on location status.
+        menu.findItem(R.id.menu_refresh_events).setEnabled(this.currentLocation != null)
+                                               .setIcon(this.currentLocation != null ? R.drawable.ic_action_new : R.drawable.ic_action_new_transparent);
+        menu.findItem(R.id.menu_create_event).setEnabled(this.currentLocation != null)
+                                             .setIcon(this.currentLocation != null ? R.drawable.refresh : R.drawable.refresh_transparent);
+
         // Keep a reference to the menu for later uses (refresh indicator change).
         this._menu = menu;
         return true;
@@ -469,6 +475,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
         	if (isOnline())
         	    new getEventsNearLocationAPICaller().execute(currentLocation);
+
+        	// Invalidate the action bar menu to enable location-based actions.
+        	invalidateOptionsMenu();
         }
 	}
 
