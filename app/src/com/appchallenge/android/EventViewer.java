@@ -97,6 +97,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      */
     private LocalDatabase localDB;
 
+    /** Keeps track of the help view state, used to keep it open / closed as necessary. */
+    private Boolean helpOpen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +119,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         }
         else
         	getActionBar().hide();
+
+        // Restore the help dialog if the user has not yet acknowledged it.
+        SharedPreferences helpPrefs = getSharedPreferences(Settings.HELP_FILE, 0);
+        this.helpOpen = savedInstanceState != null ? savedInstanceState.getBoolean("helpOpen", false) : false;
+        if (!helpPrefs.getBoolean(Settings.HELP_VIEWER_SEEN, false) || this.helpOpen) {
+        	this.helpOpen = true;
+        	findViewById(R.id.help_viewer).setVisibility(View.VISIBLE);
+        }
+        else
+        	findViewById(R.id.help_viewer).setVisibility(View.GONE);
 
         // Instantiate the list of visible types.
         if (filterTypes.size() == 0) {
@@ -157,19 +170,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         // Grab the latest location information.
         if (savedInstanceState == null) {
         	this.updateUserLocation();
-        }
-        
-        String WELCOME_DIALOG = "Welcome";
-    	String WELCOME_KEY = "DISPLAY";
-        //Displays the Welcome screen until don't show is pressed
-        SharedPreferences welcomeIndicator = getBaseContext().getSharedPreferences(WELCOME_DIALOG, 0);
-        String indicator = welcomeIndicator.getString(WELCOME_KEY, "");
-        if (indicator.length() == 0) {
-        	SharedPreferences.Editor editor = welcomeIndicator.edit();
-		    editor.putString(WELCOME_KEY, "no");
-		    editor.commit();
-		    Intent welcome = new Intent(EventViewer.this, Welcome.class);
-		    startActivity(welcome);
         }
     }
 
@@ -295,9 +295,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			// Show the settings activity.
 			Intent settings = new Intent(EventViewer.this, Settings.class);
 			startActivity(settings);
-		} else if (currentId == R.id.menu_welcome_dialog) {
-			Intent welcomeIntent = new Intent(EventViewer.this, Welcome.class);
-			startActivity(welcomeIntent);
+		} else if (currentId == R.id.menu_viewer_help) {
+			// Show the help information view overlay.
+			this.helpOpen = true;
+            findViewById(R.id.help_viewer).setVisibility(View.VISIBLE);
 			return true;
 		} else if (currentId == R.id.menu_my_events) {
 			if (this.currentEvents != null) {
@@ -344,6 +345,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	savedInstanceState.putInt("initialCreateEventVisible", findViewById(R.id.createEventButton).getVisibility());
     	savedInstanceState.putInt("initialViewEventsVisible", findViewById(R.id.initialMainActions).getVisibility());
     	savedInstanceState.putInt("initialLocProgressVisible", findViewById(R.id.initialProgressLayout).getVisibility());
+
+    	// Save the state of the help view.
+    	savedInstanceState.putBoolean("helpOpen", this.helpOpen);
 
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -406,6 +410,20 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     private boolean initialScreenVisible() {
     	return findViewById(R.id.initialScreen).getVisibility() == View.VISIBLE;
+    }
+
+    /**
+     * Closes the help information view.
+     */
+    public void onAwesomeClick(View v) {
+    	assert this.helpOpen;
+
+    	// Ensure that we remember we have already seen this help.
+    	SharedPreferences helpPrefs = getSharedPreferences(Settings.HELP_FILE, 0);
+        helpPrefs.edit().putBoolean(Settings.HELP_VIEWER_SEEN, true).commit();
+
+        // Hide the help view.
+        findViewById(R.id.help_viewer).setVisibility(View.GONE);
     }
 
     /**

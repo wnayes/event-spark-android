@@ -22,9 +22,9 @@
           android:title="My Events"
           android:showAsAction="never" />
     
-    <!-- Weclome Dialog Button -->
-    <item android:id="@+id/menu_welcome_dialog"
-          android:title="Getting Started"
+    <!-- Help Button -->
+    <item android:id="@+id/menu_viewer_help"
+          android:title="Help"
           android:showAsAction="never"/>
 
     <!-- Settings menu -->
