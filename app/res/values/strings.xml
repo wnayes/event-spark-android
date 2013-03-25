@@ -31,21 +31,22 @@
     <string name="event_name_hint">What is it called?</string>
     <string name="event_description_hint">Any more details?</string>
     <string name="event_time_page_title">Event Time</string>
-    <string name="event_time_start">Start Time</string>
-    <string name="event_time_end">End Time</string>
+    <string name="event_time_start">Start Time:</string>
+    <string name="event_time_end">End Time:</string>
     <string name="action_back">Back</string>
     <string name="action_next">Next</string>
     <string name="action_finish">Submit</string>
     
     <!-- My Events Page -->
     <string name="my_events_page_title">My Events</string>
+    <string name="my_events_header">Click on Your Event to Edit It.</string>
     <string name="my_events_no_events">You have not made any events yet!\n\nEvents you create will be listed here.</string>
 
     <!-- Edit Event page -->
     <string name="edit_event_page_title">Edit Event</string>
-    <string name="edit_event_title">Title</string>
-    <string name="edit_event_type">Type</string>
-    <string name="edit_event_description">Description</string>
+    <string name="edit_event_title">Title:</string>
+    <string name="edit_event_type">Type:</string>
+    <string name="edit_event_description">Description:</string>
     <string name="edit_event_submit">Submit</string>
     <string name="edit_event_delete">Delete</string>
     

@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
@@ -213,6 +212,10 @@ public class EditEvent extends SherlockFragmentActivity {
 			Log.d("EventEdit.onOptionsItemSelected", "Deleting event: " + event.toJSON());
 			deleteEventAPICaller deleteEvent = new deleteEventAPICaller();
 			deleteEvent.execute(event);
+			return true;
+		}
+		else if (item.getItemId() == android.R.id.home) {
+			onBackPressed();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
