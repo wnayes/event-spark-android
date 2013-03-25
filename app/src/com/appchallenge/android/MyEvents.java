@@ -15,50 +15,52 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class EventEditList extends SherlockListActivity {
+public class MyEvents extends SherlockListActivity {
 
 	private ArrayList<Event> currentEvents = new ArrayList<Event>();
-	private ArrayList<String> eventTitle = new ArrayList<String>();
+	private ArrayList<String> eventTitles = new ArrayList<String>();
 	private ArrayList<Event> ownedEvents = new ArrayList<Event>();
 	LocalDatabase localDB;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-        
+		setContentView(R.layout.activity_my_events);
+
         // The home button takes the user back to the map display.
         ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-        
-        setContentView(R.layout.event_edit_list_layout);
-        
+
 		String ownerId = "";
-		        
+
         Intent intent = getIntent();
         currentEvents = intent.getParcelableArrayListExtra("currentEvents");
-        
+
 		if (localDB == null)
 			localDB = new LocalDatabase(getApplicationContext());
-		
-		//Populates the list with all the events you own
-		for (final Event event : currentEvents) {
+
+		// Populates the list with all the events you own
+        for (final Event event : currentEvents) {
 			
-			ownerId = localDB.getEventSecretId(event);
+            ownerId = localDB.getEventSecretId(event);
 						
-			if (ownerId != null && ownerId.length() > 0) {
+            if (ownerId != null && ownerId.length() > 0) {
 				Log.d("EventEditList", "Found Owned Event");
 				if (event.getTitle().length() > 40)
-					eventTitle.add(event.getTitle().substring(0,40));
+                    eventTitles.add(event.getTitle().substring(0,40));
 				else
-					eventTitle.add(event.getTitle());
-					ownedEvents.add(event);
-				}
-			}
-		
-		ArrayAdapter<String> events = new ArrayAdapter<String>(this, 
-								android.R.layout.simple_list_item_1, eventTitle);
-	    setListAdapter(events);
-		
+                    eventTitles.add(event.getTitle());
+                ownedEvents.add(event);
+            }
+        }
+
+        if (eventTitles.size() > 0) {
+		    ArrayAdapter<String> events
+              = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, eventTitles);
+	        setListAdapter(events);
+        }
+        else
+        	findViewById(R.id.my_events_empty).setVisibility(View.VISIBLE);
 	}
 	
 	protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -69,7 +71,7 @@ public class EventEditList extends SherlockListActivity {
 	    	  return;
 	      }
 	      Event event = ownedEvents.get(position);
-	      Intent eventEdit = new Intent(EventEditList.this, EventEdit.class);
+	      Intent eventEdit = new Intent(MyEvents.this, EditEvent.class);
 	      eventEdit.putExtra("event", event);
 	      startActivity(eventEdit);
 	}
@@ -99,7 +101,7 @@ public class EventEditList extends SherlockListActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		ownedEvents.clear();
-		eventTitle.clear();
+		eventTitles.clear();
 	}
 
 }

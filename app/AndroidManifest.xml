@@ -56,12 +56,12 @@
             android:theme="@style/event.Transparent">
         </activity>
 		<activity
-            android:name="com.appchallenge.android.EventEdit"
-            android:label="@string/event_edit_page_title" >
+            android:name="com.appchallenge.android.EditEvent"
+            android:label="@string/edit_event_page_title" >
         </activity>
         <activity
-            android:name="com.appchallenge.android.EventEditList"
-            android:label="@string/event_edit_page_title" >
+            android:name="com.appchallenge.android.MyEvents"
+            android:label="@string/my_events_page_title" >
         </activity>
 
         <meta-data

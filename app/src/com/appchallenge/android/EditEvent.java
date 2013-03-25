@@ -36,7 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 
 @SuppressLint("ValidFragment")
-public class EventEdit extends SherlockFragmentActivity implements CreateEventInterface{
+public class EditEvent extends SherlockFragmentActivity implements CreateEventInterface {
 	
 	String title;
 	@Override
@@ -116,7 +116,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.event_edit_layout);
+		setContentView(R.layout.activity_edit_event);
 		
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		
@@ -132,9 +132,9 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	    attending = event.getAttendance();
 	    this.setLocation(event.getLocation());
 	    //Set the title and description
-		EditText eventTitle = (EditText) findViewById(R.id.event_edit_title);
-		EditText description = (EditText) findViewById(R.id.event_edit_description);
-		Spinner typeSpinner = (Spinner)findViewById(R.id.event_edit_type_spinner);
+		EditText eventTitle = (EditText) findViewById(R.id.edit_event_title);
+		EditText description = (EditText) findViewById(R.id.edit_event_description);
+		Spinner typeSpinner = (Spinner)findViewById(R.id.edit_event_type_spinner);
 		
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
                                                                              R.array.type_array,
@@ -180,12 +180,12 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
             this.setStartDate(event.getStartDate());
             this.setEndDate(event.getEndDate());
         }
-        ((Button)findViewById(R.id.event_edit_start_button)).setText(startString);
-        ((Button)findViewById(R.id.event_edit_end_button)).setText(endString);
+        ((Button)findViewById(R.id.edit_event_start_button)).setText(startString);
+        ((Button)findViewById(R.id.edit_event_end_button)).setText(endString);
         
         //Spinners
-        Spinner startSpinner = (Spinner)findViewById(R.id.event_edit_start_spinner);
-        Spinner endSpinner = (Spinner)findViewById(R.id.event_edit_end_spinner);
+        Spinner startSpinner = (Spinner)findViewById(R.id.edit_event_start_spinner);
+        Spinner endSpinner = (Spinner)findViewById(R.id.edit_event_end_spinner);
         ArrayAdapter<CharSequence> dateAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
                                                                              R.array.relative_days,
                                                                              android.R.layout.simple_spinner_item);
@@ -213,7 +213,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
         
         eventTitle.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
-				((CreateEventInterface)EventEdit.activity).setTitle(s.toString());
+				((CreateEventInterface)EditEvent.activity).setTitle(s.toString());
 			}
 			
 			// Unused interface methods of TextWatcher.
@@ -223,7 +223,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
         
         description.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
-				((CreateEventInterface)EventEdit.activity).setDescription(s.toString());
+				((CreateEventInterface)EditEvent.activity).setDescription(s.toString());
 			}
 			
 			// Unused interface methods of TextWatcher.
@@ -235,7 +235,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
             	// Grab the enum by matching the indices of this spinner to the enumerated types.
             	int index = (position == Type.values().length - 1 ? 0 : position + 1);
-            	((CreateEventInterface)EventEdit.activity).setType(Event.Type.typeIndices[index]);
+            	((CreateEventInterface)EditEvent.activity).setType(Event.Type.typeIndices[index]);
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}
@@ -243,7 +243,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
         
         startSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	Date startDate = ((CreateEventInterface)EventEdit.activity).getStartDate();
+            	Date startDate = ((CreateEventInterface)EditEvent.activity).getStartDate();
             	Calendar startCalendar = Calendar.getInstance();
             	startCalendar.setTime(startDate);
 
@@ -258,7 +258,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
             	else
             		return;
 	
-            	((CreateEventInterface)EventEdit.activity).setStartDate(startCalendar.getTime());
+            	((CreateEventInterface)EditEvent.activity).setStartDate(startCalendar.getTime());
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}
@@ -266,7 +266,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
         
         endSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	Date endDate = ((CreateEventInterface)EventEdit.activity).getEndDate();
+            	Date endDate = ((CreateEventInterface)EditEvent.activity).getEndDate();
             	Calendar endCalendar = Calendar.getInstance();
             	endCalendar.setTime(endDate);
 
@@ -281,7 +281,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
             	else
             		return;
 
-            	((CreateEventInterface)EventEdit.activity).setEndDate(endCalendar.getTime());
+            	((CreateEventInterface)EditEvent.activity).setEndDate(endCalendar.getTime());
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}
@@ -319,7 +319,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
-		    getSupportMenuInflater().inflate(R.menu.event_edit, menu);
+		    getSupportMenuInflater().inflate(R.menu.activity_edit_event, menu);
             return true;
 	}
 	
@@ -328,13 +328,13 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 		if (item.getItemId() == android.R.id.home){
 			onBackPressed();
         	return true;
-		} else if (item.getItemId() == R.id.event_edit_submit) {
+		} else if (item.getItemId() == R.id.edit_event_submit) {
 			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location, attending);
 			Log.d("EventEdit Submit", tempEvent.toJSON());
 			updateEventAPICaller updateEvent = new updateEventAPICaller();
 			updateEvent.execute(tempEvent);
 			return true;
-		} else if (item.getItemId() == R.id.event_edit_delete) {
+		} else if (item.getItemId() == R.id.edit_event_delete) {
 			Event tempEvent = new Event(id, title, type, desc, startDate, endDate, location, attending);
 			Log.d("EventEdit Delete", tempEvent.toJSON());
 			deleteEventAPICaller deleteEvent = new deleteEventAPICaller();
@@ -350,11 +350,11 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 	public void showEventTimeDialog(View v) {
     	DialogFragment timePicker;
     	switch (v.getId()) {
-	    	case R.id.event_edit_start_button:
+	    	case R.id.edit_event_start_button:
 	            timePicker = new StartTimePicker();
 	            timePicker.show(getSupportFragmentManager(), "startTimePicker");
 	            break;
-	    	case R.id.event_edit_end_button:
+	    	case R.id.edit_event_end_button:
 	    		timePicker = new EndTimePicker();
 	    		timePicker.show(getSupportFragmentManager(), "endTimePicker");
 	            break;
@@ -388,7 +388,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 
 			// Update the display text.
 			String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate);
-		    ((Button) findViewById(R.id.event_edit_start_button)).setText(timeString);
+		    ((Button) findViewById(R.id.edit_event_start_button)).setText(timeString);
 		}
     }
 
@@ -417,7 +417,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 
 			// Update the display text.
 			String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate);
-		    ((Button) findViewById(R.id.event_edit_end_button)).setText(timeString);
+		    ((Button) findViewById(R.id.edit_event_end_button)).setText(timeString);
 		}
     }
 	
@@ -430,7 +430,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 		@Override
 		protected void onPreExecute() {
 			// Set up progress indication.
-			dialog = ProgressDialog.show(EventEdit.this, "Updating...", "");
+			dialog = ProgressDialog.show(EditEvent.this, "Updating...", "");
 		}
 
 		@Override
@@ -445,15 +445,15 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 			dialog = null;
 			if (result == null) {
 				(Toast.makeText(getApplicationContext(), "Could not update event!", Toast.LENGTH_LONG)).show();
-				EventEdit.this.finish();
+				EditEvent.this.finish();
 				return;
 			}
 			
 			// Pass the new event to the event viewer.
-			Intent intent = new Intent(EventEdit.this, EventViewer.class);
+			Intent intent = new Intent(EditEvent.this, EventViewer.class);
 			intent.putExtra("event", result);
-		    EventEdit.this.setResult(RESULT_OK, intent);
-			EventEdit.this.finish();
+			EditEvent.this.setResult(RESULT_OK, intent);
+			EditEvent.this.finish();
 		}
 	}
 
@@ -466,7 +466,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 		@Override
 		protected void onPreExecute() {
 			// Set up progress indication.
-			dialog = ProgressDialog.show(EventEdit.this, "Deleteing...", "");
+			dialog = ProgressDialog.show(EditEvent.this, "Deleteing...", "");
 		}
 
 		@Override
@@ -481,7 +481,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 			dialog = null;
 			if (result == false) {
 				(Toast.makeText(getApplicationContext(), "Event already deleted, or could not delete event!", Toast.LENGTH_LONG)).show();
-				EventEdit.this.finish();
+				EditEvent.this.finish();
 				return;
 			}
 			
@@ -489,7 +489,7 @@ public class EventEdit extends SherlockFragmentActivity implements CreateEventIn
 			//Intent intent = new Intent(EventEdit.this, EventViewer.class);
 			//intent.putExtra("event", result);
 		    //EventEdit.this.setResult(RESULT_OK, intent);
-			EventEdit.this.finish();
+			EditEvent.this.finish();
 		}
 	}
 

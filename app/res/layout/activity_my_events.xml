@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+  
+    <ListView 
+        android:id="@android:id/list"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:divider="#DDDDDD"
+        android:dividerHeight="1sp" />
+    
+    <View
+	    android:background="#DDDDDD"
+	    android:layout_width="fill_parent"
+	    android:layout_height="1sp"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentRight="true"
+	    android:layout_below="@android:id/list" />
+
+    <TextView android:id="@+id/my_events_empty"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/my_events_no_events"
+        android:visibility="gone" />
+
+</LinearLayout>
