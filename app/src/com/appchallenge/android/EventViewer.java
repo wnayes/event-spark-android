@@ -34,7 +34,6 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -102,15 +101,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+    	Log.d("EventViewer.onCreate", "(Re)creating EventViewer.java");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
 
         // Restore the state of the initial screen.
         if (savedInstanceState != null) {
         	if (savedInstanceState.getBoolean("actionBarVisible", true))
-                getActionBar().show();
+                getSupportActionBar().show();
             else
-            	getActionBar().hide();
+            	getSupportActionBar().hide();
         	findViewById(R.id.initialScreen).setVisibility(savedInstanceState.getInt("initialScreenVisible", View.GONE));
         	findViewById(R.id.initialNoSources).setVisibility(savedInstanceState.getInt("initialNoSourcesVisible", View.GONE));
         	findViewById(R.id.createEventButton).setVisibility(savedInstanceState.getInt("initialCreateEventVisible", View.GONE));
@@ -118,7 +118,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	findViewById(R.id.initialProgressLayout).setVisibility(savedInstanceState.getInt("initialLocProgressVisible", View.GONE));
         }
         else
-        	getActionBar().hide();
+        	getSupportActionBar().hide();
 
         // Restore the help dialog if the user has not yet acknowledged it.
         SharedPreferences helpPrefs = getSharedPreferences(Settings.HELP_FILE, 0);
@@ -253,6 +253,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+    	// Close the help menu if it is open as an action is being taken.
+    	// Like the USA Today app, this does not mean we remember it has been seen.
+    	if (this.helpOpen)
+    		findViewById(R.id.help_viewer).setVisibility(View.GONE);
     	
     	int currentId = item.getItemId();
         if (currentId == R.id.menu_create_event) {
@@ -339,7 +343,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     		savedInstanceState.putBoolean("noLocationSourceDialogOpen", true);
 
     	// Save the state of the initial screen.
-    	savedInstanceState.putBoolean("actionBarVisible", getActionBar().isShowing());
+    	savedInstanceState.putBoolean("actionBarVisible", getSupportActionBar().isShowing());
     	savedInstanceState.putInt("initialScreenVisible", findViewById(R.id.initialScreen).getVisibility());
     	savedInstanceState.putInt("initialNoSourcesVisible", findViewById(R.id.initialNoSources).getVisibility());
     	savedInstanceState.putInt("initialCreateEventVisible", findViewById(R.id.createEventButton).getVisibility());
@@ -404,7 +408,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     }
 
     private void hideInitialScreen() {
-    	getActionBar().show();
+    	getSupportActionBar().show();
     	findViewById(R.id.initialScreen).setVisibility(View.GONE);
     }
 

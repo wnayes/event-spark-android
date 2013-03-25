@@ -77,9 +77,15 @@ public class MyEvents extends SherlockListActivity {
 	}
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == android.R.id.home){
-			NavUtils.navigateUpTo(this, new Intent(this, EventViewer.class));
-        	return true;
+		if (item.getItemId() == android.R.id.home) {
+			// Handle going back to the EventViewer without recreating it.
+			Intent viewerIntent = new Intent(this, EventViewer.class);
+            if (NavUtils.shouldUpRecreateTask(this, viewerIntent)) {
+                NavUtils.navigateUpTo(this, viewerIntent);
+                finish();
+            } else
+                finish();
+            return true;
 		}
 		super.onOptionsItemSelected(item);
 		return true;
@@ -103,5 +109,4 @@ public class MyEvents extends SherlockListActivity {
 		ownedEvents.clear();
 		eventTitles.clear();
 	}
-
 }

@@ -13,6 +13,9 @@
     <string name="finding_location">Finding your location&#8230;</string>
     <string name="finished_loading">Ready to start!</string>
     <string name="no_location_sources">EventHawk requires your location to operate.\nPlease enable a location source and retry loading.</string>
+    <string name="enable_source">Enable Source</string>
+    <string name="retry">Retry</string>
+    <string name="view_events">View Events</string>
     
     <!-- Help Dialogs -->
     <string name="help_viewer_p1">Tap any of the markers to see what events are near you. Press on a marker bubble to see more event details.</string>
