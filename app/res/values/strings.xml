@@ -43,9 +43,9 @@
 
     <!-- Edit Event page -->
     <string name="edit_event_page_title">Edit Event</string>
-    <string name="edit_event_title">Title:</string>
-    <string name="edit_event_type">Type:</string>
-    <string name="edit_event_description">Description:</string>
+    <string name="edit_event_title">Title</string>
+    <string name="edit_event_type">Type</string>
+    <string name="edit_event_description">Description</string>
     <string name="edit_event_submit">Submit</string>
     <string name="edit_event_delete">Delete</string>
     

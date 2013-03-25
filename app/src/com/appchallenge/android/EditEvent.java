@@ -109,7 +109,6 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
 
 	protected int id;
 	protected int attending;
-	protected static Activity activity;
 	LocalDatabase localDB;
 	protected Event event;
 	
@@ -122,7 +121,6 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
 		
 		ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-		activity = this;
 		
 		Intent intent = getIntent();
 		event = intent.getParcelableExtra("event");
@@ -135,11 +133,11 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
 		EditText eventTitle = (EditText) findViewById(R.id.edit_event_title);
 		EditText description = (EditText) findViewById(R.id.edit_event_description);
 		Spinner typeSpinner = (Spinner)findViewById(R.id.edit_event_type_spinner);
-		
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
                                                                              R.array.type_array,
-                                                                             android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                                                             com.actionbarsherlock.R.layout.sherlock_spinner_item);
+        adapter.setDropDownViewResource(com.actionbarsherlock.R.layout.sherlock_spinner_dropdown_item);
         typeSpinner.setAdapter(adapter);
         
         if (savedInstanceState != null) {
@@ -213,7 +211,7 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
         
         eventTitle.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
-				((CreateEventInterface)EditEvent.activity).setTitle(s.toString());
+				setTitle(s.toString());
 			}
 			
 			// Unused interface methods of TextWatcher.
@@ -223,7 +221,7 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
         
         description.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
-				((CreateEventInterface)EditEvent.activity).setDescription(s.toString());
+				setDescription(s.toString());
 			}
 			
 			// Unused interface methods of TextWatcher.
@@ -235,7 +233,7 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
             	// Grab the enum by matching the indices of this spinner to the enumerated types.
             	int index = (position == Type.values().length - 1 ? 0 : position + 1);
-            	((CreateEventInterface)EditEvent.activity).setType(Event.Type.typeIndices[index]);
+            	setType(Event.Type.typeIndices[index]);
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}
@@ -243,7 +241,7 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
         
         startSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	Date startDate = ((CreateEventInterface)EditEvent.activity).getStartDate();
+            	Date startDate = getStartDate();
             	Calendar startCalendar = Calendar.getInstance();
             	startCalendar.setTime(startDate);
 
@@ -258,7 +256,7 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
             	else
             		return;
 	
-            	((CreateEventInterface)EditEvent.activity).setStartDate(startCalendar.getTime());
+            	setStartDate(startCalendar.getTime());
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}
@@ -266,7 +264,7 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
         
         endSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            	Date endDate = ((CreateEventInterface)EditEvent.activity).getEndDate();
+            	Date endDate = getEndDate();
             	Calendar endCalendar = Calendar.getInstance();
             	endCalendar.setTime(endDate);
 
@@ -281,7 +279,7 @@ public class EditEvent extends SherlockFragmentActivity implements CreateEventIn
             	else
             		return;
 
-            	((CreateEventInterface)EditEvent.activity).setEndDate(endCalendar.getTime());
+            	setEndDate(endCalendar.getTime());
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}

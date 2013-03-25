@@ -7,14 +7,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp">
+        android:padding="16dp">
         
         <!-- Event Title -->
         <TextView
             android:text="@string/edit_event_title"
-            android:gravity="left"
+            android:gravity="center"
             style="@style/eventHoundTheme.smallHeading" />
         <EditText
             android:id="@+id/edit_event_title"
@@ -22,12 +20,12 @@
             android:layout_height="wrap_content"
             android:inputType="text|textCapSentences"
 	        android:maxLength="60"
-            android:paddingBottom="8dp"/>
+            android:layout_marginBottom="8dp" />
         
         <!-- Type Spinner -->
         <TextView 
             android:text="@string/edit_event_type"
-            android:gravity="left"
+            android:gravity="center"
             style="@style/eventHoundTheme.smallHeading" />
         <Spinner
             android:id="@+id/edit_event_type_spinner"
@@ -36,11 +34,11 @@
             android:prompt="@string/edit_event_type"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="8dp" />"
 
         <TextView
             android:text="@string/event_time_start"
-            android:gravity="left"
+            android:gravity="center"
             style="@style/eventHoundTheme.smallHeading" />
         
         <!-- Event time controls -->
@@ -59,7 +57,7 @@
 
         <TextView
             android:text="@string/event_time_end"
-            android:gravity="left"
+            android:gravity="center"
             style="@style/eventHoundTheme.smallHeading" />
         
         <LinearLayout android:id="@+id/my_events_end_time_controls"
@@ -77,13 +75,12 @@
         <!-- Event Description -->
         <TextView
             android:text="@string/edit_event_description"
-            android:gravity="left"
+            android:gravity="center"
             style="@style/eventHoundTheme.smallHeading" />
         <EditText
             android:id="@+id/edit_event_description"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp"
             android:inputType="textMultiLine|textCapSentences"
 	        android:gravity="top|left"
 	        android:singleLine="false"
