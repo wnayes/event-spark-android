@@ -12,6 +12,7 @@
     <string name="loading_blurb">EventHawk connects you to the latest\nevents happening near you.</string>
     <string name="finding_location">Finding your location&#8230;</string>
     <string name="finished_loading">Ready to start!</string>
+    <string name="no_location_sources">EventHawk requires your location to operate.\nPlease enable a location source and retry loading.</string>
     
     <!-- Welcome Dialog -->
     <string name="title_welcome">Name Our App</string>
