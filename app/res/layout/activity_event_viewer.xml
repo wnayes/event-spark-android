@@ -1,6 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewerLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <!-- The main map view -->
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.SupportMapFragment" xmlns:tools="http://schemas.android.com/tools"/>
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/initialScreen"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#BC3A07"
+        android:orientation="vertical"
+        android:clickable="true">
+
+        <!-- Logo and small welcome text. -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialHeader"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+	        <ImageView
+	            android:id="@+id/logoBanner"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_marginBottom="16dp"
+	            android:src="@drawable/biglogo" 
+	            android:contentDescription="@string/event_create_image_flavor_text"/>
+	        <TextView android:id="@+id/text"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:gravity="center"
+	            android:text="@string/loading_blurb"
+	            android:textColor="#FFFFFF"
+	            style="@style/eventHoundTheme.sentence"/>
+	    </LinearLayout>
+
+        <!-- Holds the location source error UI -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialNoSources"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView android:id="@+id/noSourceText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"
+                android:text="@string/no_location_sources"
+                android:textColor="#FFFFFF"
+                style="@style/eventHoundTheme.sentence"/>
+            <Button android:id="@+id/enableSourcesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable Source"
+                android:textColor="#FFFFFF"
+                android:minWidth="180sp"
+                android:layout_marginBottom="16dp"
+                android:onClick="onEnableSourcesClick"/>
+            <Button android:id="@+id/retryLoadButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Retry"
+                android:textColor="#FFFFFF"
+                android:minWidth="180sp"
+                android:onClick="onRetryLoadClick"/>
+        </LinearLayout>
+
+        <!-- The main action buttons. -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialMainActions"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+	        <Button android:id="@+id/viewEventsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="View Events"
+                android:textColor="#FFFFFF"
+                android:minWidth="180sp"
+                android:onClick="onViewEventsClick"/>
+	        <Button android:id="@+id/createEventButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create Event"
+                android:textColor="#FFFFFF"
+                android:minWidth="180sp"
+                android:onClick="onCreateEventClick"
+                android:visibility="gone"/>
+	    </LinearLayout>
+
+        <!-- Holds the location searching progress indication. -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialProgressLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <ProgressBar
+                android:id="@+id/initialProgress"
+                android:indeterminateOnly="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/progressBarStyleSmall"/>
+            <TextView android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/finding_location"
+                android:textColor="#FFFFFF"
+                android:layout_marginLeft="2dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -26,9 +26,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -96,6 +102,21 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
 
+        // Restore the state of the initial screen.
+        if (savedInstanceState != null) {
+        	if (savedInstanceState.getBoolean("actionBarVisible", true))
+                getActionBar().show();
+            else
+            	getActionBar().hide();
+        	findViewById(R.id.initialScreen).setVisibility(savedInstanceState.getInt("initialScreenVisible", View.GONE));
+        	findViewById(R.id.initialNoSources).setVisibility(savedInstanceState.getInt("initialNoSourcesVisible", View.GONE));
+        	findViewById(R.id.createEventButton).setVisibility(savedInstanceState.getInt("initialCreateEventVisible", View.GONE));
+        	findViewById(R.id.initialMainActions).setVisibility(savedInstanceState.getInt("initialViewEventsVisible", View.GONE));
+        	findViewById(R.id.initialProgressLayout).setVisibility(savedInstanceState.getInt("initialLocProgressVisible", View.GONE));
+        }
+        else
+        	getActionBar().hide();
+
         // Instantiate the list of visible types.
         if (filterTypes.size() == 0) {
         	for (Type type : Type.typeIndices)
@@ -134,8 +155,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         }
 
         // Grab the latest location information.
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
         	this.updateUserLocation();
+        }
         
         String WELCOME_DIALOG = "Welcome";
     	String WELCOME_KEY = "DISPLAY";
@@ -315,7 +337,75 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	if (noLocationSourceDialog != null && noLocationSourceDialog.isShowing())
     		savedInstanceState.putBoolean("noLocationSourceDialogOpen", true);
 
+    	// Save the state of the initial screen.
+    	savedInstanceState.putBoolean("actionBarVisible", getActionBar().isShowing());
+    	savedInstanceState.putInt("initialScreenVisible", findViewById(R.id.initialScreen).getVisibility());
+    	savedInstanceState.putInt("initialNoSourcesVisible", findViewById(R.id.initialNoSources).getVisibility());
+    	savedInstanceState.putInt("initialCreateEventVisible", findViewById(R.id.createEventButton).getVisibility());
+    	savedInstanceState.putInt("initialViewEventsVisible", findViewById(R.id.initialMainActions).getVisibility());
+    	savedInstanceState.putInt("initialLocProgressVisible", findViewById(R.id.initialProgressLayout).getVisibility());
+
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    /**
+     * Handles the user clicking the `View Events` button on the initial screen.
+     */
+    public void onViewEventsClick(View v) {
+    	Log.d("EventViewer", "User clicked View Events.");
+    	
+    	final Animation fadeOut = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+    	final View initial = findViewById(R.id.initialScreen);
+    	fadeOut.setAnimationListener(new AnimationListener() {
+    	    public void onAnimationEnd(final Animation animation) {
+    	    	hideInitialScreen();
+    	    }
+
+			public void onAnimationRepeat(Animation animation) {}
+			public void onAnimationStart(Animation animation) {}
+    	});
+    	initial.startAnimation(fadeOut);
+    }
+
+    /**
+     * Handles the user clicking the `Create Event` button on the initial screen.
+     * Hides the initial screen and opens the create event wizard.
+     */
+    public void onCreateEventClick(View v) {
+    	Log.d("EventViewer", "User clicked Create Event.");
+
+		Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
+		createEvent.putExtra("location", this.currentLocation);
+		startActivityForResult(createEvent, 0);
+
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+		    public void run() {
+		     hideInitialScreen();
+		    }
+		}, 1000);
+
+    }
+
+    public void onRetryLoadClick(View v) {
+    	Log.d("EventViewer", "User clicked retry loading.");
+    	
+    	this.updateUserLocation();
+    }
+
+    public void onEnableSourcesClick(View v) {
+    	Log.d("EventViewer", "User clicked enable sources.");
+
+    	startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+    }
+
+    private void hideInitialScreen() {
+    	getActionBar().show();
+    	findViewById(R.id.initialScreen).setVisibility(View.GONE);
+    }
+
+    private boolean initialScreenVisible() {
+    	return findViewById(R.id.initialScreen).getVisibility() == View.VISIBLE;
     }
 
     /**
@@ -457,9 +547,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     public void updateUserLocation() {
         LocationFinder locationFinder = new LocationFinder();
         boolean sourcesExist = locationFinder.getLocation(this);
-        if (!sourcesExist) {
-        	// Show a dialog indicating to turn on some location source.
-        	showNoLocationSourceDialog();
+        if (sourcesExist && this.initialScreenVisible()) {
+        	// Indicate that we are updating the location.
+        	findViewById(R.id.initialNoSources).setVisibility(View.GONE);
+        	findViewById(R.id.initialProgressLayout).setVisibility(View.VISIBLE);
+        	findViewById(R.id.initialMainActions).setVisibility(View.VISIBLE);
+        }
+        else {
+        	findViewById(R.id.initialNoSources).setVisibility(View.VISIBLE);
+        	findViewById(R.id.initialProgressLayout).setVisibility(View.GONE);
+        	findViewById(R.id.initialMainActions).setVisibility(View.INVISIBLE);
         }
     }
 
@@ -473,8 +570,15 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         if (location != null) {
         	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         	mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
-        	if (isOnline())
+
+        	if (initialScreenVisible()) {
+				findViewById(R.id.createEventButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.initialProgressLayout).setVisibility(View.GONE);
+			}
+
+        	if (isOnline()) {
         	    new getEventsNearLocationAPICaller().execute(currentLocation);
+        	}
 
         	// Invalidate the action bar menu to enable location-based actions.
         	invalidateOptionsMenu();
@@ -562,7 +666,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			if (result == null)
 				return;
 			
-			if (result.size() == 0) {
+			if (result.size() == 0 && !initialScreenVisible()) {
                 Toast.makeText(getApplicationContext(), "No events found near you!", Toast.LENGTH_LONG)
 			         .show();
                 return;
