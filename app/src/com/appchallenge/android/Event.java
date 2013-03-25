@@ -18,10 +18,26 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Can be built either from a JSONObject containing event details or from scratch.
  */
 public class Event implements Parcelable {
+	/**
+	 * Basic constructor initializing fields to some (invalid) defaults.
+	 */
+    public Event() {
+    	this.id = -1;
+    	this.secretId = "";
+    	this.title = "";
+    	this.description = "";
+    	this.type = Type.OTHER;
+    	this.location = new LatLng(0.0, 0.0);
+    	this.attendance = 0;
+    	this.startDate = new Date();
+    	this.endDate = new Date();
+    }
+
     /**
      * Create an Event from API-generated JSON.
      */
     public Event(String eventJSON) {
+    	this();
         try {
         	JSONObject jsonObject = new JSONObject(eventJSON);
         	this.secretId = jsonObject.has("secret_id") ? jsonObject.getString("secret_id") : "";
@@ -44,59 +60,9 @@ public class Event implements Parcelable {
     }
 
     /**
-     * Create a new Event object from details.
-     * @param name
-     * @param description
-     * @param time
-     * @param type
-     * @param location
-     */
-    public Event(String name, Type type, String description, Date startDate, Date endDate, LatLng location) {
-    	// Defaults
-    	this.id = -1;
-    	this.attendance = 1;
-    	this.secretId = "";
-
-        this.title = name;
-        this.type = type;
-        this.description = description;
-        this.location = location;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-    
-    
-    /**
-     * 
-     * Create an event that already has an attendance
-     * @param id
-     * @param name
-     * @param type
-     * @param description
-     * @param startDate
-     * @param endDate
-     * @param location
-     * @param attendance
-     */
-    public Event(int id, String name, Type type, String description, Date startDate, Date endDate, LatLng location, int attendance) {
-    	
-    	this.id = id;
-    	this.attendance = attendance;
-    	this.secretId = "";
-
-        this.title = name;
-        this.type = type;
-        this.description = description;
-        this.location = location;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
-
-    /**
      * @return The internal id of an Event.
      */
-    private int id;
+    protected int id;
     public int getId() {
     	return this.id;
     }
@@ -104,7 +70,7 @@ public class Event implements Parcelable {
     /**
      * @return The secret owner id of an Event. Only exists for events a user has made themselves.
      */
-    private String secretId;
+    protected String secretId;
     public String getSecretId() {
     	return this.secretId;
     }
@@ -112,7 +78,7 @@ public class Event implements Parcelable {
     /**
      * @return The title of the Event.
      */
-    private String title;
+    protected String title;
     public String getTitle() {
     	return this.title;
     }
@@ -188,7 +154,7 @@ public class Event implements Parcelable {
     /**
      * @return The type of the event
      */
-    private Type type;
+    protected Type type;
     public Type getType() {
 		return this.type;
 	}
@@ -196,7 +162,7 @@ public class Event implements Parcelable {
     /**
      * @return The description of the Event.
      */
-    private String description;
+    protected String description;
     public String getDescription() {
     	return this.description;
     }
@@ -204,7 +170,7 @@ public class Event implements Parcelable {
     /**
      * @return The location of the Event as a LatLng object.
      */
-    private LatLng location;
+    protected LatLng location;
     public LatLng getLocation() {
     	return this.location;
     }
@@ -212,7 +178,7 @@ public class Event implements Parcelable {
     /**
      *  @return The start date and time of the event.
      */
-    private Date startDate;
+    protected Date startDate;
     public Date getStartDate() {
     	return this.startDate;
     }
@@ -220,7 +186,7 @@ public class Event implements Parcelable {
     /**
      *  @return The end date and time of the event
      */
-    private Date endDate;
+    protected Date endDate;
     public Date getEndDate() {
     	return this.endDate;
     }
@@ -229,7 +195,7 @@ public class Event implements Parcelable {
      * @return The number of users that have claimed they will attend
      * the event from our app.
      */
-    private int attendance;
+    protected int attendance;
     public int getAttendance() {
     	return this.attendance;
     }
