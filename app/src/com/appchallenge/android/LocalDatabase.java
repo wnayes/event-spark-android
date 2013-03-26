@@ -1,6 +1,10 @@
 package com.appchallenge.android;
 
 import java.util.ArrayList;
+import java.util.Date;
+
+import com.appchallenge.android.Event.Type;
+import com.google.android.gms.maps.model.LatLng;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,7 +22,7 @@ import android.util.Log;
  */
 public class LocalDatabase extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     /** Name of the database we use to store our tables. */
     private static final String DATABASE_NAME = "eventLocalDatabase";
@@ -39,6 +43,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
 
     /** Column names in event_cache. */
     //private static final String KEY_ID = "id";
+    private static final String KEY_TITLE = "title";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_LATITUDE = "latitude";
@@ -51,6 +56,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
     /** SQLITE command for creating the event_cache table. */
     private static final String EVENT_CACHE_TABLE_CREATE = "CREATE TABLE " + EVENT_CACHE_TABLE_NAME + " (" +
                                                             KEY_ID + " INTEGER PRIMARY KEY, " +
+                                                            KEY_TITLE + " TEXT, " +   
                                                             KEY_DESCRIPTION + " TEXT, " +
                                                             KEY_LONGITUDE + " REAL, " +
                                                             KEY_LATITUDE + " REAL, " +
@@ -126,6 +132,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
         	// Insert the event into the local cache.
         	ContentValues values = new ContentValues();
 			values.put(KEY_ID, event.getId());
+			values.put(KEY_TITLE, event.getTitle());
 			values.put(KEY_DESCRIPTION, event.getDescription());
 			values.put(KEY_LONGITUDE, event.getLocation().longitude);
 			values.put(KEY_LATITUDE, event.getLocation().latitude);
@@ -255,6 +262,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		for (Event newEvent : latestEvents) {
 			ContentValues values = new ContentValues();
 			values.put(KEY_ID, newEvent.getId());
+			values.put(KEY_TITLE, newEvent.getTitle());
 			values.put(KEY_DESCRIPTION, newEvent.getDescription());
 			values.put(KEY_LONGITUDE, newEvent.getLocation().longitude);
 			values.put(KEY_LATITUDE, newEvent.getLocation().latitude);
@@ -262,11 +270,41 @@ public class LocalDatabase extends SQLiteOpenHelper {
 			values.put(KEY_ENDDATE, newEvent.getEndDate().getTime() / 1000);
 			values.put(KEY_TYPE, newEvent.getType().getValue());
 			values.put(KEY_ATTENDING, newEvent.getAttendance());
-			
+
 			db.insert(EVENT_CACHE_TABLE_NAME, null, values);
 		}
 		
 		db.close();
 		return latestEvents;
+	}
+
+	/**
+	 * Get all of the cached events that belong to the device (have non-NULL secret_id)
+	 */
+	public ArrayList<Event> getMyEvents() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		Cursor result = db.rawQuery("SELECT * FROM " + EVENT_CACHE_TABLE_NAME + " WHERE " + KEY_SECRETID + " IS NOT NULL", null);
+		ArrayList<Event> myEvents = new ArrayList<Event>();
+
+		// Parse the events from the database query.
+		if (result.moveToFirst()) {
+			do {
+				LocalEvent event
+                  = new LocalEvent(result.getInt(result.getColumnIndex(KEY_ID)),
+                		           result.getString(result.getColumnIndex(KEY_SECRETID)),
+                		           result.getString(result.getColumnIndex(KEY_TITLE)),
+                		           result.getString(result.getColumnIndex(KEY_DESCRIPTION)), 
+                                   Type.typeIndices[result.getInt(result.getColumnIndex(KEY_TYPE))], 
+                                   new LatLng(result.getDouble(result.getColumnIndex(KEY_LATITUDE)), result.getDouble(result.getColumnIndex(KEY_LONGITUDE))),
+                                   new Date(result.getLong(result.getColumnIndex(KEY_STARTDATE)) * 1000),
+                                   new Date(result.getLong(result.getColumnIndex(KEY_ENDDATE)) * 1000),
+                                   result.getInt(result.getColumnIndex(KEY_ATTENDING)));
+				myEvents.add(event);
+			} while (result.moveToNext());
+		}
+		result.close();
+		db.close();
+		return myEvents;
 	}
 }

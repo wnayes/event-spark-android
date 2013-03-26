@@ -300,15 +300,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             findViewById(R.id.help_viewer).setVisibility(View.VISIBLE);
 			return true;
 		} else if (currentId == R.id.menu_my_events) {
-			if (this.currentEvents != null) {
-				Intent eventEdit = new Intent(EventViewer.this, MyEvents.class);
-				eventEdit.putParcelableArrayListExtra("currentEvents", this.currentEvents);
-				startActivity(eventEdit);
-				return true;
-			}  else {
-				Context context = getApplicationContext();
-				Toast.makeText(context, "No Events Found Near You to Edit.", Toast.LENGTH_LONG).show();
-			}
+			// Show a listing of the events we have made.
+		    Intent myEvents = new Intent(EventViewer.this, MyEvents.class);
+			startActivity(myEvents);
+			return true;
 		}
 
         return super.onOptionsItemSelected(item);
@@ -423,6 +418,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
         // Hide the help view.
         findViewById(R.id.help_viewer).setVisibility(View.GONE);
+        this.helpOpen = false;
     }
 
     /**
