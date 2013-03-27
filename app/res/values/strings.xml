@@ -39,6 +39,9 @@
     
     <!-- My Events Page -->
     <string name="my_events_page_title">My Events</string>
+    <string name="my_events_delete">Delete</string>
+    <string name="my_events_update">Update</string>
+    <string name="my_events_repost">Resubmit</string>
     <string name="my_events_header">Click on Your Event to Edit It.</string>
     <string name="my_events_no_events">You have not made any events yet!\n\nEvents you create will be listed here.</string>
 
@@ -48,7 +51,7 @@
     <string name="edit_event_type">Type:</string>
     <string name="edit_event_description">Description:</string>
     <string name="edit_event_submit">Submit</string>
-    <string name="edit_event_delete">Delete</string>
+    
     
     <!-- Event Details page -->
     <string name="title_activity_event_details">Event Details</string>

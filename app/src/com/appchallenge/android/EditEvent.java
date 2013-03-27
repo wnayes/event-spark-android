@@ -208,12 +208,6 @@ public class EditEvent extends SherlockFragmentActivity {
 			updateEvent.execute(localEvent);
 			return true;
 		}
-		else if (item.getItemId() == R.id.edit_event_delete) {
-			Log.d("EventEdit.onOptionsItemSelected", "Deleting event: " + event.toJSON());
-			deleteEventAPICaller deleteEvent = new deleteEventAPICaller();
-			deleteEvent.execute(event);
-			return true;
-		}
 		else if (item.getItemId() == android.R.id.home) {
 			onBackPressed();
 			return true;
@@ -326,42 +320,6 @@ public class EditEvent extends SherlockFragmentActivity {
 			Intent intent = new Intent(EditEvent.this, EventViewer.class);
 			intent.putExtra("event", result);
 			EditEvent.this.setResult(RESULT_OK, intent);
-			EditEvent.this.finish();
-		}
-	}
-
-	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
-		/**
-	     * Informs the user that the event is being deleted.
-	     */
-	    ProgressDialog dialog;
-
-		@Override
-		protected void onPreExecute() {
-			// Set up progress indication.
-			dialog = ProgressDialog.show(EditEvent.this, "Deleting...", "");
-		}
-
-		@Override
-		protected Boolean doInBackground(Event... event) {
-			return APICalls.deleteEvent(event[0], Identity.getUserId(getApplicationContext()));
-		}
-
-		@Override
-		protected void onPostExecute(Boolean result) {
-			// Close the wizard and any progress indication.
-			dialog.dismiss();
-			dialog = null;
-			if (result == false) {
-				(Toast.makeText(getApplicationContext(), "Event already deleted, or could not delete event!", Toast.LENGTH_LONG)).show();
-				EditEvent.this.finish();
-				return;
-			}
-			
-			// Pass the new event to the event viewer.
-			//Intent intent = new Intent(EventEdit.this, EventViewer.class);
-			//intent.putExtra("event", result);
-		    //EventEdit.this.setResult(RESULT_OK, intent);
 			EditEvent.this.finish();
 		}
 	}

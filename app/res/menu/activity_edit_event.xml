@@ -1,9 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
     <!-- View event details. -->
-    <item android:id="@+id/edit_event_delete"
-          android:title="@string/edit_event_delete"
-          android:showAsAction="always|withText" />   
            
     <item android:id="@+id/edit_event_submit"
           android:title="@string/edit_event_submit"
