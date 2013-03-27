@@ -15,22 +15,25 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 public class MyEvents extends SherlockListActivity {
-
-
-	/**
-	 * The event we selecte in our list
-	 */
-	Event selectedEvent;
 	/**
 	 * List of events that the user has made over time.
 	 */
 	private ArrayList<Event> myEvents = new ArrayList<Event>();
+
+	/**
+	 * The position of the event we selected from the list.
+	 */
+	int selectedIndex = -1;
+
+	/**
+	 * Whether or not the context menu is open.
+	 */
+	boolean contextMenuOpen = false;
 
 	/**
      * Provides access to our local sqlite database.
@@ -47,11 +50,17 @@ public class MyEvents extends SherlockListActivity {
         ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
 
-		if (localDB == null)
-			localDB = new LocalDatabase(getApplicationContext());
+        // Restore bundle contents.
+        if (savedInstanceState != null) {
+        	this.selectedIndex = savedInstanceState.getInt("selectedIndex");
+        	this.contextMenuOpen = savedInstanceState.getBoolean("contextMenuOpen");
+        }
 
-		// Get a list of the events we have created over time.
-		myEvents = localDB.getMyEvents();
+        if (localDB == null)
+            localDB = new LocalDatabase(getApplicationContext());
+
+        // Get a list of the events we have created over time.
+        this.myEvents = localDB.getMyEvents();
 
 		// Extract the titles of these events.
 		ArrayList<String> titles = new ArrayList<String>();
@@ -69,62 +78,90 @@ public class MyEvents extends SherlockListActivity {
         }
         else
         	findViewById(R.id.my_events_empty).setVisibility(View.VISIBLE);
-        
+
+        // Persist the context menu state. This required a Runnable to overcome issues
+        // with the Activity window not being ready during calls to openContextMenu().
+        findViewById(android.R.id.list).post(new Runnable() {
+            public void run() {
+                // Reopen the context menu on configuration changes.
+                if (contextMenuOpen)
+                    openContextMenu(getListView());
+            }
+        });
+    }
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		savedInstanceState.putInt("selectedIndex", this.selectedIndex);
+		savedInstanceState.putBoolean("contextMenuOpen", this.contextMenuOpen);
+		super.onSaveInstanceState(savedInstanceState);
 	}
-	
+
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        android.view.MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.my_events_menu_layout, menu);
+        getMenuInflater().inflate(R.menu.my_events_menu_layout, menu);
+        this.contextMenuOpen = true;
     }
-	
+
+	public void onContextMenuClosed(ContextMenu menu) {
+	    super.onContextMenuClosed(menu);
+	    this.contextMenuOpen = false;
+	    this.selectedIndex = -1;
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-		Log.d("which", "one");
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
-				NavUtils.navigateUpTo(this, new Intent(this, EventViewer.class));
-	        	return true;
+	        	// Handle going back to the EventViewer without recreating it.
+                Intent viewerIntent = new Intent(this, EventViewer.class);
+                if (NavUtils.shouldUpRecreateTask(this, viewerIntent)) {
+                    NavUtils.navigateUpTo(this, viewerIntent);
+                    finish();
+                } else
+                    finish();
+                return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
-	            
 	    }
 	}
-	
-	
+
 	public boolean onContextItemSelected(android.view.MenuItem item) {
-		
-	    if (item.getItemId() == R.id.my_events_delete && selectedEvent != null) {
+		// Ensure we have selected an item.
+		if (selectedIndex == -1) {
+			Log.e("MyEvents.onContextItemSelected", "No selected list item available.");
+			return super.onContextItemSelected((android.view.MenuItem) item);
+		}
+
+	    if (item.getItemId() == R.id.my_events_delete) {
 	    	deleteEventAPICaller deleteEvent = new deleteEventAPICaller();
 			//deleteEvent.execute(selectedEvent);
 	    	return true;
 	    }
-	    else if (item.getItemId() == R.id.my_events_repost){
+	    else if (item.getItemId() == R.id.my_events_repost) {
 	    	return true;
 	    }
-	    else if (item.getItemId() == R.id.my_events_update && selectedEvent !=null){
+	    else if (item.getItemId() == R.id.my_events_update) {
+	    	// Pass the event to the Edit Event activity.
 	    	Intent editEvent = new Intent(MyEvents.this, EditEvent.class);
-	    	editEvent.putExtra("event", selectedEvent);
+	    	editEvent.putExtra("event", myEvents.get(selectedIndex));
 	    	startActivity(editEvent);
 	    	return true;
 	    }
 	    return super.onContextItemSelected((android.view.MenuItem) item);
 	}
-	
-	protected void onListItemClick(ListView l, View v, int position, long id) {
 
-	    super.onListItemClick(l, v, position, id);
-	    if (myEvents == null) {
-	    	  Toast.makeText(this, "Something Went Wrong Please Try Again.", Toast.LENGTH_LONG).show();
-	    	  this.finish();
-	    	  return;
-	      }
-	      selectedEvent = myEvents.get(position);
-	      openContextMenu(v);
-	      //startActivity(eventEdit);
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        if (myEvents == null) {
+        	Log.e("MyEvents.onListItemClick", "ArrayList<Event> myEvents is null.");
+            return;
+        }
+
+        this.selectedIndex = position;
+        openContextMenu(v);
 	}
-		
 
 	@Override
     protected void onPause() {
@@ -137,6 +174,7 @@ public class MyEvents extends SherlockListActivity {
 	
 	protected void onDestroy() {
 		super.onDestroy();
+		closeContextMenu();
 		myEvents.clear();
 	}
 	
