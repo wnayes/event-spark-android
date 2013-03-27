@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewerLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <!-- The main map view -->
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportMapFragment" xmlns:tools="http://schemas.android.com/tools"/>
+
+    <!-- Help/Tutorial content -->
+    <LinearLayout
+        android:id="@+id/help_viewer"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#EE5A5A5A"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:clickable="true">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_weight="1" >
+            <TextView
+                android:id="@+id/help_viewer_p1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:drawableRight="@drawable/place"
+                android:paddingBottom="30dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="15dp"
+                android:text="@string/help_viewer_p1"
+                android:textColor="#d9d9d9" />
+            <TextView
+                android:id="@+id/help_viewer_p2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:drawableRight="@drawable/ic_action_new"
+                android:paddingBottom="30dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="15dp"
+                android:text="@string/help_viewer_p2"
+                android:textColor="#d9d9d9" />
+            <TextView
+                android:id="@+id/help_viewer_p3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="30dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/help_viewer_p3"
+                android:textColor="#d9d9d9" />
+        </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="0" 
+            android:layout_marginBottom="30dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:onClick="onAwesomeClick"
+            android:text="@string/awesome"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- Initial Screen -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/initialScreen"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#BC3A07"
+        android:orientation="vertical"
+        android:clickable="true">
+
+        <!-- Logo and small welcome text. -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialHeader"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+	        <ImageView
+	            android:id="@+id/logoBanner"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_marginBottom="16dp"
+	            android:src="@drawable/logo" 
+	            android:contentDescription="@string/event_create_image_flavor_text"/>
+	        <TextView android:id="@+id/text"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:gravity="center"
+	            android:text="@string/loading_blurb"
+	            android:textColor="#FFFFFF"
+	            style="@style/eventHoundTheme.sentence"/>
+	    </LinearLayout>
+
+        <!-- Holds the location source error UI -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialNoSources"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView android:id="@+id/noSourceText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"
+                android:text="@string/no_location_sources"
+                android:textColor="#FFFFFF"
+                style="@style/eventHoundTheme.sentence"/>
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center"
+	            android:orientation="horizontal">
+	            <Button android:id="@+id/enableSourcesButton"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:text="@string/enable_source"
+	                android:textColor="#FFFFFF"
+	                android:minWidth="180sp"
+	                android:layout_marginRight="8dp"
+	                android:onClick="onEnableSourcesClick"/>
+	            <Button android:id="@+id/retryLoadButton"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:text="@string/retry"
+	                android:textColor="#FFFFFF"
+	                android:minWidth="180sp"
+	                android:onClick="onRetryLoadClick"/>
+	        </LinearLayout>
+        </LinearLayout>
+
+        <!-- The main action buttons. -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialMainActions"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+	        <Button android:id="@+id/viewEventsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:text="@string/view_events"
+                android:textColor="#FFFFFF"
+                android:minWidth="180sp"
+                android:onClick="onViewEventsClick"/>
+	        <Button android:id="@+id/createEventButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_create_event"
+                android:textColor="#FFFFFF"
+                android:minWidth="180sp"
+                android:onClick="onCreateEventClick"
+                android:visibility="gone"/>
+	    </LinearLayout>
+
+        <!-- Holds the location searching progress indication. -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/initialProgressLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <ProgressBar
+                android:id="@+id/initialProgress"
+                android:indeterminateOnly="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/progressBarStyleSmall"/>
+            <TextView android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/finding_location"
+                android:textColor="#FFFFFF"
+                android:layout_marginLeft="2dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

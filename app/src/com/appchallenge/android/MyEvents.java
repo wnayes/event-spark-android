@@ -22,11 +22,19 @@ import android.widget.Toast;
 
 public class MyEvents extends SherlockListActivity {
 
-	private ArrayList<Event> currentEvents = new ArrayList<Event>();
-	private ArrayList<String> eventTitles = new ArrayList<String>();
-	private ArrayList<Event> ownedEvents = new ArrayList<Event>();
-	int listPosition = 0;
+
+	/**
+	 * The event we selecte in our list
+	 */
 	Event selectedEvent;
+	/**
+	 * List of events that the user has made over time.
+	 */
+	private ArrayList<Event> myEvents = new ArrayList<Event>();
+
+	/**
+     * Provides access to our local sqlite database.
+     */
 	LocalDatabase localDB;
 
 	@Override
@@ -39,32 +47,24 @@ public class MyEvents extends SherlockListActivity {
         ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
 
-		String ownerId = "";
-
-        Intent intent = getIntent();
-        currentEvents = intent.getParcelableArrayListExtra("currentEvents");
-
 		if (localDB == null)
 			localDB = new LocalDatabase(getApplicationContext());
 
-		// Populates the list with all the events you own
-        for (final Event event : currentEvents) {
-			
-            ownerId = localDB.getEventSecretId(event);
-						
-            if (ownerId != null && ownerId.length() > 0) {
-				Log.d("EventEditList", "Found Owned Event");
-				if (event.getTitle().length() > 40)
-                    eventTitles.add(event.getTitle().substring(0,40));
-				else
-                    eventTitles.add(event.getTitle());
-                ownedEvents.add(event);
-            }
-        }
+		// Get a list of the events we have created over time.
+		myEvents = localDB.getMyEvents();
 
-        if (eventTitles.size() > 0) {
+		// Extract the titles of these events.
+		ArrayList<String> titles = new ArrayList<String>();
+		for (Event e : myEvents) {
+			if (e.getTitle().length() > 40)
+			    titles.add(e.getTitle().substring(0, 40));
+			else
+				titles.add(e.getTitle());
+		}
+
+        if (myEvents.size() > 0) {
 		    ArrayAdapter<String> events
-              = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, eventTitles);
+              = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titles);
 	        setListAdapter(events);
         }
         else
@@ -113,34 +113,31 @@ public class MyEvents extends SherlockListActivity {
 	}
 	
 	protected void onListItemClick(ListView l, View v, int position, long id) {
+
 	    super.onListItemClick(l, v, position, id);
-	    if (ownedEvents == null) {
+	    if (myEvents == null) {
 	    	  Toast.makeText(this, "Something Went Wrong Please Try Again.", Toast.LENGTH_LONG).show();
 	    	  this.finish();
 	    	  return;
 	      }
-	      selectedEvent = ownedEvents.get(position);
+	      selectedEvent = myEvents.get(position);
 	      openContextMenu(v);
 	      //startActivity(eventEdit);
 	}
 		
+
 	@Override
     protected void onPause() {
     	super.onPause();
+
     	// Close our database helper if necessary.
     	if (localDB != null)
             localDB.close();
     }
 	
-	protected void onStop() {
-		super.onStop();
-		
-	}
-	
 	protected void onDestroy() {
 		super.onDestroy();
-		ownedEvents.clear();
-		eventTitles.clear();
+		myEvents.clear();
 	}
 	
 	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {

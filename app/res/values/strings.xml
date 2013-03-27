@@ -9,15 +9,19 @@
     <string name="refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
     <string name="view_details">View Details</string>
+    <string name="loading_blurb">EventHawk connects you to the latest\nevents happening near you.</string>
+    <string name="finding_location">Finding your location&#8230;</string>
+    <string name="finished_loading">Ready to start!</string>
+    <string name="no_location_sources">EventHawk requires your location to operate.\nPlease enable a location source and retry loading.</string>
+    <string name="enable_source">Enable Source</string>
+    <string name="retry">Retry</string>
+    <string name="view_events">View Events</string>
     
-    <!-- Welcome Dialog -->
-    <string name="title_welcome">Name Our App</string>
-    <string name="title_welcome_dialog">Welcome to Name Our App!</string>
-    <string name="welcome_dialog_one">Tap any of the markers to see what events are near you. Press on a marker bubble to see more event details.</string>
-    <string name="welcome_dialog_two">To add your own event tap the add icon.</string>
-    <string name="welcome_dialog_three">To see more features or change settings, view the options menu.</string>
-    <string name="welcome_dialog_never_display">Don\'t Show Again</string>
-    <string name="welcome_button">Awesome</string>
+    <!-- Help Dialogs -->
+    <string name="help_viewer_p1">Tap any of the markers to see what events are near you. Press on a marker bubble to see more event details.</string>
+    <string name="help_viewer_p2">To add your own event tap the add icon.</string>
+    <string name="help_viewer_p3">To see more features or change settings, view the options menu.</string>
+    <string name="awesome">Awesome</string>
 
     <!-- Create Event wizard -->
     <string name="event_create_image_flavor_text">Create Event Wizard</string>

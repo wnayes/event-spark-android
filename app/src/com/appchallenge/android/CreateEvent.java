@@ -209,9 +209,14 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         }
 
         if (item.getItemId() == android.R.id.home) {
-			// See http://developer.android.com/design/patterns/navigation.html for more.
-			NavUtils.navigateUpTo(this, new Intent(this, EventViewer.class));
-        	return true;
+			// Handle navigating back to the EventViewer on Home press.
+        	Intent viewerIntent = new Intent(this, EventViewer.class);
+            if (NavUtils.shouldUpRecreateTask(this, viewerIntent)) {
+                NavUtils.navigateUpTo(this, viewerIntent);
+                finish();
+            } else
+                finish();
+            return true;
 		} else if (item.getItemId() == R.id.action_back) {
 			// Go to the previous step in the wizard. If there is no previous step,
 			// setCurrentItem will do nothing.

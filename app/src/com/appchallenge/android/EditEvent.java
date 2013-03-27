@@ -31,8 +31,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.android.Event.Type;
-import com.google.android.gms.maps.model.LatLng;
-
 
 @SuppressLint("ValidFragment")
 public class EditEvent extends SherlockFragmentActivity {
