@@ -282,7 +282,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
 	 * Get all of the cached events that belong to the device (have non-NULL secret_id)
 	 */
 	public ArrayList<Event> getMyEvents() {
-		SQLiteDatabase db = this.getWritableDatabase();
+		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor result = db.rawQuery("SELECT * FROM " + EVENT_CACHE_TABLE_NAME + " WHERE " + KEY_SECRETID + " IS NOT NULL", null);
 		ArrayList<Event> myEvents = new ArrayList<Event>();
@@ -306,5 +306,13 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		result.close();
 		db.close();
 		return myEvents;
+	}
+
+	public boolean deleteEventFromCache(Event event) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		int count = db.delete(EVENT_CACHE_TABLE_NAME, "id = ?", new String[] { ((Integer)(event.getId())).toString() });
+		Log.d("LocalCache.deleteEventFromCache", "Deleted " + count + " rows from the event cache.");
+		return (count > 0);
 	}
 }

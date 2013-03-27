@@ -14,6 +14,7 @@ import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -29,6 +30,9 @@ public class MyEvents extends SherlockListActivity {
 	 * The position of the event we selected from the list.
 	 */
 	int selectedIndex = -1;
+
+	/** Holds the selectedIndex for deletion, as the context menu closes beforehand. */
+	int deletionIndex = -1;
 
 	/**
 	 * Whether or not the context menu is open.
@@ -61,23 +65,7 @@ public class MyEvents extends SherlockListActivity {
 
         // Get a list of the events we have created over time.
         this.myEvents = localDB.getMyEvents();
-
-		// Extract the titles of these events.
-		ArrayList<String> titles = new ArrayList<String>();
-		for (Event e : myEvents) {
-			if (e.getTitle().length() > 40)
-			    titles.add(e.getTitle().substring(0, 40));
-			else
-				titles.add(e.getTitle());
-		}
-
-        if (myEvents.size() > 0) {
-		    ArrayAdapter<String> events
-              = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titles);
-	        setListAdapter(events);
-        }
-        else
-        	findViewById(R.id.my_events_empty).setVisibility(View.VISIBLE);
+        this.refreshMyEventsList();
 
         // Persist the context menu state. This required a Runnable to overcome issues
         // with the Activity window not being ready during calls to openContextMenu().
@@ -98,12 +86,14 @@ public class MyEvents extends SherlockListActivity {
 	}
 
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		Log.d("MyEvents.onCreateContextMenu", "Context menu created.");
         super.onCreateContextMenu(menu, v, menuInfo);
         getMenuInflater().inflate(R.menu.my_events_menu_layout, menu);
         this.contextMenuOpen = true;
     }
 
-	public void onContextMenuClosed(ContextMenu menu) {
+	public void onContextMenuClosed(Menu menu) {
+		Log.d("MyEvents.onContextMenuClosed", "Context menu closed.");
 	    super.onContextMenuClosed(menu);
 	    this.contextMenuOpen = false;
 	    this.selectedIndex = -1;
@@ -134,8 +124,8 @@ public class MyEvents extends SherlockListActivity {
 		}
 
 	    if (item.getItemId() == R.id.my_events_delete) {
-	    	deleteEventAPICaller deleteEvent = new deleteEventAPICaller();
-			//deleteEvent.execute(selectedEvent);
+	    	this.deletionIndex = selectedIndex;
+	    	new deleteEventAPICaller().execute(myEvents.get(selectedIndex));
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_repost) {
@@ -177,7 +167,26 @@ public class MyEvents extends SherlockListActivity {
 		closeContextMenu();
 		myEvents.clear();
 	}
-	
+
+	private void refreshMyEventsList() {
+		// Extract the titles of these events.
+		ArrayList<String> titles = new ArrayList<String>();
+		for (Event e : myEvents) {
+			if (e.getTitle().length() > 40)
+			    titles.add(e.getTitle().substring(0, 40));
+			else
+				titles.add(e.getTitle());
+		}
+
+        if (myEvents.size() > 0) {
+		    ArrayAdapter<String> events
+		      = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titles);
+			setListAdapter(events);
+		}
+		else
+		    findViewById(R.id.my_events_empty).setVisibility(View.VISIBLE);
+	}
+
 	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
 		/**
 	     * Informs the user that the event is being deleted.
@@ -197,21 +206,25 @@ public class MyEvents extends SherlockListActivity {
 
 		@Override
 		protected void onPostExecute(Boolean result) {
-			// Close the wizard and any progress indication.
+			// Close any progress indication.
 			dialog.dismiss();
 			dialog = null;
 			if (result == false) {
-				(Toast.makeText(getApplicationContext(), "Event already deleted, or could not delete event!", Toast.LENGTH_LONG)).show();
-				MyEvents.this.finish();
+				(Toast.makeText(getApplicationContext(), "The event could not be deleted!", Toast.LENGTH_LONG)).show();
 				return;
 			}
-			
-			// Pass the new event to the event viewer.
-			//Intent intent = new Intent(EventEdit.this, EventViewer.class);
-			//intent.putExtra("event", result);
-		    //EventEdit.this.setResult(RESULT_OK, intent);
-			MyEvents.this.finish();
+
+			// Update the local cache to recognize deletion.
+			if (localDB == null)
+	            localDB = new LocalDatabase(getApplicationContext());
+			boolean deleted = localDB.deleteEventFromCache(myEvents.get(deletionIndex));
+			if (!deleted)
+				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
+
+			// Update the list view and internal events list.
+			myEvents.remove(deletionIndex);
+			deletionIndex = -1;
+			refreshMyEventsList();
 		}
 	}
-
 }

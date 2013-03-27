@@ -311,15 +311,13 @@ public class APICalls {
 		} 
         
         return updatedEvent;
-
 	}
 	
 	public static Boolean deleteEvent(Event event, String userId) {
-    	String createEventUrl = "http://saypoint.dreamhosters.com/api/events/deleteEvent";
-        RestClient client = new RestClient(createEventUrl);
+    	String deleteEventUrl = "http://saypoint.dreamhosters.com/api/events/" + event.getId();
+        RestClient client = new RestClient(deleteEventUrl);
 
-        client.AddParam("id", ((Integer)event.getId()).toString());
-        Log.d("APICalls.deleteEvent Id Check", ((Integer)event.getId()).toString());
+        client.AddParam("secret_id", event.getSecretId());
         client.AddParam("user_id", userId);
 
         try {
@@ -333,8 +331,10 @@ public class APICalls {
 
         // Determine if an error has occurred.
         try {
-			if ((new JSONObject(result)).has("error"))
+			if ((new JSONObject(result)).has("error")) {
+				Log.e("APICalls.deleteEvent", "Error deleting event: " + (new JSONObject(result)).getString("error"));
 				return false;
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return false;
@@ -344,7 +344,5 @@ public class APICalls {
 		} 
 
         return true;
-
 	}
-
 }
