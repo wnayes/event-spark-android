@@ -202,6 +202,16 @@ public class EditEvent extends SherlockFragmentActivity {
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.edit_event_submit) {
+			// Prevent incorrect information from being submitted.
+			if (localEvent.getTitle().trim().length() == 0) {
+				Toast.makeText(getBaseContext(), "Please enter a title!", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+			if (localEvent.getStartDate().after(localEvent.getEndDate()) || localEvent.getEndDate().before(new Date())) {
+				Toast.makeText(getBaseContext(), "Please enter a valid timespan!", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+
 			Log.d("EventEdit.onOptionsItemSelected", "Submitting updated event: " + localEvent.toJSON());
 			new updateEventAPICaller().execute(event, localEvent);
 			return true;
