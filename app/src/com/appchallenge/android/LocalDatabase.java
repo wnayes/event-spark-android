@@ -312,7 +312,30 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		int count = db.delete(EVENT_CACHE_TABLE_NAME, "id = ?", new String[] { ((Integer)(event.getId())).toString() });
-		Log.d("LocalCache.deleteEventFromCache", "Deleted " + count + " rows from the event cache.");
+		Log.d("LocalCache.deleteEventFromCache", "Deleted " + count + " row(s) from the event cache.");
+		return (count > 0);
+	}
+
+	/**
+	 * Updates the values of an event based on its id.
+	 */
+	public boolean updateEventInCache(String id, String title, String description, String type, String startDate, String endDate) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		if (title == null && description == null && type == null && startDate == null && endDate == null) {
+			Log.e("LocalCache.updateEventInCache", "Update called with all null parameters.");
+			return false;
+		}
+
+		ContentValues values = new ContentValues();
+		if (title != null) values.put("title", title);
+		if (description != null) values.put("description", description);
+		if (type != null) values.put("type", Integer.parseInt(type));
+		if (startDate != null) values.put("start_date", Integer.parseInt(startDate));
+		if (endDate != null) values.put("end_date", Integer.parseInt(endDate));
+
+		int count = db.update(EVENT_CACHE_TABLE_NAME, values, "id = ?", new String[] { id });
+		Log.d("LocalCache.updateEventInCache", "Updated " + count + " row(s) in the event cache.");
 		return (count > 0);
 	}
 }

@@ -2,6 +2,7 @@ package com.appchallenge.android;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONArray;
@@ -265,21 +266,35 @@ public class APICalls {
         }
 	}
 
-	public static Event updateEvent(Event event, String userId) {
-    	String createEventUrl = "http://saypoint.dreamhosters.com/api/events/updateEvent";
-        RestClient client = new RestClient(createEventUrl);
+	/**
+	 * Submits updated information about an event to the backend.
+	 * @param existingEvent The event as it currently exists.
+	 * @param updatedEvent The event with changes to members.
+	 * @return A mapping from the mutable event member names to their new values.
+	 */
+	public static TreeMap<String, String> updateEvent(Event existingEvent, Event updatedEvent, String userId) {
+    	String updateEventUrl = "http://saypoint.dreamhosters.com/api/events/" + existingEvent.getId();
+        RestClient client = new RestClient(updateEventUrl);
 
-        client.AddParam("id", ((Integer)event.getId()).toString());
-        client.AddParam("title", event.getTitle());
-        client.AddParam("description", event.getDescription());
-        client.AddParam("start_date", ((Long)(event.getStartDate().getTime() / 1000)).toString());
-        client.AddParam("end_date", ((Long)(event.getEndDate().getTime() / 1000)).toString());
-        client.AddParam("type", ((Integer)event.getType().getValue()).toString());
-        LatLng location = event.getLocation();
-        client.AddParam("latitude", ((Double)location.latitude).toString());
-        client.AddParam("longitude", ((Double)location.longitude).toString());
+        client.AddParam("id", ((Integer)existingEvent.getId()).toString());
         client.AddParam("user_id", userId);
-        client.AddParam("attending", ((Integer)event.getAttendance()).toString());
+        client.AddParam("secret_id", existingEvent.getSecretId());
+
+        // Pass only the parameters that have been changed.
+        if (!existingEvent.getTitle().equals(updatedEvent.getTitle()))
+            client.AddParam("title", updatedEvent.getTitle());
+        if (!existingEvent.getDescription().equals(updatedEvent.getDescription()))
+            client.AddParam("description", updatedEvent.getDescription());
+        if (!existingEvent.getType().equals(updatedEvent.getType()))
+        	client.AddParam("type", ((Integer)updatedEvent.getType().getValue()).toString());
+        if (!existingEvent.getStartDate().equals(updatedEvent.getStartDate()))
+            client.AddParam("start_date", ((Long)(updatedEvent.getStartDate().getTime() / 1000)).toString());
+        if (!existingEvent.getEndDate().equals(updatedEvent.getEndDate()))
+            client.AddParam("end_date", ((Long)(updatedEvent.getEndDate().getTime() / 1000)).toString());
+
+        // Ensure that we are passing at least one parameter besides the basic identifiers.
+        if (client.getParamCount() <= 3)
+        	return null;
 
         try {
             client.Execute(RestClient.RequestMethod.PUT);
@@ -287,21 +302,32 @@ public class APICalls {
             e.printStackTrace();
         }
 
-        String result = client.getResponse();
-        Log.d("APICalls.updateEvent", result == null ? "" : result);
-        Event updatedEvent;
-        // Determine if an error has occurred.
+        Log.d("APICalls.updateEvent", (client.getResponse() == null) ? "" : client.getResponse());
+
+        // Parse the updated members and return their values in a map.
+        TreeMap<String, String> changes = new TreeMap<String, String>();
         try {
-        	JSONObject eventJSON = new JSONObject(client.getResponse());
-			if ((eventJSON).has("error")) {
-				Log.d("APICalls.updateEvent", "A planned error occured");
+        	JSONObject changesJSON = new JSONObject(client.getResponse());
+			if ((changesJSON).has("error")) {
+				Log.e("APICalls.updateEvent", "An error has occured.");
 				return null;
 			}
-			if (!(eventJSON).has("event")) {
-				Log.d("APICalls.updateEvent", "Some unplanned error occured");
+			if (!(changesJSON).has("changes")) {
+				Log.e("APICalls.updateEvent", "Unexpected JSON response.");
 				return null;
 			}
-			updatedEvent = new Event(eventJSON.toString());
+
+			JSONObject changedValues = changesJSON.getJSONObject("changes");
+			if (changedValues.has("title"))
+                changes.put("title", changedValues.getString("title"));
+			if (changedValues.has("description"))
+                changes.put("description", changedValues.getString("description"));
+			if (changedValues.has("type"))
+                changes.put("type", changedValues.getString("type"));
+			if (changedValues.has("start_date"))
+                changes.put("start_date", changedValues.getString("start_date"));
+			if (changedValues.has("end_date"))
+                changes.put("end_date", changedValues.getString("end_date"));
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
@@ -310,7 +336,9 @@ public class APICalls {
 			return null;
 		} 
         
-        return updatedEvent;
+        if (changes.size() == 0)
+        	return null;
+        return changes;
 	}
 	
 	public static Boolean deleteEvent(Event event, String userId) {

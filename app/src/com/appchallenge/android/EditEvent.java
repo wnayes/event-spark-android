@@ -3,6 +3,7 @@ package com.appchallenge.android;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TreeMap;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -202,8 +203,7 @@ public class EditEvent extends SherlockFragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.edit_event_submit) {
 			Log.d("EventEdit.onOptionsItemSelected", "Submitting updated event: " + localEvent.toJSON());
-			updateEventAPICaller updateEvent = new updateEventAPICaller();
-			updateEvent.execute(localEvent);
+			new updateEventAPICaller().execute(event, localEvent);
 			return true;
 		}
 		else if (item.getItemId() == android.R.id.home) {
@@ -227,7 +227,6 @@ public class EditEvent extends SherlockFragmentActivity {
     	}
     }
 
-	
 	@SuppressLint("ValidFragment")
 	public class StartTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		@Override
@@ -286,7 +285,7 @@ public class EditEvent extends SherlockFragmentActivity {
 		}
     }
 
-	private class updateEventAPICaller extends AsyncTask<Event, Void, Event> {
+	private class updateEventAPICaller extends AsyncTask<Event, Void, TreeMap<String, String>> {
 		/**
 	     * Informs the user that the event is being updated.
 	     */
@@ -299,25 +298,34 @@ public class EditEvent extends SherlockFragmentActivity {
 		}
 
 		@Override
-		protected Event doInBackground(Event... event) {
-			return APICalls.updateEvent(event[0], Identity.getUserId(getApplicationContext()));
+		protected TreeMap<String, String> doInBackground(Event... event) {
+			// Passes the original event and the LocalEvent with changes.
+			return APICalls.updateEvent(event[0], event[1], Identity.getUserId(getApplicationContext()));
 		}
 
 		@Override
-		protected void onPostExecute(Event result) {
-			// Close the wizard and any progress indication.
+		protected void onPostExecute(TreeMap<String, String> result) {
+			// Close any progress indication.
 			dialog.dismiss();
 			dialog = null;
 			if (result == null) {
 				(Toast.makeText(getApplicationContext(), "Could not update event!", Toast.LENGTH_LONG)).show();
-				EditEvent.this.finish();
 				return;
 			}
-			
-			// Pass the new event to the event viewer.
-			Intent intent = new Intent(EditEvent.this, EventViewer.class);
-			intent.putExtra("event", result);
-			EditEvent.this.setResult(RESULT_OK, intent);
+
+			// Reflect these changes in the local event cache.
+			if (localDB == null)
+	            localDB = new LocalDatabase(getApplicationContext());
+			boolean updated = localDB.updateEventInCache(((Integer)event.getId()).toString(),
+					                                     result.get("title"),
+					                                     result.get("description"),
+					                                     result.get("type"),
+					                                     result.get("start_date"),
+					                                     result.get("end_date"));
+			if (!updated)
+				Log.e("updateEventAPICaller.onPostExecute", "Could not update event in local cache");
+
+			// Return to the events list.
 			EditEvent.this.finish();
 		}
 	}

@@ -57,12 +57,15 @@ public class RestClient {
         headers = new ArrayList<NameValuePair>();
     }
 
-    private ArrayList <NameValuePair> params;
+    private ArrayList<NameValuePair> params;
     public void AddParam(String name, String value) {
         params.add(new BasicNameValuePair(name, value));
     }
+    public int getParamCount() {
+    	return params.size();
+    }
 
-    private ArrayList <NameValuePair> headers;
+    private ArrayList<NameValuePair> headers;
     public void AddHeader(String name, String value) {
         headers.add(new BasicNameValuePair(name, value));
     }
