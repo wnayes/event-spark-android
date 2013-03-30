@@ -284,7 +284,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
 	public ArrayList<Event> getMyEvents() {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
-		Cursor result = db.rawQuery("SELECT * FROM " + EVENT_CACHE_TABLE_NAME + " WHERE " + KEY_SECRETID + " IS NOT NULL", null);
+		Cursor result = db.rawQuery("SELECT * FROM " + EVENT_CACHE_TABLE_NAME + " WHERE " + KEY_SECRETID + " IS NOT NULL ORDER BY " + KEY_ID + " DESC", null);
 		ArrayList<Event> myEvents = new ArrayList<Event>();
 
 		// Parse the events from the database query.
