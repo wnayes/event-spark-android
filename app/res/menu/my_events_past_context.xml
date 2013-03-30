@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/my_events_repost"
+        android:title="@string/my_events_repost" />
+    <item
+        android:id="@+id/my_events_forget"
+        android:title="@string/my_events_forget" />
+</menu>

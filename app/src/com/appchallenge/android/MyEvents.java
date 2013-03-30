@@ -1,6 +1,7 @@
 package com.appchallenge.android;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -16,23 +17,17 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 public class MyEvents extends SherlockListActivity {
 	/**
-	 * List of events that the user has made over time.
+	 * The selected event from the list.
 	 */
-	private ArrayList<Event> myEvents = new ArrayList<Event>();
-
-	/**
-	 * The position of the event we selected from the list.
-	 */
-	int selectedIndex = -1;
-
-	/** Holds the selectedIndex for deletion, as the context menu closes beforehand. */
-	int deletionIndex = -1;
+	Event selectedEvent;
+	
+	/** Event object for storing the Event to be deleted (persists after selectedEvent is emptied) */
+	Event deletionEvent;
 
 	/**
 	 * Whether or not the context menu is open.
@@ -56,15 +51,12 @@ public class MyEvents extends SherlockListActivity {
 
         // Restore bundle contents.
         if (savedInstanceState != null) {
-        	this.selectedIndex = savedInstanceState.getInt("selectedIndex");
         	this.contextMenuOpen = savedInstanceState.getBoolean("contextMenuOpen");
+        	this.selectedEvent = savedInstanceState.getParcelable("selectedEvent");
+        	this.deletionEvent = savedInstanceState.getParcelable("deletionEvent");
         }
 
-        if (localDB == null)
-            localDB = new LocalDatabase(getApplicationContext());
-
-        // Get a list of the events we have created over time.
-        this.myEvents = localDB.getMyEvents();
+    	// Build the list of events.
         this.refreshMyEventsList();
 
         // Persist the context menu state. This required a Runnable to overcome issues
@@ -80,15 +72,22 @@ public class MyEvents extends SherlockListActivity {
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putInt("selectedIndex", this.selectedIndex);
 		savedInstanceState.putBoolean("contextMenuOpen", this.contextMenuOpen);
+		savedInstanceState.putParcelable("selectedEvent", this.selectedEvent);
+		savedInstanceState.putParcelable("deletionEvent", this.deletionEvent);
 		super.onSaveInstanceState(savedInstanceState);
 	}
 
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		Log.d("MyEvents.onCreateContextMenu", "Context menu created.");
         super.onCreateContextMenu(menu, v, menuInfo);
-        getMenuInflater().inflate(R.menu.my_events_menu_layout, menu);
+
+        // Determine the available actions based on event list section.
+        if (this.selectedEvent.getEndDate().before(new Date()))
+        	getMenuInflater().inflate(R.menu.my_events_past_context, menu);
+        else
+            getMenuInflater().inflate(R.menu.my_events_active_context, menu);
+
         this.contextMenuOpen = true;
     }
 
@@ -96,7 +95,7 @@ public class MyEvents extends SherlockListActivity {
 		Log.d("MyEvents.onContextMenuClosed", "Context menu closed.");
 	    super.onContextMenuClosed(menu);
 	    this.contextMenuOpen = false;
-	    this.selectedIndex = -1;
+	    this.selectedEvent = null;
 	}
 
 	@Override
@@ -118,24 +117,35 @@ public class MyEvents extends SherlockListActivity {
 
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		// Ensure we have selected an item.
-		if (selectedIndex == -1) {
-			Log.e("MyEvents.onContextItemSelected", "No selected list item available.");
+		if (selectedEvent == null) {
+			Log.e("MyEvents.onContextItemSelected", "No selected event item available.");
 			return super.onContextItemSelected((android.view.MenuItem) item);
 		}
 
 	    if (item.getItemId() == R.id.my_events_delete) {
-	    	this.deletionIndex = selectedIndex;
-	    	new deleteEventAPICaller().execute(myEvents.get(selectedIndex));
-	    	return true;
-	    }
-	    else if (item.getItemId() == R.id.my_events_repost) {
+	    	this.deletionEvent = selectedEvent;
+	    	new deleteEventAPICaller().execute(selectedEvent);
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_update) {
 	    	// Pass the event to the Edit Event activity.
 	    	Intent editEvent = new Intent(MyEvents.this, EditEvent.class);
-	    	editEvent.putExtra("event", myEvents.get(selectedIndex));
+	    	editEvent.putExtra("event", selectedEvent);
 	    	startActivity(editEvent);
+	    	return true;
+	    }
+	    else if (item.getItemId() == R.id.my_events_repost) {
+	    	return true;
+	    }
+	    else if (item.getItemId() == R.id.my_events_forget) {
+	    	// Remove the past event from the cache and refresh the list.
+	    	if (localDB == null)
+	            localDB = new LocalDatabase(this);
+			boolean deleted = localDB.deleteEventFromCache(selectedEvent);
+			if (!deleted)
+				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
+
+			this.refreshMyEventsList();
 	    	return true;
 	    }
 	    return super.onContextItemSelected((android.view.MenuItem) item);
@@ -144,12 +154,7 @@ public class MyEvents extends SherlockListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        if (myEvents == null) {
-        	Log.e("MyEvents.onListItemClick", "ArrayList<Event> myEvents is null.");
-            return;
-        }
-
-        this.selectedIndex = position;
+        this.selectedEvent = (Event)l.getItemAtPosition(position);
         openContextMenu(v);
 	}
 
@@ -165,26 +170,44 @@ public class MyEvents extends SherlockListActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		closeContextMenu();
-		myEvents.clear();
 	}
 
 	private void refreshMyEventsList() {
-		// Extract the titles of these events.
-		ArrayList<String> titles = new ArrayList<String>();
-		for (Event e : myEvents) {
-			if (e.getTitle().length() > 40)
-			    titles.add(e.getTitle().substring(0, 40));
-			else
-				titles.add(e.getTitle());
-		}
+		if (localDB == null)
+            localDB = new LocalDatabase(getApplicationContext());
 
-        if (myEvents.size() > 0) {
-		    ArrayAdapter<String> events
-		      = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titles);
-			setListAdapter(events);
+		// Get a list of the events we have created over time.
+    	ArrayList<Event> allMyEvents = localDB.getMyEvents();
+    	if (allMyEvents.size() < 1) {
+    		findViewById(R.id.my_events_empty).setVisibility(View.VISIBLE);
+    		findViewById(android.R.id.list).setVisibility(View.GONE);
+    		return;
+    	}
+
+    	findViewById(R.id.my_events_empty).setVisibility(View.GONE);
+    	findViewById(android.R.id.list).setVisibility(View.VISIBLE);
+
+    	// Partition the events into active and past lists.
+    	ArrayList<Event> activeEvents = new ArrayList<Event>();
+    	ArrayList<Event> pastEvents = new ArrayList<Event>();
+    	for (Event e : allMyEvents) {
+    		if (e.getEndDate().before(new Date()))
+    			pastEvents.add(e);
+    		else
+    			activeEvents.add(e);
+    	}
+
+    	// Build the list adapter and sections.
+		SeparatedListAdapter adapter = new SeparatedListAdapter(this);
+        if (activeEvents.size() > 0) {
+		    EventAdapter active = new EventAdapter(this, R.layout.list_event, activeEvents);
+			adapter.addSection(getResources().getString(R.string.active), active);
 		}
-		else
-		    findViewById(R.id.my_events_empty).setVisibility(View.VISIBLE);
+        if (pastEvents.size() > 0) {
+		    EventAdapter past = new EventAdapter(this, R.layout.list_event, pastEvents);
+			adapter.addSection(getResources().getString(R.string.past), past);
+		}
+        setListAdapter(adapter);  
 	}
 
 	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
@@ -217,13 +240,12 @@ public class MyEvents extends SherlockListActivity {
 			// Update the local cache to recognize deletion.
 			if (localDB == null)
 	            localDB = new LocalDatabase(getApplicationContext());
-			boolean deleted = localDB.deleteEventFromCache(myEvents.get(deletionIndex));
+			boolean deleted = localDB.deleteEventFromCache(deletionEvent);
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
 
 			// Update the list view and internal events list.
-			myEvents.remove(deletionIndex);
-			deletionIndex = -1;
+			deletionEvent = null;
 			refreshMyEventsList();
 		}
 	}

@@ -46,8 +46,11 @@
     <string name="my_events_delete">Delete</string>
     <string name="my_events_update">Update</string>
     <string name="my_events_repost">Resubmit</string>
+    <string name="my_events_forget">Forget</string>
     <string name="my_events_header">Click on Your Event to Edit It.</string>
     <string name="my_events_no_events">You have not made any events yet!\n\nEvents you create will be listed here.</string>
+    <string name="active">Active</string>
+    <string name="past">Past</string>
 
     <!-- Edit Event page -->
     <string name="edit_event_page_title">Edit Event</string>

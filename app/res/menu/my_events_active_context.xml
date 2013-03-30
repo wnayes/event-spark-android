@@ -6,7 +6,4 @@
     <item
         android:id="@+id/my_events_delete"
         android:title="@string/my_events_delete" />
-    <item
-        android:id="@+id/my_events_repost"
-        android:title="@string/my_events_repost" />
 </menu>
