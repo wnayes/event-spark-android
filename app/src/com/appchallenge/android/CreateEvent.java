@@ -31,6 +31,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.appchallenge.android.Event.Type;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -39,8 +40,7 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class CreateEvent extends SherlockFragmentActivity implements CreateEventInterface {
     /**
-     * The pager widget, which handles animation and allows swiping horizontally to access previous
-     * and next wizard steps.
+     * A pager widget that controls animating between fragments.
      */
     private ViewPager mPager;
 
@@ -50,72 +50,51 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     private PagerAdapter mPagerAdapter;
 
     /**
-     * The title of the event provided by the user.
+     * The local event we are creating.
      */
-    private String title = "";
+    private LocalEvent newEvent;
+
+    // Method implementations for CreateEventInterface.
 	public void setTitle(String title) {
-		this.title = title;
+		newEvent.setTitle(title);
 	}
 	public String getEventTitle() {
-		return this.title;
+		return newEvent.getTitle();
 	}
 
-	/**
-	 * The category the event fits into.
-	 */
-	private Event.Type type;
-	public void setType(Event.Type type) {
-		this.type = type;
+	public void setType(Type type) {
+		newEvent.setType(type);
 	}
-	public Event.Type getType() {
-		return this.type;
+	public Type getType() {
+		return newEvent.getType();
 	}
 
-	/**
-	 * The description of the event provided by the user.
-	 */
-	private String description = "";
 	public void setDescription(String description) {
-		this.description = description;
+		newEvent.setDescription(description);
 	}
 	public String getDescription() {
-		return this.description;
+		return newEvent.getDescription();
 	}
 
-	/**
-	 * The date when the event goes live.
-	 */
-	private Date startDate;
 	public void setStartDate(Date date) {
-		this.startDate = date;
+		newEvent.setStartDate(date);
 	}
 	public Date getStartDate() {
-		return this.startDate;
+		return newEvent.getStartDate();
 	}
 
-	/**
-	 * The date when the event finishes.
-	 */
-	private Date endDate;
 	public void setEndDate(Date date) {
-		if (endDate != null)
-		    Log.d("setEndDate", "endDate was: " + endDate.getTime());
-		this.endDate = date;
-		Log.d("setEndDate", "endDate now: " + endDate.getTime());
+		newEvent.setEndDate(date);
 	}
 	public Date getEndDate() {
-		return this.endDate;
+		return newEvent.getEndDate();
 	}
 
-	/**
-     * Location keeping track of the wizard map camera.
-     */
-	private LatLng mapLocation;
 	public void setLocation(LatLng location) {
-		this.mapLocation = location;
+		newEvent.setLocation(location);
 	}
 	public LatLng getLocation() {
-		return this.mapLocation;
+		return newEvent.getLocation();
 	}
 
     @Override
@@ -124,32 +103,28 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         setContentView(R.layout.activity_create_event);
         
         // The home button takes the user back to the map display.
-        ActionBar bar = getSupportActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         // Keeps keyboard from popping up unless invoked
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // Set the initial date values for the event.
-        if ((savedInstanceState != null) && savedInstanceState.containsKey("startDate") && savedInstanceState.containsKey("endDate")) {
-        	this.startDate = new Date(savedInstanceState.getLong("startDate"));
-        	this.endDate = new Date(savedInstanceState.getLong("endDate"));
-        }
-        else if (this.startDate == null && this.endDate == null) {
-        	this.startDate = new Date();
+        if (savedInstanceState != null)
+        	this.newEvent = savedInstanceState.getParcelable("newEvent");
+        else
+        	this.newEvent = new LocalEvent();
+
+        if (this.getStartDate() == null && this.getEndDate() == null) {
+        	this.setStartDate(new Date());
         	Calendar c = Calendar.getInstance();
-           	this.startDate = new Date();
            	c.add(Calendar.HOUR_OF_DAY, 3);
-            this.endDate = c.getTime();
-            Log.d("set startDate", ((Long)this.startDate.getTime()).toString());
-            Log.d("set endDate", ((Long)this.endDate.getTime()).toString());
-
+            this.setEndDate(c.getTime());
         }
 
-        // Set the map location to use the location given from the EventViewer.
-        if (mapLocation == null) {
+        // Set the map location to use the location passed in.
+        if (this.getLocation() == null) {
             Intent receivedIntent = getIntent();
-            mapLocation = receivedIntent.getParcelableExtra("location");
+            this.setLocation((LatLng)receivedIntent.getParcelableExtra("location"));
         }
 
         // Instantiate a ViewPager and a PagerAdapter.
@@ -167,11 +142,9 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
             }
         });
     }
-    
+
     public void onSaveInstanceState(Bundle savedInstanceState) {
-    	savedInstanceState.putLong("startDate", getStartDate().getTime());
-    	savedInstanceState.putLong("endDate", getEndDate().getTime());
-    	
+    	savedInstanceState.putParcelable("newEvent", this.newEvent);
     	super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -224,13 +197,13 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			return true;
 		} else if (item.getItemId() == R.id.action_next) {
 			// Advance to the next step in the wizard after performing error checking.
-			if (mPager.getCurrentItem() == 0 && this.title == "") {
+			if (mPager.getCurrentItem() == 0 && this.getEventTitle().trim() == "") {
 				Toast.makeText(context, "Please enter a title for the event!", duration).show();
 				return true;
 			}
 
 			if (mPager.getCurrentItem() == 1) {
-				if (this.startDate.after(this.endDate) || this.endDate.before(new Date())) {
+				if (getStartDate().after(getEndDate()) || getEndDate().before(new Date())) {
 					Toast.makeText(context, "Please enter a valid timespan!", duration).show();
 					return true;
 				}
@@ -240,9 +213,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
 			// Perform an asynchronous API call to create the new event.
-			LocalEvent newEvent = new LocalEvent(-1, "", title, description, type, mapLocation, startDate, endDate, 0);
 			createEventAPICaller apiCall = new createEventAPICaller();
-			apiCall.execute(newEvent);
+			apiCall.execute(this.newEvent);
 			return true;
 		}
 

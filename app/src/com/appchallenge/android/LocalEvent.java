@@ -33,6 +33,10 @@ public class LocalEvent extends Event {
 		this.attendance = e.attendance;
 	}
 
+	LocalEvent() {
+		super();
+	}
+
     public void setId(Integer id) {
     	this.id = id;
     }

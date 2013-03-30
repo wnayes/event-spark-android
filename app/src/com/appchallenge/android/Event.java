@@ -27,10 +27,10 @@ public class Event implements Parcelable {
     	this.title = "";
     	this.description = "";
     	this.type = Type.OTHER;
-    	this.location = new LatLng(0.0, 0.0);
+    	this.location = null;
     	this.attendance = 0;
-    	this.startDate = new Date();
-    	this.endDate = new Date();
+    	this.startDate = null;
+    	this.endDate = null;
     }
 
     /**
