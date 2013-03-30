@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -175,7 +177,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {    
-        Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
 
         // Close the keyboard after each page change.
@@ -203,13 +204,13 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		} else if (item.getItemId() == R.id.action_next) {
 			// Advance to the next step in the wizard after performing error checking.
 			if (mPager.getCurrentItem() == 0 && this.getEventTitle().trim() == "") {
-				Toast.makeText(context, "Please enter a title for the event!", duration).show();
+				Toast.makeText(this, "Please enter a title for the event!", duration).show();
 				return true;
 			}
 
 			if (mPager.getCurrentItem() == 1) {
 				if (getStartDate().after(getEndDate()) || getEndDate().before(new Date())) {
-					Toast.makeText(context, "Please enter a valid timespan!", duration).show();
+					Toast.makeText(this, "Please enter a valid timespan!", duration).show();
 					return true;
 				}
 			}
@@ -217,6 +218,12 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
+			// Prevent being offline from losing entered data.
+			if (!isOnline()) {
+				Toast.makeText(this, "Please connect to a network and try again.", duration).show();
+				return true;
+			}
+
 			// Perform an asynchronous API call to create the new event.
 			createEventAPICaller apiCall = new createEventAPICaller();
 			apiCall.execute(this.newEvent);
@@ -234,6 +241,18 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
             return;
         }
         super.onBackPressed(); 
+    }
+
+    /**
+	 * Determines if the device has internet connectivity.
+	 * @return Whether a data connection is available.
+	 */
+	public boolean isOnline() {
+        ConnectivityManager connectivityManager =
+          (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
     }
 
     /**
@@ -366,7 +385,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			dialog = null;
 			if (result == null) {
 				(Toast.makeText(getApplicationContext(), "Could not create event!", Toast.LENGTH_LONG)).show();
-				CreateEvent.this.finish();
 				return;
 			}
 			
