@@ -57,9 +57,9 @@
     <string name="edit_event_title">Title:</string>
     <string name="edit_event_type">Type:</string>
     <string name="edit_event_description">Description:</string>
-    <string name="edit_event_submit">Submit</string>
-    
-    
+    <string name="done">Done</string>
+    <string name="discard">Discard</string>
+
     <!-- Event Details page -->
     <string name="title_activity_event_details">Event Details</string>
     <string name="event_description_empty">No description given.</string>

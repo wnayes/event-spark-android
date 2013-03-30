@@ -16,7 +16,9 @@ import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -54,8 +56,42 @@ public class EditEvent extends SherlockFragmentActivity {
 
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-		ActionBar bar = getSupportActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        // Establish the Done / Discard pattern in the Action Bar.
+        LayoutInflater inflater = (LayoutInflater)getSupportActionBar().getThemedContext()
+                                                                       .getSystemService(LAYOUT_INFLATER_SERVICE);
+        final View doneDiscardView = inflater.inflate(R.layout.actionbar_custom_view_done_discard, null);
+
+        // The Done button submits the updated information.
+        doneDiscardView.findViewById(R.id.actionbar_done).setOnClickListener(
+            new View.OnClickListener() {
+                public void onClick(View v) {
+                	if (localEvent.getTitle().trim().length() == 0) {
+        				Toast.makeText(getBaseContext(), "Please enter a title!", Toast.LENGTH_SHORT).show();
+        				return;
+        			}
+        			if (localEvent.getStartDate().after(localEvent.getEndDate()) || localEvent.getEndDate().before(new Date())) {
+        				Toast.makeText(getBaseContext(), "Please enter a valid timespan!", Toast.LENGTH_SHORT).show();
+        				return;
+        			}
+        
+        			Log.d("EventEdit.onOptionsItemSelected", "Submitting updated event: " + localEvent.toJSON());
+        			new updateEventAPICaller().execute(event, localEvent);
+                }
+            });
+
+        // The Discard button cancels and returns to the previous activity.
+        doneDiscardView.findViewById(R.id.actionbar_discard).setOnClickListener(
+            new View.OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+        		                    ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+        actionBar.setCustomView(doneDiscardView, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                                            ViewGroup.LayoutParams.MATCH_PARENT));
 
 		Intent intent = getIntent();
 		event = intent.getParcelableExtra("event");
@@ -193,35 +229,6 @@ public class EditEvent extends SherlockFragmentActivity {
     	if (localDB != null)
             localDB.close();
     }
-
-    public boolean onCreateOptionsMenu(Menu menu){
-        super.onCreateOptionsMenu(menu);
-        getSupportMenuInflater().inflate(R.menu.activity_edit_event, menu);
-        return true;
-    }
-
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.edit_event_submit) {
-			// Prevent incorrect information from being submitted.
-			if (localEvent.getTitle().trim().length() == 0) {
-				Toast.makeText(getBaseContext(), "Please enter a title!", Toast.LENGTH_SHORT).show();
-				return true;
-			}
-			if (localEvent.getStartDate().after(localEvent.getEndDate()) || localEvent.getEndDate().before(new Date())) {
-				Toast.makeText(getBaseContext(), "Please enter a valid timespan!", Toast.LENGTH_SHORT).show();
-				return true;
-			}
-
-			Log.d("EventEdit.onOptionsItemSelected", "Submitting updated event: " + localEvent.toJSON());
-			new updateEventAPICaller().execute(event, localEvent);
-			return true;
-		}
-		else if (item.getItemId() == android.R.id.home) {
-			onBackPressed();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 
 	public void showEventTimeDialog(View v) {
     	DialogFragment timePicker;
