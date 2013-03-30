@@ -2,6 +2,7 @@ package com.appchallenge.android;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.http.conn.ConnectTimeoutException;
@@ -216,6 +217,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	if (localDB == null)
     		localDB = new LocalDatabase(this);
     	localDB.takeOwnership(event);
+
+    	// If the event should not yet be shown, do not place a marker.
+    	if (!event.isLive()) {
+    		Toast.makeText(this, "Your event will begin showing up closer to its start time.", Toast.LENGTH_LONG).show();
+    		return;
+    	}
 
     	// Display the new marker
     	this.currentEvents.add(event);

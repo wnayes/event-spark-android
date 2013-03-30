@@ -242,6 +242,18 @@ public class Event implements Parcelable {
         return this.toMarker().draggable(isDraggable);
     }
 
+    /**
+     * Determines if the Event should be shown to users yet.
+     * Currently Events starting within 3 hours should be shown.
+     * @return Whether the event should be shown on the map.
+     */
+    public boolean isLive() {
+    	if (this.startDate == null)
+    		return false;
+    	Date today = new Date();
+    	return (today.getTime() + 10800000 > this.startDate.getTime());
+    }
+
     // Methods implementing Parcelable.
 	public int describeContents() { return 0; }
 
