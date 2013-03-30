@@ -34,6 +34,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.android.Event.Type;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Wizard activity for creating new events.
@@ -95,6 +96,10 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	}
 	public LatLng getLocation() {
 		return newEvent.getLocation();
+	}
+
+	public MarkerOptions getMarker() {
+		return newEvent.toMarker(true);
 	}
 
     @Override

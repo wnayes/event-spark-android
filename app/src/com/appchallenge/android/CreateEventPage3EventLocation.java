@@ -20,29 +20,16 @@ import android.view.ViewGroup;
  * that the user can modify the event location marker position.
  */
 public class CreateEventPage3EventLocation extends SupportMapFragment {
-	// The marker representing the new event.
-	//private MarkerOptions eventMarker;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	View view = super.onCreateView(inflater, container, savedInstanceState);
     	LatLng location = ((CreateEventInterface)getActivity()).getLocation();
     	getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
-
-    	// Match the marker color to the event type.
-    	float typeColor = ((CreateEventInterface)getActivity()).getType().color();
-    	BitmapDescriptor markerColor = BitmapDescriptorFactory.defaultMarker(typeColor);
     	
-        MarkerOptions m = new MarkerOptions().position(location)
-                                             .title(((CreateEventInterface)getActivity()).getEventTitle())
-                                             .snippet("Move the marker to the event.")
-                                             .icon(markerColor)
-                                             .draggable(true);
+        MarkerOptions m = ((CreateEventInterface)getActivity()).getMarker();
+        m.position(location);
+        m.title(((CreateEventInterface)getActivity()).getEventTitle());
+        m.snippet("Move the marker to the event.");
+
         final Marker marker = getMap().addMarker(m);
 
         // Set a listener to update the marker location when dragged by the user.
@@ -50,6 +37,9 @@ public class CreateEventPage3EventLocation extends SupportMapFragment {
 			@Override
 			public void onMarkerDragEnd(Marker arg0) {
 	    		((CreateEventInterface)getActivity()).setLocation(marker.getPosition());
+
+	    		// Have the map follow the marker and center on it.
+	    		getMap().animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 500, null);
 			}
 			
 			// Unused interface methods

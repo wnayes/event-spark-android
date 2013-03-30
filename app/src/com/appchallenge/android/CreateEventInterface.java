@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.appchallenge.android.Event.Type;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Interface that the CreateEvent wizard implements to allow the
@@ -28,4 +29,5 @@ public interface CreateEventInterface {
 	public Type getType();
 	public void setType(Type type);
 
+	public MarkerOptions getMarker();
 }
