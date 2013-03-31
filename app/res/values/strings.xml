@@ -88,6 +88,8 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     
+    <string name="connect_facebook">Connect Facebook</string>
+    
     <!-- Notifications -->
     <plurals name="new_events_nearby">
         <item quantity="one">1 new event nearby</item>

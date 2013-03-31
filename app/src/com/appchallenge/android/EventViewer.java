@@ -1,11 +1,21 @@
 package com.appchallenge.android;
 
 import java.net.SocketTimeoutException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.conn.ConnectTimeoutException;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.model.GraphUser;
+import com.facebook.widget.LoginButton;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,6 +30,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.ConnectivityManager;
@@ -28,6 +42,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -105,6 +120,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
 
+        LoginButton authButton = (LoginButton) findViewById(R.id.authButton);
+        authButton.setPublishPermissions(Arrays.asList("publish_actions"));
         // Restore the state of the initial screen.
         if (savedInstanceState != null) {
         	if (savedInstanceState.getBoolean("actionBarVisible", true))
@@ -116,6 +133,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	findViewById(R.id.createEventButton).setVisibility(savedInstanceState.getInt("initialCreateEventVisible", View.GONE));
         	findViewById(R.id.initialMainActions).setVisibility(savedInstanceState.getInt("initialViewEventsVisible", View.GONE));
         	findViewById(R.id.initialProgressLayout).setVisibility(savedInstanceState.getInt("initialLocProgressVisible", View.GONE));
+        	
         }
         else
         	getSupportActionBar().hide();
@@ -172,6 +190,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	this.updateUserLocation();
         }
     }
+    
 
     @Override
     protected void onResume() {

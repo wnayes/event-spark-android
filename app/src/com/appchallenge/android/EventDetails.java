@@ -2,15 +2,6 @@ package com.appchallenge.android;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.ShareActionProvider;
-import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
-import com.appchallenge.android.ReportDialogFragment.ReportReason;
-import com.google.android.gms.maps.model.LatLng;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -24,10 +15,28 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.ShareActionProvider;
+import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
+import com.appchallenge.android.ReportDialogFragment.ReportReason;
+import com.facebook.HttpMethod;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphObject;
+import com.facebook.model.OpenGraphAction;
+import com.google.android.gms.maps.model.LatLng;
+
 public class EventDetails extends SherlockFragmentActivity implements ReportDialogListener {
 	// Private members containing the Event information.
 	private Event event;
 	private LatLng userLocation;
+	private Integer id;
+	private String URL = "http://saypoint.dreamhosters.com/facebook/";
 	
 	/**
 	 * Indicates whether we have attended the event already.
@@ -57,6 +66,9 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		// The home button takes the user back to the map display.
 		ActionBar bar = getSupportActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
+		
+		id = this.event.getId();
+		URL = URL + id.toString() + ".html";
 		
 		// Learn whether we have already attended this event.
 		if (attended == null) {
@@ -160,10 +172,10 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		inflater.inflate(R.menu.activity_event_details, menu);
 
 		// Establish the "Share" action provider.
-        this.mShareActionProvider = (ShareActionProvider)menu.findItem(R.id.share).getActionProvider();
-        Intent intent = this.getEventShareIntent();
-        if (intent != null && this.mShareActionProvider != null)
-            this.mShareActionProvider.setShareIntent(intent);
+        //this.mShareActionProvider = (ShareActionProvider)menu.findItem(R.id.share).getActionProvider();
+        //Intent intent = this.getEventShareIntent();
+        //if (intent != null && this.mShareActionProvider != null)
+          //  this.mShareActionProvider.setShareIntent(intent);
 
 		// Keep a reference to the menu for later uses (refresh indicator change).
         this._menu = menu;
@@ -201,23 +213,26 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                 // Commit to attending the event.
             	new attendEventAPICaller().execute(this.event.getId());
 	        	return true;
+            case R.id.share:
+            	shareEvent();
+            	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
 	}
+	
 
 	/**
      *Returns a Share intent for use with the Share action provider.
      */
-    private Intent getEventShareIntent() {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, event.getTitle());
-        String text = event.getTitle() + "\n\nTime: " +
-                      ((TextView)findViewById(R.id.event_details_date_description)).getText().toString() +
-                      "\n\n" + event.getDescription();
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        return intent;
+    private void shareEvent() {
+    	Log.d("EventDetails","Started Posting the Event");
+    	Session session = Session.getActiveSession();
+    	if (session == null) {
+    		Toast.makeText(this.getApplicationContext(), "Log into Facebook to share the event", Toast.LENGTH_LONG).show();
+    		return;
+    	}
+        
     }
 
 	/**
@@ -326,6 +341,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		}
 	}
 	
+	
 	/**
 	 * Performs an asynchronous API call receive any updates of the event we are viewing.
 	 */
@@ -366,4 +382,52 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			updateEventDetails();
 		}
 	}
+	
+	private interface EventGraphObject extends GraphObject {
+	    // A URL
+	    public String getUrl();
+	    public void setUrl(String url);
+
+	    // An ID
+	    public String getId();
+	    public void setId(String id);
+	}
+	
+	private interface EatAction extends OpenGraphAction {
+	    // The meal object
+	    public EventGraphObject getMeal();
+	    public void setMeal(EventGraphObject meal);
+	}
+	
+	private static final String POST_ACTION_PATH = "me/appchallenge_arrows:join";
+	AsyncTask<Void, Void, Response> task = 
+		    new AsyncTask<Void, Void, Response>() {
+
+		    @Override
+		    protected Response doInBackground(Void... voids) {
+		        // Create an eat action
+		         EventGraphObject eatAction = GraphObject.Factory.create(EventGraphObject.class);
+		        // Populate the action with the POST parameters:
+		        // the meal, friends, and place info
+		        //for (BaseListElement element : listElements) {
+		           // element.populateOGAction(eatAction);
+		        //}   
+		        // Set up a request with the active session, set up
+		        // an HTTP POST to the eat action endpoint
+		        Request request = new Request(Session.getActiveSession(),
+		                POST_ACTION_PATH, null, HttpMethod.POST);
+		        // Add the post parameter, the eat action
+		        request.setGraphObject(eatAction);
+		        // Execute the request synchronously in the background
+		        // and return the response.
+		        return request.executeAndWait();
+		    }   
+
+		    @Override
+		    protected void onPostExecute(Response response) {
+		        // When the task completes, process
+		        // the response on the main thread
+		        //onPostActionResponse(response);
+		     }   
+		};  
 }
