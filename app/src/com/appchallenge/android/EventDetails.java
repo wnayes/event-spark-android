@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -23,12 +24,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.ShareActionProvider;
 import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
 import com.appchallenge.android.ReportDialogFragment.ReportReason;
-import com.facebook.HttpMethod;
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
-import com.facebook.model.GraphObject;
-import com.facebook.model.OpenGraphAction;
 import com.google.android.gms.maps.model.LatLng;
 
 public class EventDetails extends SherlockFragmentActivity implements ReportDialogListener {
@@ -214,7 +210,8 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
             	new attendEventAPICaller().execute(this.event.getId());
 	        	return true;
             case R.id.share:
-            	shareEvent();
+            	new shareEventAPICaller().execute(this.event.getId());
+            	//shareEvent();
             	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
@@ -222,18 +219,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	}
 	
 
-	/**
-     *Returns a Share intent for use with the Share action provider.
-     */
-    private void shareEvent() {
-    	Log.d("EventDetails","Started Posting the Event");
-    	Session session = Session.getActiveSession();
-    	if (session == null) {
-    		Toast.makeText(this.getApplicationContext(), "Log into Facebook to share the event", Toast.LENGTH_LONG).show();
-    		return;
-    	}
-        
-    }
 
 	/**
 	 * Receives the ReportReason from the report dialog and submits the report.
@@ -383,51 +368,43 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		}
 	}
 	
-	private interface EventGraphObject extends GraphObject {
-	    // A URL
-	    public String getUrl();
-	    public void setUrl(String url);
-
-	    // An ID
-	    public String getId();
-	    public void setId(String id);
-	}
 	
-	private interface EatAction extends OpenGraphAction {
-	    // The meal object
-	    public EventGraphObject getMeal();
-	    public void setMeal(EventGraphObject meal);
-	}
 	
-	private static final String POST_ACTION_PATH = "me/appchallenge_arrows:join";
-	AsyncTask<Void, Void, Response> task = 
-		    new AsyncTask<Void, Void, Response>() {
+	private class shareEventAPICaller extends AsyncTask<Integer, Void, Boolean> {
+		/**
+		 * Quick access to the refresh button in the actionbar.
+		 */
+		String token;
+		ProgressDialog dialog;
 
-		    @Override
-		    protected Response doInBackground(Void... voids) {
-		        // Create an eat action
-		         EventGraphObject eatAction = GraphObject.Factory.create(EventGraphObject.class);
-		        // Populate the action with the POST parameters:
-		        // the meal, friends, and place info
-		        //for (BaseListElement element : listElements) {
-		           // element.populateOGAction(eatAction);
-		        //}   
-		        // Set up a request with the active session, set up
-		        // an HTTP POST to the eat action endpoint
-		        Request request = new Request(Session.getActiveSession(),
-		                POST_ACTION_PATH, null, HttpMethod.POST);
-		        // Add the post parameter, the eat action
-		        request.setGraphObject(eatAction);
-		        // Execute the request synchronously in the background
-		        // and return the response.
-		        return request.executeAndWait();
-		    }   
+		protected void onPreExecute() {
+			// Establish progress UI changes.
+			Session session = Session.getActiveSession();
+			if (session != null) {
+			    token = session.getAccessToken();
+			}
+			dialog = ProgressDialog.show(EventDetails.this, "Creating...", "");
+		}
 
-		    @Override
-		    protected void onPostExecute(Response response) {
-		        // When the task completes, process
-		        // the response on the main thread
-		        //onPostActionResponse(response);
-		     }   
-		};  
+		protected Boolean doInBackground(Integer... id) {
+			if (token != null){
+			return APICalls.shareEvent(id[0], token);
+			}
+			return false;
+		}
+			
+
+		protected void onPostExecute(Boolean result) {
+
+			if (result == false) {
+				Toast.makeText(getApplicationContext(),
+                               "The event could not be found or no longer exists!",
+                               Toast.LENGTH_LONG).show();
+				
+				return;
+			}
+			Toast.makeText(getApplicationContext(), "The Event has Been Shared", Toast.LENGTH_LONG).show();
+
+		}
+	}  
 }

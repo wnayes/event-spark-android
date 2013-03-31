@@ -1,21 +1,14 @@
 package com.appchallenge.android;
 
 import java.net.SocketTimeoutException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.conn.ConnectTimeoutException;
 
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
-import com.facebook.model.GraphUser;
-import com.facebook.widget.LoginButton;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,10 +23,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.Signature;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.ConnectivityManager;
@@ -42,7 +31,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -113,6 +101,15 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     /** Keeps track of the help view state, used to keep it open / closed as necessary. */
     private Boolean helpOpen;
+    
+    /*
+     * Facebook Integration
+     * The following is used to set our requested permissions
+     */
+    List<String> readPermissions = new ArrayList<String>();
+    List<String> writePermissions = new ArrayList<String>();
+    Boolean read = false;
+    Boolean write = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,8 +117,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
 
-        LoginButton authButton = (LoginButton) findViewById(R.id.authButton);
-        authButton.setPublishPermissions(Arrays.asList("publish_actions"));
+        
         // Restore the state of the initial screen.
         if (savedInstanceState != null) {
         	if (savedInstanceState.getBoolean("actionBarVisible", true))
@@ -191,7 +187,44 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         }
     }
     
-
+    Session.StatusCallback callBack = new Session.StatusCallback() {
+		
+		@Override
+		public void call(Session session, SessionState state, Exception exception) {
+			
+			if (state.isOpened() && (state.equals(SessionState.OPENED_TOKEN_UPDATED) || state.equals(SessionState.OPENED))) {
+				if (!read) {
+					readPermissions.add("read_friendlists");
+					session.requestNewReadPermissions(new Session.NewPermissionsRequest(EventViewer.this, readPermissions));
+					read = true;
+					return;
+				}
+				if (!write) {
+				    writePermissions.add("publish_actions");
+				    session.requestNewPublishPermissions(new Session.NewPermissionsRequest(EventViewer.this, writePermissions));
+				    Log.d("this", "is called");
+				    write = true;
+				    return;
+				    
+				}
+				
+			}
+			//session.
+			Log.d("Facebook Permissions", session.getPermissions().toString());
+			// TODO Auto-generated method stub
+			
+		}
+	}; 
+    
+    public void connectFacebook(View view) {
+    	Session currentSession = Session.getActiveSession();
+        if (currentSession == null || currentSession.getState().isClosed()) {
+            Session.openActiveSession(this, true, callBack); // PROBLEM: NO PERMISSIONS YET BUT CALLBACK IS EXECUTED ON OPEN
+            return;
+        }
+        Log.d("facebook Permissions", currentSession.getPermissions().toString());
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -223,13 +256,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	Log.d("EventViewer.onActivityResult", "Received intent back from creation wizard.");
+    	
     	if (resultCode != RESULT_OK)
     		return;
     	
     	// Show the user the newly created event.
     	Event event = data.getParcelableExtra("event");
-    	if (event == null)
+    	if (event == null){
+    		Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
     		return;
+    	}
     	
     	// Save this event's secret_id to our local storage.
     	if (localDB == null)

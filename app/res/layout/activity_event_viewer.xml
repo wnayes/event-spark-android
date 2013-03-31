@@ -161,11 +161,19 @@
                 android:minWidth="180sp"
                 android:onClick="onCreateEventClick"
                 android:visibility="gone"/>
-	        <com.facebook.widget.LoginButton
+	        <Button android:id="@+id/connectFacebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/connect_facebook"
+                android:textColor="#FFFFFF"
+                android:minWidth="180sp"
+                android:onClick="connectFacebook"/>
+	       <!-- <com.facebook.widget.LoginButton
                 android:id="@+id/authButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal" /> -->
 	    </LinearLayout>
 
         <!-- Holds the location searching progress indication. -->
