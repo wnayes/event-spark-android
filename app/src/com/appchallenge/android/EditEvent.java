@@ -343,6 +343,9 @@ public class EditEvent extends SherlockFragmentActivity {
 				Log.e("updateEventAPICaller.onPostExecute", "Could not update event in local cache");
 
 			// Return to the events list.
+			Intent intent = new Intent(EditEvent.this, MyEvents.class);
+			intent.putExtra("id", event.getId());
+			EditEvent.this.setResult(RESULT_OK, intent);
 			EditEvent.this.finish();
 		}
 	}

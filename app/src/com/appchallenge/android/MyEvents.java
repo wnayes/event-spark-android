@@ -38,6 +38,8 @@ public class MyEvents extends SherlockListActivity {
      * Provides access to our local sqlite database.
      */
 	LocalDatabase localDB;
+	
+	private final int MY_EVENTS_REQUEST_CODE = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -131,7 +133,7 @@ public class MyEvents extends SherlockListActivity {
 	    	// Pass the event to the Edit Event activity.
 	    	Intent editEvent = new Intent(MyEvents.this, EditEvent.class);
 	    	editEvent.putExtra("event", selectedEvent);
-	    	startActivity(editEvent);
+	    	startActivityForResult(editEvent, MY_EVENTS_REQUEST_CODE);
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_repost) {
@@ -144,6 +146,8 @@ public class MyEvents extends SherlockListActivity {
 			boolean deleted = localDB.deleteEventFromCache(selectedEvent);
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
+			else
+			    Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG);
 
 			this.refreshMyEventsList();
 	    	return true;
@@ -209,6 +213,16 @@ public class MyEvents extends SherlockListActivity {
 		}
         setListAdapter(adapter);  
 	}
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == MY_EVENTS_REQUEST_CODE) {
+			if (resultCode == RESULT_OK) {
+				Intent intent = new Intent(MyEvents.this, EventViewer.class);
+				MyEvents.this.setResult(RESULT_OK, intent);
+				MyEvents.this.finish();
+			}
+		}
+	}
 
 	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
 		/**
@@ -243,6 +257,8 @@ public class MyEvents extends SherlockListActivity {
 			boolean deleted = localDB.deleteEventFromCache(deletionEvent);
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
+			else
+				Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG);
 
 			// Update the list view and internal events list.
 			deletionEvent = null;

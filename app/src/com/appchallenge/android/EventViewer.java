@@ -2,7 +2,6 @@ package com.appchallenge.android;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.http.conn.ConnectTimeoutException;
@@ -207,34 +206,41 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	Log.d("EventViewer.onActivityResult", "Received intent back from creation wizard.");
     	if (resultCode != RESULT_OK)
     		return;
+    	if (requestCode == 0) {
+        	// Show the user the newly created event.
+    	    Event event = data.getParcelableExtra("event");
+    	    if (event == null)
+    		    return;
     	
-    	// Show the user the newly created event.
-    	Event event = data.getParcelableExtra("event");
-    	if (event == null)
-    		return;
-    	
-    	// Save this event's secret_id to our local storage.
-    	if (localDB == null)
-    		localDB = new LocalDatabase(this);
-    	localDB.takeOwnership(event);
+    	    // Save this event's secret_id to our local storage.
+    	    if (localDB == null)
+    		    localDB = new LocalDatabase(this);
+    	        localDB.takeOwnership(event);
 
-    	// If the event should not yet be shown, do not place a marker.
-    	if (!event.isLive()) {
-    		Toast.makeText(this, "Your event will begin showing up closer to its start time.", Toast.LENGTH_LONG).show();
-    		return;
+    	        // If the event should not yet be shown, do not place a marker.
+    	        if (!event.isLive()) {
+    		    Toast.makeText(this, "Your event will begin showing up closer to its start time.", Toast.LENGTH_LONG).show();
+    		    return;
+    	    }
+
+    	    // Display the new marker
+    	    this.currentEvents.add(event);
+    	    Marker m = mMap.addMarker(event.toMarker());
+    	    eventMarkerMap.put(m, event.getId());
+
+    	    // Pan and zoom to this new marker.
+    	    CameraUpdate viewEvent = CameraUpdateFactory.newLatLngZoom(event.getLocation(), 18);
+    	    mMap.animateCamera(viewEvent);
+
+    	    // Show the info window for the new event.
+    	    m.showInfoWindow();
     	}
-
-    	// Display the new marker
-    	this.currentEvents.add(event);
-    	Marker m = mMap.addMarker(event.toMarker());
-    	eventMarkerMap.put(m, event.getId());
-
-    	// Pan and zoom to this new marker.
-    	CameraUpdate viewEvent = CameraUpdateFactory.newLatLngZoom(event.getLocation(), 18);
-    	mMap.animateCamera(viewEvent);
-
-    	// Show the info window for the new event.
-    	m.showInfoWindow();
+    	if (requestCode == 1 && resultCode == RESULT_OK){
+    		if (!isOnline())
+				this.displayConnectivityMessage();
+			else if (currentLocation != null)
+			    new getEventsNearLocationAPICaller().execute(currentLocation);
+    	}
     }
 
     private Menu _menu;
@@ -309,7 +315,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		} else if (currentId == R.id.menu_my_events) {
 			// Show a listing of the events we have made.
 		    Intent myEvents = new Intent(EventViewer.this, MyEvents.class);
-			startActivity(myEvents);
+			startActivityForResult(myEvents, 1);
 			return true;
 		}
 
