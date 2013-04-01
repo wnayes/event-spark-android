@@ -2,7 +2,6 @@ package com.appchallenge.android;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.http.conn.ConnectTimeoutException;
@@ -416,7 +415,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     /**
      * Closes the help information view.
      */
-    public void onAwesomeClick(View v) {
+    public void onCloseHelpClick(View v) {
     	assert this.helpOpen;
 
     	// Ensure that we remember we have already seen this help.

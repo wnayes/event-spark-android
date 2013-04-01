@@ -29,7 +29,6 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;

@@ -40,10 +40,6 @@ public class LocalEvent extends Event {
     public void setId(Integer id) {
     	this.id = id;
     }
-    
-    public void setSecretId(String secretId) {
-    	this.secretId = secretId;
-    }
 
     public void setTitle(String title) {
     	this.title = title;

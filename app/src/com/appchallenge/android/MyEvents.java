@@ -17,6 +17,7 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,7 +44,6 @@ public class MyEvents extends SherlockListActivity {
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_my_events);
-		registerForContextMenu(getListView());
 
         // The home button takes the user back to the map display.
         ActionBar bar = getSupportActionBar();
@@ -58,6 +58,7 @@ public class MyEvents extends SherlockListActivity {
 
     	// Build the list of events.
         this.refreshMyEventsList();
+        registerForContextMenu(getListView());
 
         // Persist the context menu state. This required a Runnable to overcome issues
         // with the Activity window not being ready during calls to openContextMenu().
@@ -81,6 +82,10 @@ public class MyEvents extends SherlockListActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		Log.d("MyEvents.onCreateContextMenu", "Context menu created.");
         super.onCreateContextMenu(menu, v, menuInfo);
+
+        // Retrieve the Event that was selected.
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+        this.selectedEvent = (Event)getListAdapter().getItem(info.position);
 
         // Determine the available actions based on event list section.
         if (this.selectedEvent.getEndDate().before(new Date()))
@@ -122,7 +127,12 @@ public class MyEvents extends SherlockListActivity {
 			return super.onContextItemSelected((android.view.MenuItem) item);
 		}
 
-	    if (item.getItemId() == R.id.my_events_delete) {
+		if (item.getItemId() == R.id.my_events_details) {
+			Intent eventDetails = new Intent(MyEvents.this, EventDetails.class);
+	     	eventDetails.putExtra("event", selectedEvent);
+	     	startActivity(eventDetails);
+		}
+		else if (item.getItemId() == R.id.my_events_delete) {
 	    	this.deletionEvent = selectedEvent;
 	    	new deleteEventAPICaller().execute(selectedEvent);
 	    	return true;
@@ -153,9 +163,16 @@ public class MyEvents extends SherlockListActivity {
 
 	protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        Log.d("MyEvents.onListItemClick", "List item has been clicked.");
 
-        this.selectedEvent = (Event)l.getItemAtPosition(position);
-        openContextMenu(v);
+        Event event = (Event)l.getItemAtPosition(position);
+        if (event == null)
+        	return;
+
+        // Pass information about the event to the details activity.
+        Intent eventDetails = new Intent(MyEvents.this, EventDetails.class);
+     	eventDetails.putExtra("event", event);
+     	startActivity(eventDetails);
 	}
 
 	@Override

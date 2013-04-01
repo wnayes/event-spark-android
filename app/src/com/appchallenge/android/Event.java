@@ -74,6 +74,9 @@ public class Event implements Parcelable {
     public String getSecretId() {
     	return this.secretId;
     }
+    public void setSecretId(String secretId) {
+    	this.secretId = secretId;
+    }
 
     /**
      * @return The title of the Event.
@@ -252,6 +255,14 @@ public class Event implements Parcelable {
     		return false;
     	Date today = new Date();
     	return (today.getTime() + 10800000 > this.startDate.getTime());
+    }
+
+    /**
+     * Returns whether we have ownership of the Event.
+     * @return True if the Event has a populated secret_id field.
+     */
+    public boolean isOurs() {
+    	return !this.secretId.trim().equals("");
     }
 
     // Methods implementing Parcelable.
