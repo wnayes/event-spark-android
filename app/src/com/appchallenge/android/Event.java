@@ -231,10 +231,25 @@ public class Event implements Parcelable {
      * @return A Google Maps marker representing the Event.
      */
     public MarkerOptions toMarker() {
+    	// Determine which icon resource we use based on event type.
+    	int markerIcon;
+    	if (this.type == Type.ACADEMICS)
+    		markerIcon = R.drawable.academics;
+    	else if (this.type == Type.ATHLETICS)
+    		markerIcon = R.drawable.athletics;
+    	else if (this.type == Type.ENTERTAINMENT)
+    		markerIcon = R.drawable.entertainment;
+    	else if (this.type == Type.PROMOTIONS)
+    		markerIcon = R.drawable.promotions;
+    	else if (this.type == Type.SOCIAL)
+    		markerIcon = R.drawable.social;
+    	else
+    		markerIcon = R.drawable.other;
+
         return new MarkerOptions().title(this.title)
                                   .snippet("Click to view more info.")
                                   .position(this.location)
-                                  .icon(BitmapDescriptorFactory.defaultMarker(this.type.color()));
+                                  .icon(BitmapDescriptorFactory.fromResource(markerIcon));
     }
 
     /**

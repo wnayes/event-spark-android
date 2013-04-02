@@ -85,7 +85,8 @@ public class MyEvents extends SherlockListActivity {
 
         // Retrieve the Event that was selected.
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        this.selectedEvent = (Event)getListAdapter().getItem(info.position);
+        if (this.selectedEvent == null)
+            this.selectedEvent = (Event)getListAdapter().getItem(info.position);
 
         // Determine the available actions based on event list section.
         if (this.selectedEvent.getEndDate().before(new Date()))
