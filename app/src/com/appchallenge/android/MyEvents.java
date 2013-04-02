@@ -146,6 +146,11 @@ public class MyEvents extends SherlockListActivity {
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_repost) {
+	    	// Allow the user to repost the event by spawning the create event wizard
+	    	// with the old event's information pre-filled.
+	    	Intent createEvent = new Intent(MyEvents.this, CreateEvent.class);
+			createEvent.putExtra("event", selectedEvent);
+			startActivityForResult(createEvent, 0);
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_forget) {

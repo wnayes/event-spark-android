@@ -114,11 +114,18 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         // Keeps keyboard from popping up unless invoked
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        Intent receivedIntent = getIntent();
+
         // Set the initial date values for the event.
         if (savedInstanceState != null)
         	this.newEvent = savedInstanceState.getParcelable("newEvent");
-        else
-        	this.newEvent = new LocalEvent();
+        else {
+        	// See if an event was passed in.
+        	if (receivedIntent.hasExtra("event"))
+        		this.newEvent = new LocalEvent((Event)receivedIntent.getParcelableExtra("event"));
+        	else
+        	    this.newEvent = new LocalEvent();
+        }
 
         if (this.getStartDate() == null && this.getEndDate() == null) {
         	this.setStartDate(new Date());
@@ -128,10 +135,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         }
 
         // Set the map location to use the location passed in.
-        if (this.getLocation() == null) {
-            Intent receivedIntent = getIntent();
+        if (this.getLocation() == null)
             this.setLocation((LatLng)receivedIntent.getParcelableExtra("location"));
-        }
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager)findViewById(R.id.pager);
