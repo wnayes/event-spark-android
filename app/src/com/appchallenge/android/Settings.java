@@ -20,7 +20,8 @@ public class Settings extends PreferenceActivity {
 	final static String HELP_FILE = "Help";
 	final static String HELP_VIEWER_SEEN = "HELP_VIEWER_SEEN";
 
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);

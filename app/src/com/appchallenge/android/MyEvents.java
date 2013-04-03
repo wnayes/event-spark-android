@@ -163,7 +163,7 @@ public class MyEvents extends SherlockListActivity {
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
 			else
-			    Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG);
+			    Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG).show();
 
 			this.refreshMyEventsList();
 	    	return true;
@@ -240,9 +240,7 @@ public class MyEvents extends SherlockListActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == MY_EVENTS_REQUEST_CODE) {
 			if (resultCode == RESULT_OK) {
-				Intent intent = new Intent(MyEvents.this, EventViewer.class);
-				MyEvents.this.setResult(RESULT_OK, intent);
-				MyEvents.this.finish();
+				refreshMyEventsList();
 			}
 		}
 	}
@@ -270,7 +268,7 @@ public class MyEvents extends SherlockListActivity {
 			dialog.dismiss();
 			dialog = null;
 			if (result == false) {
-				(Toast.makeText(getApplicationContext(), "The event could not be deleted!", Toast.LENGTH_LONG)).show();
+				Toast.makeText(getApplicationContext(), "The event could not be deleted!", Toast.LENGTH_LONG).show();
 				return;
 			}
 
@@ -281,7 +279,7 @@ public class MyEvents extends SherlockListActivity {
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
 			else
-				Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG);
+				Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG).show();
 
 			// Update the list view and internal events list.
 			deletionEvent = null;

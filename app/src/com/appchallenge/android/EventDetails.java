@@ -1,21 +1,26 @@
 package com.appchallenge.android;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.ShareActionProvider;
 import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
 import com.appchallenge.android.ReportDialogFragment.ReportReason;
+import com.facebook.Session;
+import com.facebook.SessionState;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -41,11 +46,27 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
      * Provides access to our local sqlite database.
      */
     private LocalDatabase localDB;
-
+    
     /**
-     * Used to provide the sharing feature in the action bar.
+     * Used to provide the sharing feature with Facebook.
      */
-    private ShareActionProvider mShareActionProvider;
+    private List<String> writePermissions = new ArrayList<String>();
+    Session.StatusCallback callBack = new Session.StatusCallback() {
+		@SuppressWarnings("unchecked")
+		@Override
+		public void call(Session session, SessionState state, Exception exception) {
+
+			if (state.isOpened() && (state.equals(SessionState.OPENED_TOKEN_UPDATED) || state.equals(SessionState.OPENED))) {
+				if (!Arrays.asList(session.getPermissions()).contains("publish_actions")) {
+					writePermissions.clear();
+				    writePermissions.add("publish_actions");
+				    session.requestNewPublishPermissions(new Session.NewPermissionsRequest(EventDetails.this, writePermissions));
+				    Log.d("ShareDialogFragment", "Requesting Share Permissions");
+				}
+			}
+		}
+	};
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -182,12 +203,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		if (this.userLocation == null)
 			menu.findItem(R.id.menu_get_directions).setVisible(false);
 
-		// Establish the "Share" action provider.
-        this.mShareActionProvider = (ShareActionProvider)menu.findItem(R.id.share).getActionProvider();
-        Intent intent = this.getEventShareIntent();
-        if (intent != null && this.mShareActionProvider != null)
-            this.mShareActionProvider.setShareIntent(intent);
-
 		// Keep a reference to the menu for later uses (refresh indicator change).
         this._menu = menu;
 		return true;
@@ -238,23 +253,47 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                 // Remove the event from the backend.
             	new deleteEventAPICaller().execute(event);
     	    	return true;
+            case R.id.share:
+            	connectFacebook();
+            	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
 	}
+	
 
 	/**
-     *Returns a Share intent for use with the Share action provider.
+     *  Checks if the person is signed into facebook and posts to their wall if they are else
+     *  makes them connect through a Dialog.
      */
-    private Intent getEventShareIntent() {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, event.getTitle());
-        String text = event.getTitle() + "\n\nTime: " +
-                      ((TextView)findViewById(R.id.event_details_date_description)).getText().toString() +
-                      "\n\n" + event.getDescription();
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        return intent;
+    public void connectFacebook() {
+        Session session = Session.getActiveSession();
+        if (session == null) {
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.event_share_dialog)
+                   .setPositiveButton(R.string.log_in_to_facebook, new DialogInterface.OnClickListener() {
+                       public void onClick(DialogInterface dialog, int id) {
+                    	   Session session = Session.getActiveSession();
+                    	   if (session == null) {
+                    		   session = Session.openActiveSession(EventDetails.this, true, callBack);
+                    	   }
+                    	   if (session != null) {
+                    		   Log.d("Is is", "Yes");
+           					   new shareEventAPICaller().execute(event.getId());
+                    	   }
+                    	   connectFacebook();
+                    	   dialog.dismiss();
+                    	   
+                       }
+                   })
+                   .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                       public void onClick(DialogInterface dialog, int id) {
+                           dialog.dismiss();
+                       }
+                   });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
 	/**
@@ -447,4 +486,44 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			updateEventDetails();
 		}
 	}
+	
+	private class shareEventAPICaller extends AsyncTask<Integer, Void, Boolean> {
+		/**
+		 * Quick access to the refresh button in the actionbar.
+		 */
+		String token;
+		ProgressDialog shareDialog;
+
+		protected void onPreExecute() {
+			// Establish progress UI changes.
+			Session session = Session.getActiveSession();
+			if (session != null) {
+			    token = session.getAccessToken();
+			}
+			shareDialog = ProgressDialog.show(EventDetails.this, "Sharing...", "");
+		}
+
+		protected Boolean doInBackground(Integer... id) {
+			if (token != null){
+			return APICalls.shareEvent(id[0], token);
+			}
+			return false;
+		}
+
+
+		protected void onPostExecute(Boolean result) {
+            shareDialog.dismiss();
+			if (result == false) {
+				Toast.makeText(getApplicationContext(),
+                               "The event could not be found or no longer exists!",
+                               Toast.LENGTH_LONG).show();
+
+				return;
+			}
+			Toast.makeText(getApplicationContext(), "The Event has been shared.", Toast.LENGTH_LONG).show();
+			return;
+
+		}
+	}  
+	
 }
