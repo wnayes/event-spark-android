@@ -41,9 +41,11 @@ public class CreateEventPage1EventName extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(adapter);
 
-        // Read the title and description from the parent Activity.
+        // Read saved data from the parent Activity.
         titleBox.setText(((CreateEventInterface)getActivity()).getEventTitle());
         descBox.setText(((CreateEventInterface)getActivity()).getDescription());
+        int typeVal = ((CreateEventInterface)getActivity()).getType().getValue();
+        typeSpinner.setSelection(typeVal == 0 ? Type.values().length - 1 : typeVal - 1);
 
         // Handle keeping track of future updates to the text.
         titleBox.addTextChangedListener(new TextWatcher() {
@@ -69,7 +71,7 @@ public class CreateEventPage1EventName extends Fragment {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
             	// Grab the enum by matching the indices of this spinner to the enumerated types.
             	int index = (position == Type.values().length - 1 ? 0 : position + 1);
-            	((CreateEventInterface)getActivity()).setType(Event.Type.typeIndices[index]);
+            	((CreateEventInterface)getActivity()).setType(Type.typeIndices[index]);
             }
             // Interface requirements
             public void onNothingSelected(AdapterView<?> parentView) {}

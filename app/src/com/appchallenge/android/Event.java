@@ -74,6 +74,9 @@ public class Event implements Parcelable {
     public String getSecretId() {
     	return this.secretId;
     }
+    public void setSecretId(String secretId) {
+    	this.secretId = secretId;
+    }
 
     /**
      * @return The title of the Event.
@@ -228,10 +231,25 @@ public class Event implements Parcelable {
      * @return A Google Maps marker representing the Event.
      */
     public MarkerOptions toMarker() {
+    	// Determine which icon resource we use based on event type.
+    	int markerIcon;
+    	if (this.type == Type.ACADEMICS)
+    		markerIcon = R.drawable.academics;
+    	else if (this.type == Type.ATHLETICS)
+    		markerIcon = R.drawable.athletics;
+    	else if (this.type == Type.ENTERTAINMENT)
+    		markerIcon = R.drawable.entertainment;
+    	else if (this.type == Type.PROMOTIONS)
+    		markerIcon = R.drawable.promotions;
+    	else if (this.type == Type.SOCIAL)
+    		markerIcon = R.drawable.social;
+    	else
+    		markerIcon = R.drawable.other;
+
         return new MarkerOptions().title(this.title)
                                   .snippet("Click to view more info.")
                                   .position(this.location)
-                                  .icon(BitmapDescriptorFactory.defaultMarker(this.type.color()));
+                                  .icon(BitmapDescriptorFactory.fromResource(markerIcon));
     }
 
     /**
@@ -252,6 +270,14 @@ public class Event implements Parcelable {
     		return false;
     	Date today = new Date();
     	return (today.getTime() + 10800000 > this.startDate.getTime());
+    }
+
+    /**
+     * Returns whether we have ownership of the Event.
+     * @return True if the Event has a populated secret_id field.
+     */
+    public boolean isOurs() {
+    	return !this.secretId.trim().equals("");
     }
 
     // Methods implementing Parcelable.

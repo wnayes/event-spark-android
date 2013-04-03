@@ -24,6 +24,16 @@
           android:title="@string/event_get_directions"
           android:showAsAction="ifRoom"/>
 
+    <!-- Edit details of the event. -->
+    <item android:id="@+id/menu_update_event"
+          android:title="@string/update"
+          android:showAsAction="never"/>
+
+    <!-- Delete event from server. -->
+    <item android:id="@+id/menu_delete_event"
+          android:title="@string/delete"
+          android:showAsAction="never"/>
+
     <!-- Report event item. -->
     <item android:id="@+id/menu_report_event"
           android:title="@string/event_report"

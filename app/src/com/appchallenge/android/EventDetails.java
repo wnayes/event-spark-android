@@ -2,6 +2,8 @@ package com.appchallenge.android;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -13,6 +15,7 @@ import com.appchallenge.android.ReportDialogFragment.ReportReason;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -54,16 +57,23 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		this.event = intent.getParcelableExtra("event");
 		this.userLocation = intent.getParcelableExtra("userLocation");
 
+		if (localDB == null)
+    		localDB = new LocalDatabase(this);
+
+		// We might still have a secret_id locally.
+		if (!this.event.isOurs()) {
+			String secretId = localDB.getEventSecretId(this.event);
+			if (secretId != null && !secretId.equals(""))
+				this.event.setSecretId(secretId);
+		}
+
 		// The home button takes the user back to the map display.
 		ActionBar bar = getSupportActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
 		
 		// Learn whether we have already attended this event.
-		if (attended == null) {
-			if (localDB == null)
-	    		localDB = new LocalDatabase(this);
+		if (attended == null)
 			attended = localDB.getAttendanceStatus(event.getId());
-		}
 
 		this.updateEventDetails();
 	}
@@ -159,6 +169,19 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_event_details, menu);
 
+		// Change various visibilities depending on event status and ownership.
+		boolean weHaveOwnership = this.event.isOurs();
+		boolean eventHasEnded = this.event.getEndDate().before(new Date());
+		menu.findItem(R.id.menu_update_event).setVisible(weHaveOwnership && !eventHasEnded);
+		menu.findItem(R.id.menu_delete_event).setVisible(weHaveOwnership && !eventHasEnded);
+		menu.findItem(R.id.menu_report_event).setVisible((!eventHasEnded && !weHaveOwnership) || !weHaveOwnership);
+		menu.findItem(R.id.menu_attend_event).setVisible(!eventHasEnded);
+		menu.findItem(R.id.menu_get_directions).setVisible(!eventHasEnded);
+
+		// Prevent any issues with directions if we have no location.
+		if (this.userLocation == null)
+			menu.findItem(R.id.menu_get_directions).setVisible(false);
+
 		// Establish the "Share" action provider.
         this.mShareActionProvider = (ShareActionProvider)menu.findItem(R.id.share).getActionProvider();
         Intent intent = this.getEventShareIntent();
@@ -182,11 +205,15 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	        	new updateEventDetailsAPICaller().execute(this.event.getId());
 	        	return true;
 	        case R.id.menu_get_directions:
+	        	// Prevent null exceptions if we did not receive a location.
+	        	if (this.userLocation == null)
+	        		return true;
+
 	        	// Prepare maps url query url parameters.
             	String startCoords = ((Double)this.userLocation.latitude).toString() + "," + ((Double)this.userLocation.longitude).toString();
             	String endCoords = ((Double)this.event.getLocation().latitude).toString() + "," + ((Double)this.event.getLocation().longitude).toString();
             	String url = "http://maps.google.com/maps?saddr=" + startCoords + "&daddr=" + endCoords;
-            	Log.d("EventDetailsLocationTab", "Get directions, " + url);
+            	Log.d("EventDetails.onOptionsItemSelected", "Get directions, " + url);
 
                 // Pass an intent to an activity that can provide directions.
             	Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url));
@@ -201,6 +228,16 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                 // Commit to attending the event.
             	new attendEventAPICaller().execute(this.event.getId());
 	        	return true;
+            case R.id.menu_update_event:
+                // Open the activity for updating the event.
+            	Intent editEvent = new Intent(EventDetails.this, EditEvent.class);
+    	    	editEvent.putExtra("event", this.event);
+    	    	startActivity(editEvent);
+    	    	return true;
+            case R.id.menu_delete_event:
+                // Remove the event from the backend.
+            	new deleteEventAPICaller().execute(event);
+    	    	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	   }
@@ -325,7 +362,47 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			}
 		}
 	}
-	
+
+	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
+		/**
+	     * Informs the user that the event is being deleted.
+	     */
+	    ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			// Set up progress indication.
+			dialog = ProgressDialog.show(EventDetails.this, "Deleting...", "");
+		}
+
+		@Override
+		protected Boolean doInBackground(Event... event) {
+			return APICalls.deleteEvent(event[0], Identity.getUserId(getApplicationContext()));
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// Close any progress indication.
+			dialog.dismiss();
+			dialog = null;
+			if (result == false) {
+				(Toast.makeText(getApplicationContext(), "The event could not be deleted!", Toast.LENGTH_LONG)).show();
+				return;
+			}
+
+			// Update the local cache to recognize deletion.
+			if (localDB == null)
+	            localDB = new LocalDatabase(getApplicationContext());
+			boolean deleted = localDB.deleteEventFromCache(event);
+			if (!deleted)
+				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
+
+			// Exit the details page as the event no longer exists.
+			Toast.makeText(getApplicationContext(), "The event has been deleted.", Toast.LENGTH_LONG).show();
+			EventDetails.this.finish();
+		}
+	}
+
 	/**
 	 * Performs an asynchronous API call receive any updates of the event we are viewing.
 	 */
@@ -363,6 +440,10 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			}
 
 			event = result;
+			
+			// Invalidate the options menu to account for any needed visibility changes.
+			invalidateOptionsMenu();
+
 			updateEventDetails();
 		}
 	}

@@ -65,8 +65,8 @@
             android:layout_weight="0" 
             android:layout_marginBottom="30dp"
             android:gravity="center_vertical|center_horizontal"
-            android:onClick="onAwesomeClick"
-            android:text="@string/awesome"
+            android:onClick="onHelpCloseClick"
+            android:text="@string/OK"
             android:textColor="#FFFFFF" />
     </LinearLayout>
 

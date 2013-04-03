@@ -269,23 +269,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	int currentId = item.getItemId();
         if (currentId == R.id.menu_create_event) {
         	//Makes sure null cannot get passed as an location
-        	
         	if (this.currentLocation == null) {
-        		this.updateUserLocation();
-        		//Checks if the have enabled location since event start, if the have let continue
-        		if(this.currentLocation !=null) {
-        			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
-        			// Pass the current location to the wizard so the maps appear synced.
-        			createEvent.putExtra("location", this.currentLocation);
-        			// Launch the wizard for creating a new event.
-        			startActivityForResult(createEvent, 0);
-        			return true;
-        		}
-        		
+        		Toast.makeText(this, "Please turn on a location source.", Toast.LENGTH_SHORT).show();
         	    return true;
         	}
-			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
 
+			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
 			// Pass the current location to the wizard so the maps appear synced.
 			createEvent.putExtra("location", this.currentLocation);
 			// Launch the wizard for creating a new event.
@@ -422,7 +411,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     /**
      * Closes the help information view.
      */
-    public void onAwesomeClick(View v) {
+    public void onCloseHelpClick(View v) {
     	assert this.helpOpen;
 
     	// Ensure that we remember we have already seen this help.

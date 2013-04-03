@@ -21,7 +21,7 @@
     <string name="help_viewer_p1">Tap any of the markers to see what events are near you. Press on a marker bubble to see more event details.</string>
     <string name="help_viewer_p2">To add your own event tap the add icon.</string>
     <string name="help_viewer_p3">To see more features or change settings, view the options menu.</string>
-    <string name="awesome">Awesome</string>
+    <string name="OK">OK</string>
 
     <!-- Create Event wizard -->
     <string name="event_create_image_flavor_text">Create Event Wizard</string>
@@ -43,8 +43,8 @@
     
     <!-- My Events Page -->
     <string name="my_events_page_title">My Events</string>
-    <string name="my_events_delete">Delete</string>
-    <string name="my_events_update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
     <string name="my_events_repost">Resubmit</string>
     <string name="my_events_forget">Forget</string>
     <string name="my_events_header">Click on Your Event to Edit It.</string>
