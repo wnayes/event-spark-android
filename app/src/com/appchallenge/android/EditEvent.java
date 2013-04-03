@@ -106,7 +106,7 @@ public class EditEvent extends SherlockFragmentActivity {
 
 		// Set up the type spinner.
 		Spinner typeSpinner = (Spinner)findViewById(R.id.edit_event_type_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                                                                              R.array.type_array,
                                                                              android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -123,7 +123,7 @@ public class EditEvent extends SherlockFragmentActivity {
         // Prepare the time spinners.
         Spinner startSpinner = (Spinner)findViewById(R.id.edit_event_start_spinner);
         Spinner endSpinner = (Spinner)findViewById(R.id.edit_event_end_spinner);
-        ArrayAdapter<CharSequence> dateAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
+        ArrayAdapter<CharSequence> dateAdapter = ArrayAdapter.createFromResource(this,
                                                                                  R.array.relative_days,
                                                                                  android.R.layout.simple_spinner_item);
         dateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

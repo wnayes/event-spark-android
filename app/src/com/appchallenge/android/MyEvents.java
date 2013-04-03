@@ -199,6 +199,22 @@ public class MyEvents extends SherlockListActivity {
 		closeContextMenu();
 	}
 
+	/**
+     * Receives the result of the event creation wizard.
+     */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	Log.d("MyEvents.onActivityResult", "Received activity result intent.");
+    	if (resultCode != RESULT_OK)
+    		return;
+
+    	// Received result from creation wizard.
+    	if (requestCode == 0) {
+    		Log.d("MyEvents.onActivityResult", "CreateEvent sent info back to MyEvents.");
+    		this.refreshMyEventsList();
+    	}
+    	
+    }
+
 	private void refreshMyEventsList() {
 		if (localDB == null)
             localDB = new LocalDatabase(getApplicationContext());
@@ -235,14 +251,6 @@ public class MyEvents extends SherlockListActivity {
 			adapter.addSection(getResources().getString(R.string.past), past);
 		}
         setListAdapter(adapter);  
-	}
-	
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == MY_EVENTS_REQUEST_CODE) {
-			if (resultCode == RESULT_OK) {
-				refreshMyEventsList();
-			}
-		}
 	}
 
 	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
