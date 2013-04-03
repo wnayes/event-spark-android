@@ -107,18 +107,12 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
         // Restore the state of the initial screen.
         if (savedInstanceState != null) {
-        	if (savedInstanceState.getBoolean("actionBarVisible", true))
-                getSupportActionBar().show();
-            else
-            	getSupportActionBar().hide();
         	findViewById(R.id.initialScreen).setVisibility(savedInstanceState.getInt("initialScreenVisible", View.GONE));
         	findViewById(R.id.initialNoSources).setVisibility(savedInstanceState.getInt("initialNoSourcesVisible", View.GONE));
         	findViewById(R.id.createEventButton).setVisibility(savedInstanceState.getInt("initialCreateEventVisible", View.GONE));
         	findViewById(R.id.initialMainActions).setVisibility(savedInstanceState.getInt("initialViewEventsVisible", View.GONE));
         	findViewById(R.id.initialProgressLayout).setVisibility(savedInstanceState.getInt("initialLocProgressVisible", View.GONE));
         }
-        else
-        	getSupportActionBar().hide();
 
         // Restore the help dialog if the user has not yet acknowledged it.
         SharedPreferences helpPrefs = getSharedPreferences(Settings.HELP_FILE, 0);
@@ -235,6 +229,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.activity_event_viewer, menu);
+
+        menu.setGroupVisible(R.id.group_viewer_menuitems, !this.initialScreenVisible());
 
         // Enable and make transparent certain menu items based on location status.
         menu.findItem(R.id.menu_refresh_events).setEnabled(this.currentLocation != null)
@@ -369,7 +365,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
 		    public void run() {
-		     hideInitialScreen();
+                hideInitialScreen();
 		    }
 		}, 1000);
 
@@ -388,8 +384,10 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     }
 
     private void hideInitialScreen() {
-    	getSupportActionBar().show();
     	findViewById(R.id.initialScreen).setVisibility(View.GONE);
+
+    	// Prompt the options menu to become visible again.
+    	invalidateOptionsMenu();
     }
 
     private boolean initialScreenVisible() {

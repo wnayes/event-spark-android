@@ -1,22 +1,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    
+
+<!-- This group lets us hide/show the visible actions easily.  -->
+<group android:id="@+id/group_viewer_menuitems">
+
     <!-- Show the Create Event wizard. -->
     <item android:id="@+id/menu_create_event"
           android:icon="@drawable/ic_action_new"
           android:title="@string/menu_create_event"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="always" />
     
     <!-- Refresh event listing. -->
     <item android:id="@+id/menu_refresh_events"
           android:icon="@drawable/refresh"
           android:title="@string/refresh"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="always" />
+    
+</group>
     
     <!-- Show the event type filter dialog. -->
     <item android:id="@+id/menu_type_filter"
           android:title="Filter By Type"
-          android:showAsAction="ifRoom" />
-    
+          android:showAsAction="never" />
+
     <!-- Edit Your Events -->
     <item android:id="@+id/menu_my_events"
           android:title="My Events"
