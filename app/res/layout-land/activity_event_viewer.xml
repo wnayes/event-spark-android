@@ -89,19 +89,13 @@
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible">
-	        <ImageView
-	            android:id="@+id/logoBanner"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="16dp"
-	            android:src="@drawable/logo" 
-	            android:contentDescription="@string/event_create_image_flavor_text"/>
 	        <TextView android:id="@+id/text"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:gravity="center"
 	            android:text="@string/loading_blurb"
 	            android:textColor="#FFFFFF"
+	            android:drawableTop="@drawable/biglogo"
 	            style="@style/eventHoundTheme.sentence"/>
 	    </LinearLayout>
 

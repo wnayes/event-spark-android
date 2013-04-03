@@ -373,4 +373,46 @@ public class APICalls {
 
         return true;
 	}
+	
+	
+	// This is the API to share events with Facebook
+	public static Boolean shareEvent(Integer id, String token) {
+		String facebookURL = "https://graph.facebook.com/me/appchallenge_arrows:join";
+		String eventURL = "http://saypoint.dreamhosters.com/facebook/" + id + ".html";
+
+		RestClient client = new RestClient(facebookURL);
+
+        client.AddParam("event", eventURL);
+        client.AddParam("access_token", token);
+        
+        try {
+            client.Execute(RestClient.RequestMethod.POST);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String result = client.getResponse();
+        Log.d("APICalls.shareEvent", result == null ? "" : result);
+        
+        try {
+			if ((new JSONObject(result)).has("error")) {
+				Log.e("APICalls.shareEvent", "Error sharing event: " + (new JSONObject(result)).getString("error"));
+				return false;
+			}
+			if ((new JSONObject(result)).has("id")) {
+				Log.d("APICalls.shareEvent", "Success");
+				return true;
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return false;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return false;
+		} 
+
+
+		return false;
+
+	}
 }

@@ -89,20 +89,17 @@
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible">
-	        <ImageView
-	            android:id="@+id/logoBanner"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="16dp"
-	            android:src="@drawable/biglogo" 
-	            android:contentDescription="@string/event_create_image_flavor_text"/>
-	        <TextView android:id="@+id/text"
+
+	        <TextView
+	            android:id="@+id/text"
+	            style="@style/eventHoundTheme.sentence"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
+	            android:drawableTop="@drawable/biglogo"
 	            android:gravity="center"
 	            android:text="@string/loading_blurb"
-	            android:textColor="#FFFFFF"
-	            style="@style/eventHoundTheme.sentence"/>
+	            android:textColor="#FFFFFF" />
+
 	    </LinearLayout>
 
         <!-- Holds the location source error UI -->

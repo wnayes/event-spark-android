@@ -39,6 +39,8 @@ public class MyEvents extends SherlockListActivity {
      * Provides access to our local sqlite database.
      */
 	LocalDatabase localDB;
+	
+	private final int MY_EVENTS_REQUEST_CODE = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -142,7 +144,7 @@ public class MyEvents extends SherlockListActivity {
 	    	// Pass the event to the Edit Event activity.
 	    	Intent editEvent = new Intent(MyEvents.this, EditEvent.class);
 	    	editEvent.putExtra("event", selectedEvent);
-	    	startActivity(editEvent);
+	    	startActivityForResult(editEvent, MY_EVENTS_REQUEST_CODE);
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_repost) {
@@ -160,6 +162,8 @@ public class MyEvents extends SherlockListActivity {
 			boolean deleted = localDB.deleteEventFromCache(selectedEvent);
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
+			else
+			    Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG).show();
 
 			this.refreshMyEventsList();
 	    	return true;
@@ -272,7 +276,7 @@ public class MyEvents extends SherlockListActivity {
 			dialog.dismiss();
 			dialog = null;
 			if (result == false) {
-				(Toast.makeText(getApplicationContext(), "The event could not be deleted!", Toast.LENGTH_LONG)).show();
+				Toast.makeText(getApplicationContext(), "The event could not be deleted!", Toast.LENGTH_LONG).show();
 				return;
 			}
 
@@ -282,6 +286,8 @@ public class MyEvents extends SherlockListActivity {
 			boolean deleted = localDB.deleteEventFromCache(deletionEvent);
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
+			else
+				Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG).show();
 
 			// Update the list view and internal events list.
 			deletionEvent = null;
