@@ -52,6 +52,11 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     private PagerAdapter mPagerAdapter;
 
     /**
+     * Provides access to our local sqlite database.
+     */
+    private LocalDatabase localDB;
+
+    /**
      * The local event we are creating.
      */
     private LocalEvent newEvent;
@@ -121,8 +126,20 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         	this.newEvent = savedInstanceState.getParcelable("newEvent");
         else {
         	// See if an event was passed in.
-        	if (receivedIntent.hasExtra("event"))
+        	if (receivedIntent.hasExtra("event")) {
         		this.newEvent = new LocalEvent((Event)receivedIntent.getParcelableExtra("event"));
+
+        		// Establish proper relative time intervals.
+        		Calendar today = Calendar.getInstance();
+        		Calendar c = Calendar.getInstance();
+        		c.setTime(this.newEvent.getStartDate());
+        		c.set(Calendar.DAY_OF_YEAR, today.get(Calendar.DAY_OF_YEAR));
+        		this.newEvent.setStartDate(c.getTime());
+        		c.setTime(this.newEvent.getEndDate());
+        		c.set(Calendar.DAY_OF_YEAR, today.get(Calendar.DAY_OF_YEAR));
+        		this.newEvent.setEndDate(c.getTime());
+        		
+        	}
         	else
         	    this.newEvent = new LocalEvent();
         }
@@ -391,6 +408,11 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 				(Toast.makeText(getApplicationContext(), "Could not create event!", Toast.LENGTH_LONG)).show();
 				return;
 			}
+
+			// Save this event's secret_id to our local storage.
+	    	if (localDB == null)
+	    		localDB = new LocalDatabase(CreateEvent.this);
+	    	localDB.takeOwnership(result);
 			
 			// Pass the new event to the event viewer.
 			Intent intent = new Intent(CreateEvent.this, EventViewer.class);

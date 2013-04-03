@@ -211,11 +211,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	Event event = data.getParcelableExtra("event");
     	if (event == null)
     		return;
-    	
-    	// Save this event's secret_id to our local storage.
-    	if (localDB == null)
-    		localDB = new LocalDatabase(this);
-    	localDB.takeOwnership(event);
 
     	// If the event should not yet be shown, do not place a marker.
     	if (!event.isLive()) {

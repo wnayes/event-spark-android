@@ -195,6 +195,22 @@ public class MyEvents extends SherlockListActivity {
 		closeContextMenu();
 	}
 
+	/**
+     * Receives the result of the event creation wizard.
+     */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	Log.d("MyEvents.onActivityResult", "Received activity result intent.");
+    	if (resultCode != RESULT_OK)
+    		return;
+
+    	// Received result from creation wizard.
+    	if (requestCode == 0) {
+    		Log.d("MyEvents.onActivityResult", "CreateEvent sent info back to MyEvents.");
+    		this.refreshMyEventsList();
+    	}
+    	
+    }
+
 	private void refreshMyEventsList() {
 		if (localDB == null)
             localDB = new LocalDatabase(getApplicationContext());
