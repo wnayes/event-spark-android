@@ -9,10 +9,13 @@ import org.apache.http.conn.ConnectTimeoutException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import android.app.AlertDialog;
@@ -71,6 +74,19 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      */
     private LatLng currentMapLocation = new LatLng(44.9764164, -93.2323474);
     private float currentMapZoom = 15;
+
+    /**
+     * Indicates whether receiving the user's location should move the map.
+     * For instance, the viewer may go to a location such that certain events
+     * will be visible.
+     */
+    private boolean atSpecifiedLocation = false;
+
+    /**
+     * A set of bounds we wish to show in the viewer, set due to receiving
+     * a list of locations from a notification.
+     */
+    private LatLngBounds mapBounds;
 
     /**
      * Array of Events we have downloaded for the user.
@@ -143,6 +159,21 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
             // Restore any closed dialogs.
             if (savedInstanceState.getBoolean("noLocationSourceDialogOpen", false))
             	this.showNoLocationSourceDialog();
+        }
+
+        // If we receive a "newEvents" key in the bundle, it means this activity has
+        // been spawned for the purpose of viewing some events from a notification.
+        if (getIntent().hasExtra("newEvents") && savedInstanceState == null) {
+        	// The initial screen should be hidden.
+        	this.hideInitialScreen();
+
+        	// The map will be zoomed such that we can see all of these events.
+        	LatLngBounds.Builder builder = LatLngBounds.builder();
+        	ArrayList<Event> newEvents = getIntent().getExtras().getParcelableArrayList("newEvents");
+        	for (Event e : newEvents)
+        		builder.include(e.getLocation());
+        	this.mapBounds = builder.build();
+        	this.atSpecifiedLocation = true;
         }
 
         setUpMapIfNeeded();
@@ -326,7 +357,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     		savedInstanceState.putBoolean("noLocationSourceDialogOpen", true);
 
     	// Save the state of the initial screen.
-    	savedInstanceState.putBoolean("actionBarVisible", getSupportActionBar().isShowing());
     	savedInstanceState.putInt("initialScreenVisible", findViewById(R.id.initialScreen).getVisibility());
     	savedInstanceState.putInt("initialNoSourcesVisible", findViewById(R.id.initialNoSources).getVisibility());
     	savedInstanceState.putInt("initialCreateEventVisible", findViewById(R.id.createEventButton).getVisibility());
@@ -452,10 +482,21 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      *  This should only be called once and when we are sure that the map is not null.
      */
     private void setUpMap() {
-    	//mMap.getUiSettings().setZoomControlsEnabled(false);
     	mMap.setMyLocationEnabled(true);
     	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapLocation, currentMapZoom));
     	mMap.setOnInfoWindowClickListener(this);
+    	mMap.setOnCameraChangeListener(new OnCameraChangeListener() {
+    	    public void onCameraChange(CameraPosition arg0) {
+    	    	Log.d("EventViewer.onCameraChange", "onCameraChangeListener executed.");
+
+    	    	// We are able to use newLatLngBounds when the map reaches this point in layout.
+    	    	if (mapBounds != null) {
+    	    		mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mapBounds, 50));
+    	    		mapBounds = null;
+    	    	}
+    	    	mMap.setOnCameraChangeListener(null);
+    	    }
+    	});
     }
 
     /**
@@ -577,7 +618,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		// Act based on the new location.
         if (location != null) {
         	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        	mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
+        	if (!this.atSpecifiedLocation)
+        	    mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
 
         	if (initialScreenVisible()) {
 				findViewById(R.id.createEventButton).setVisibility(View.VISIBLE);

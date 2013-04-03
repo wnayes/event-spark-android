@@ -163,7 +163,7 @@ public class MyEvents extends SherlockListActivity {
 			if (!deleted)
 				Log.e("deleteEventAPICaller.onPostExecute", "Could not delete event from local cache");
 			else
-			    Toast.makeText(getApplicationContext(), "Deleted Event.", Toast.LENGTH_LONG).show();
+			    Toast.makeText(this, "Event removed from list.", Toast.LENGTH_SHORT).show();
 
 			this.refreshMyEventsList();
 	    	return true;

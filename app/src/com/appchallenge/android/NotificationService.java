@@ -102,7 +102,7 @@ public class NotificationService extends Service implements LocationListener {
 		if (prefs.getBoolean("notificationVibrate", false))
 		    mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
 
-		// Create an explicit intent for an Activity in your app
+		// Create an explicit intent.
         Intent resultIntent;
 
 		// Create a "big view" style that shows the names of the first few events when expanded (>4.1 only)
@@ -115,6 +115,7 @@ public class NotificationService extends Service implements LocationListener {
 
 		    // With multiple events, send the user to the map.
 		    resultIntent = new Intent(this, EventViewer.class);
+		    resultIntent.putParcelableArrayListExtra("newEvents", newEvents);
 		}
 		else {
 			// A single event notification should send the user to the event details page directly.
