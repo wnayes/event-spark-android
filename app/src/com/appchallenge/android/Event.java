@@ -5,6 +5,7 @@ import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -115,21 +116,21 @@ public class Event implements Parcelable {
 		/**
 		 * Each type is associated with a unique marker color on the map.
 		 */
-		public float color() {
+		public int color() {
 			switch (this.value) {
 			    case 1:
-				    return BitmapDescriptorFactory.HUE_BLUE;
+				    return Color.parseColor("#275fac");
 			    case 2:
-			    	return BitmapDescriptorFactory.HUE_ORANGE;
+			    	return Color.parseColor("#690e0d");
 			    case 3:
-			    	return BitmapDescriptorFactory.HUE_MAGENTA;
+			    	return Color.parseColor("#8b288d");
 			    case 4:
-			    	return BitmapDescriptorFactory.HUE_GREEN;
+			    	return Color.parseColor("#1f9045");
 			    case 5:
-			    	return BitmapDescriptorFactory.HUE_YELLOW;
+			    	return Color.parseColor("#d52e30");
 			    case 0:
 			    default:
-			    	return BitmapDescriptorFactory.HUE_RED;
+			    	return Color.parseColor("#ea9d38");
 		    }
 		}
 

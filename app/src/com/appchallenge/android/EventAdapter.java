@@ -38,6 +38,9 @@ public class EventAdapter extends ArrayAdapter<Event> {
             TextView description = (TextView)view.findViewById(R.id.list_event_description);
             if (description != null)
             	description.setText(item.getDescription());
+
+            // Set the side bar color based on the event type.
+            view.findViewById(R.id.list_event_colorbar).setBackgroundColor(item.getType().color());
         }
 
         return view;
