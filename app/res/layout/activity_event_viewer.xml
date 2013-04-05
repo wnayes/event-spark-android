@@ -27,36 +27,80 @@
 	        android:orientation="vertical"
 	        android:layout_weight="1" >
 	        <TextView
-	            android:id="@+id/help_viewer_p1"
-	            android:layout_width="wrap_content"
+	            android:id="@+id/help_viewer_overview"
+	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
-	            android:layout_marginTop="30dp"
-	            android:drawableRight="@drawable/place"
-	            android:paddingBottom="30dp"
-	            android:paddingLeft="20dp"
-	            android:paddingRight="15dp"
-	            android:text="@string/help_viewer_p1"
+	            android:layout_marginTop="32dp"
+	            android:gravity="center"
+	            android:paddingBottom="32dp"
+	            android:paddingLeft="8dp"
+	            android:paddingRight="8dp"
+	            android:text="@string/help_viewer_overview"
 	            android:textColor="#d9d9d9" />
+
+	        <!-- 'Menu Options' -->
 	        <TextView
-	            android:id="@+id/help_viewer_p2"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:drawablePadding="10dp"
-	            android:drawableRight="@drawable/ic_action_new"
-	            android:paddingBottom="30dp"
-	            android:paddingLeft="20dp"
-	            android:paddingRight="15dp"
-	            android:text="@string/help_viewer_p2"
-	            android:textColor="#d9d9d9" />
-	        <TextView
-	            android:id="@+id/help_viewer_p3"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:paddingBottom="30dp"
-	            android:paddingLeft="20dp"
-	            android:paddingRight="20dp"
-	            android:text="@string/help_viewer_p3"
-	            android:textColor="#d9d9d9" />
+                    android:id="@+id/help_viewer_menuoptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/help_viewer_menuoptions"
+                    android:textColor="#d9d9d9"
+                    android:textSize="18sp"/>
+
+	        <!-- Explanation of the create '+' menu item. -->
+	        <LinearLayout
+	            android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="72dp"
+                android:orientation="horizontal"
+                android:paddingBottom="16dp">
+
+                <ImageView android:src="@drawable/ic_action_new"
+                    android:contentDescription="+"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="16dp"/>
+                <View
+			        android:layout_width="1dip"
+			        android:layout_height="32dp"
+			        android:background="#44AAAAAA"/>
+	            <TextView
+	                android:id="@+id/help_viewer_create"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:paddingLeft="16dp"
+	                android:text="@string/help_viewer_create"
+	                android:textColor="#d9d9d9"
+                    android:textSize="16sp"/>
+	        </LinearLayout>
+	        <!-- Explanation of the refresh menu item. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="72dp"
+                android:orientation="horizontal"
+                android:paddingBottom="16dp">
+
+                <ImageView android:src="@drawable/refresh"
+                    android:contentDescription="refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="16dp"/>
+                <View
+                    android:layout_width="1dip"
+                    android:layout_height="32dp"
+                    android:background="#44AAAAAA"/>
+                <TextView
+                    android:id="@+id/help_viewer_refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
+                    android:text="@string/help_viewer_refresh"
+                    android:textColor="#d9d9d9"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 	    </LinearLayout>
         <Button
             android:layout_width="wrap_content"

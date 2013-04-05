@@ -18,9 +18,10 @@
     <string name="view_events">View Events</string>
     
     <!-- Help Dialogs -->
-    <string name="help_viewer_p1">Tap any of the markers to see what events are near you. Press on a marker bubble to see more event details.</string>
-    <string name="help_viewer_p2">To add your own event tap the add icon.</string>
-    <string name="help_viewer_p3">To see more features or change settings, view the options menu.</string>
+    <string name="help_viewer_overview">Events near you are pinned on the map when your location is found.\n\nTapping on the events will bring up a title bubble, and more details can be found by tapping that bubble.</string>
+    <string name="help_viewer_create">Create Event</string>
+    <string name="help_viewer_refresh">Refresh Events</string>
+    <string name="help_viewer_menuoptions">Menu Options</string>
     <string name="OK">OK</string>
 
     <!-- Create Event wizard -->
