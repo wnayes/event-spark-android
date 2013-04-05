@@ -239,7 +239,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     	    // If the event should not yet be shown, do not place a marker.
     	    if (!event.isLive()) {
-    		    Toast.makeText(this, "Your event will begin showing up closer to its start time.", Toast.LENGTH_LONG).show();
+    		    Toast.makeText(this, "Your event will appear closer to its start time.", Toast.LENGTH_LONG).show();
     		    return;
     	    }
 

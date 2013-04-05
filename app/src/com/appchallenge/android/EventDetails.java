@@ -113,6 +113,9 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	 * Updates the UI with the latest copy of the Event we have.
 	 */
 	private void updateEventDetails() {
+		// Update the actionbar border color.
+		findViewById(R.id.event_details_colorbar).setBackgroundColor(this.event.getType().color());
+
 		// Display the Event title and description.
 	    ((TextView)findViewById(R.id.event_details_title)).setText(this.event.getTitle());
 	    TextView descBox = (TextView)findViewById(R.id.event_details_description);
