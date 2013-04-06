@@ -208,6 +208,23 @@ public class LocalDatabase extends SQLiteOpenHelper {
 	}
 
 	/**
+	 * Removes 
+	 * @param eventId The event we have just indicated attendance of.
+	 */
+	public void removeAttendance(Integer eventId) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		if (eventId < 1) {
+    		Log.e("LocalDatabase.removeAttendance", "Given id was not valid.");
+    		db.close();
+		}
+
+		int count = db.delete(LOCAL_ATTENDANCE_TABLE_NAME, "id = ?", new String[] { eventId.toString() });
+		Log.d("LocalCache.removeAttendance", "Deleted " + count + " row(s) from the local attendance cache.");
+		db.close();
+	}
+
+	/**
 	 * Checks if we know that we have previously said we would attend an event.
 	 * @param eventId The event id.
 	 * @return True if we know we have attended this event already.

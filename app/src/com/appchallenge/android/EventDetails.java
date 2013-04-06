@@ -117,7 +117,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		// The home button takes the user back to the map display.
 		ActionBar bar = getSupportActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
-		
+
 		// Learn whether we have already attended this event.
 		if (attended == null)
 			attended = localDB.getAttendanceStatus(event.getId());
@@ -215,9 +215,11 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	 * @param attendingCount The number of users attending.
 	 */
 	private void updateAttendingText(int attendingCount) {
-		TextView attendingTextBox = ((TextView)findViewById(R.id.event_details_attendance));
+		// Invalidate the options menu to ensure the value of attending is applied to the icon.
+		invalidateOptionsMenu();
 
 		// Change the string and image based on whether we are attending.
+		TextView attendingTextBox = ((TextView)findViewById(R.id.event_details_attendance));
 		String attending;
 		Drawable icon;
 		if (this.attended) {
@@ -239,6 +241,9 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_event_details, menu);
+
+		// Change the attend actionbar icon depending on whether we have attended or not.
+		menu.findItem(R.id.menu_attend_event).setIcon(!this.attended ? R.drawable.attend : R.drawable.unattend);
 
 		// Change various visibilities depending on event status and ownership.
 		boolean weHaveOwnership = this.event.isOurs();
@@ -290,8 +295,11 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 				reportDialog.show(getSupportFragmentManager(), "reportDialog");
 	        	return true;
             case R.id.menu_attend_event:
-                // Commit to attending the event.
-            	new attendEventAPICaller().execute(this.event.getId());
+                // Attend or unattend the event.
+            	if (!this.attended)
+            	    new attendEventAPICaller().execute(this.event.getId());
+            	else
+            		new unattendEventAPICaller().execute(this.event.getId());
 	        	return true;
             case R.id.menu_update_event:
                 // Open the activity for updating the event.
@@ -310,7 +318,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	            return super.onOptionsItemSelected(item);
 	   }
 	}
-	
 
 	/**
      *  Checks if the person is signed into facebook and posts to their wall if they are else
@@ -399,9 +406,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	 * Performs an async call to submit attendance to an event.
 	 */
 	private class attendEventAPICaller extends AsyncTask<Integer, Void, String> {
-		/**
-		 * Quick access to the attend button in the actionbar.
-		 */
+		/** Quick access to the attend button in the actionbar. */
 		MenuItem attendItem;
 
 		@Override
@@ -432,22 +437,76 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 				return;
 			}
 
+			// Whether we have already attended before the request was sent, we for sure have attended now.
+			attended = true;
+			if (localDB == null)
+			    localDB = new LocalDatabase(EventDetails.this);
+			localDB.trackAttendance(event.getId());
+
 			// Our request went through and we have not yet attended previously.
 			if (result.equals("OK")) {
-				// Remember this action in our local database.
-				attended = true;
-				if (localDB == null)
-				    localDB = new LocalDatabase(EventDetails.this);
-				localDB.trackAttendance(event.getId());
-
 				// Update the text display to reflect the changed number.
 				updateAttendingText(event.getAttendance() + 1);
 				(Toast.makeText(getApplicationContext(), "Thanks for attending!", Toast.LENGTH_LONG)).show();
 			}
-			
 			// The user has already said they will attend the event.
 			else if (result.equals("PREVIOUSLY_ATTENDED")) {
+				updateAttendingText(event.getAttendance());
 				(Toast.makeText(getApplicationContext(), "You have already indicated you will attend.", Toast.LENGTH_LONG)).show();
+			}
+		}
+	}
+
+	/**
+	 * Performs an async call to remove attendance to an event.
+	 */
+	private class unattendEventAPICaller extends AsyncTask<Integer, Void, String> {
+		/** Quick access to the attend button in the actionbar. */
+		MenuItem attendItem;
+
+		@Override
+		protected void onPreExecute() {
+			// Establish progress UI changes.
+			if (_menu != null) {
+				attendItem = _menu.findItem(R.id.menu_attend_event);
+				if (attendItem != null)
+					attendItem.setActionView(R.layout.actionbar_refresh_progress);
+			}
+		}
+
+		@Override
+		protected String doInBackground(Integer... id) {
+			return APICalls.unattendEvent(id[0], Identity.getUserId(getApplicationContext()));
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// Remove progress UI.
+			if (attendItem != null)
+				attendItem.setActionView(null);
+			attendItem = null;
+
+			// Some sort of error occurred during the request.
+			if (result == null) {
+				(Toast.makeText(getApplicationContext(), "Could not unattend event!", Toast.LENGTH_LONG)).show();
+				return;
+			}
+
+			// Whether we have actually unattended or not, we must now allow the user to attend again.
+			attended = false;
+			if (localDB == null)
+			    localDB = new LocalDatabase(EventDetails.this);
+			localDB.removeAttendance(event.getId());
+			updateAttendingText(event.getAttendance());
+
+			// Our request went through and we have not yet attended previously.
+			if (result.equals("OK")) {
+				// Update the text display to reflect the changed number.
+				(Toast.makeText(getApplicationContext(), "Sorry to see you go!", Toast.LENGTH_LONG)).show();
+			}
+			// The user has not yet attended this event!
+			else if (result.equals("NO_ATTENDANCE_RECORD")) {
+				(Toast.makeText(getApplicationContext(), "You have not attended this event yet.", Toast.LENGTH_LONG)).show();
 			}
 		}
 	}

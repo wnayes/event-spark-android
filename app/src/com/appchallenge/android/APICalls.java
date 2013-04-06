@@ -167,10 +167,8 @@ public class APICalls {
     }
 
 	public static int getAttendance(int id) {
-		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/getAttend/";
+		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/attend/" + id;
 		RestClient client = new RestClient(getAttendUrl);
-
-		client.AddParam("id", Integer.toString(id));
 
 		try {
             client.Execute(RestClient.RequestMethod.GET);
@@ -200,10 +198,9 @@ public class APICalls {
 	}
 
 	public static String attendEvent(Integer eventId, String userId) {
-		String attendUrl = "http://saypoint.dreamhosters.com/api/events/attend/";
+		String attendUrl = "http://saypoint.dreamhosters.com/api/events/attend/" + eventId;
 		RestClient client = new RestClient(attendUrl);
 
-		client.AddParam("id", eventId.toString());
 		client.AddParam("user_id", userId);
 
 		try {
@@ -233,11 +230,43 @@ public class APICalls {
         }
 	}
 
+	public static String unattendEvent(Integer eventId, String userId) {
+		String unattendUrl = "http://saypoint.dreamhosters.com/api/events/attend/" + eventId;
+		RestClient client = new RestClient(unattendUrl);
+
+		client.AddParam("user_id", userId);
+
+		try {
+            client.Execute(RestClient.RequestMethod.DELETE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    	Log.d("APICalls.unattendEvent", (client.getResponse() == null) ? "" : client.getResponse());
+
+    	try {
+            JSONObject eventJSON = new JSONObject(client.getResponse());
+            if (eventJSON.has("error"))
+				return null;
+            if (eventJSON.has("result")) {
+            	// Inform the UI whether we were able to unattend.
+            	return eventJSON.getString("result");
+            }
+            else {
+            	Log.e("APICalls.unattendEvent", "'result' key not present");
+            	return null;
+            }
+    	} catch (JSONException e) {
+            Log.e(APICalls.class.toString(), "Error parsing JSON in unattendEvent()");
+            e.printStackTrace();
+            return null;
+        }
+	}
+
 	public static String reportEvent(Integer eventId, Integer reasonCode, String userId) {
-		String getReportUrl = "http://saypoint.dreamhosters.com/api/events/report/";
+		String getReportUrl = "http://saypoint.dreamhosters.com/api/events/report/" + eventId;
 		RestClient client = new RestClient(getReportUrl);
 
-		client.AddParam("id", eventId.toString());
 		client.AddParam("user_id", userId);
 		client.AddParam("reason", reasonCode.toString());
 
@@ -278,7 +307,6 @@ public class APICalls {
     	String updateEventUrl = "http://saypoint.dreamhosters.com/api/events/" + existingEvent.getId();
         RestClient client = new RestClient(updateEventUrl);
 
-        client.AddParam("id", ((Integer)existingEvent.getId()).toString());
         client.AddParam("user_id", userId);
         client.AddParam("secret_id", existingEvent.getSecretId());
 
@@ -412,7 +440,6 @@ public class APICalls {
 			e.printStackTrace();
 			return false;
 		} 
-
 
 		return false;
 

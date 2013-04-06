@@ -91,7 +91,7 @@ public class NotificationService extends Service implements LocationListener {
 	 */
 	private NotificationCompat.Builder buildNotification(ArrayList<Event> newEvents) {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-		mBuilder.setSmallIcon(R.drawable.logo);
+		mBuilder.setSmallIcon(R.drawable.notification_logo);
 		String title = getResources().getQuantityString(R.plurals.new_events_nearby, newEvents.size(), newEvents.size());
 		mBuilder.setContentTitle(title);
 		mBuilder.setContentText(newEvents.get(0).getTitle());
