@@ -3,6 +3,7 @@ package com.appchallenge.android;
 import java.util.Date;
 
 import com.appchallenge.android.Event.Type;
+import com.appchallenge.android.Event.UserType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -28,6 +29,11 @@ public interface CreateEventInterface {
 	
 	public Type getType();
 	public void setType(Type type);
+
+	public UserType getUserType();
+	public void setUserType(UserType userType);
+
+	public void setToken(String token);
 
 	public MarkerOptions getMarker();
 }

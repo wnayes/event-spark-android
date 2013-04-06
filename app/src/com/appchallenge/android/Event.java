@@ -220,8 +220,6 @@ public class Event implements Parcelable {
     	GPLUS(1),
     	FACEBOOK(2);
     	
-    	public static UserType[] indicies = new UserType[]{ANONYMOUS, GPLUS, FACEBOOK};
-    	
     	private int value;
     	public int getValue() {
     		return value;

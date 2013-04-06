@@ -114,27 +114,14 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	public UserType getUserType() {
 		return newEvent.getUserType();
 	}
-	
-	public void setUserName(String name) {
-		newEvent.userName = name;
-	}
-	
-	public String getUserName() {
-		return newEvent.getUserName();
-	}
-	
-	public void setUserPicture(String picture) {
-		newEvent.userPicture = picture;
-	}
-	
-	public String getUserPicture() {
-		return newEvent.userPicture;
+
+	public void setToken(String token) {
+		// TODO: Act on receiving a token from our auth classes.
 	}
 
 	public MarkerOptions getMarker() {
 		return newEvent.toMarker(true);
 	}
-	
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

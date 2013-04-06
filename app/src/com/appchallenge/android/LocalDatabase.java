@@ -314,7 +314,7 @@ public class LocalDatabase extends SQLiteOpenHelper {
                                    new Date(result.getLong(result.getColumnIndex(KEY_STARTDATE)) * 1000),
                                    new Date(result.getLong(result.getColumnIndex(KEY_ENDDATE)) * 1000),
                                    result.getInt(result.getColumnIndex(KEY_ATTENDING)),
-                                   UserType.indicies[result.getInt(result.getColumnIndex(KEY_USER_TYPE))],
+                                   UserType.values()[result.getInt(result.getColumnIndex(KEY_USER_TYPE))],
                                    result.getString(result.getColumnIndex(KEY_USER_NAME)),
                                    result.getString(result.getColumnIndex(KEY_USER_PICTURE)));
 				myEvents.add(event);
