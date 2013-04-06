@@ -49,14 +49,14 @@
 	      android:hint="@string/event_description_hint"
 	      android:maxLength="300"/>
       
-      <Button
+      <!-- <Button
           android:id="@+id/create_event_login"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_gravity="center_vertical|center_horizontal"
           android:layout_marginTop="15dp"
           android:onClick="connectFacebook"
-          android:text="@string/link_with_facebook" />
+          android:text="@string/link_with_facebook" /> -->
 
     </LinearLayout>
 

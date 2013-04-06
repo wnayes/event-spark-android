@@ -29,13 +29,14 @@ public class Event implements Parcelable {
     	this.title = "";
     	this.description = "";
     	this.type = Type.OTHER;
+    	this.userType = UserType.ANONYMOUS;
+    	this.userName = "";
+    	this.userPicture = "";
     	this.location = null;
     	this.attendance = 0;
     	this.startDate = null;
     	this.endDate = null;
-    	this.user_type = UserType.indicies[0];
-    	this.user_name = "";
-        this.user_picture = "";
+
     }
 
     /**
@@ -58,9 +59,9 @@ public class Event implements Parcelable {
 			double lng = jsonObject.getDouble("longitude");
 			this.location = new LatLng(lat, lng);
 			this.attendance = jsonObject.getInt("attending");
-			this.user_type = UserType.indicies[jsonObject.getInt("user_type")];
-			this.user_name = jsonObject.getString("user_name");
-			this.user_picture = jsonObject.getString("user_picture");
+			this.userType = UserType.values()[jsonObject.getInt("user_type")];
+			this.userName = jsonObject.getString("user_name");
+			this.userPicture = jsonObject.getString("user_picture");
 		} catch (JSONException e) {
 			Log.e(Event.class.toString(), "Failed parsing eventJSON in Event constructor.");
 			e.printStackTrace();
@@ -211,6 +212,9 @@ public class Event implements Parcelable {
     	return this.attendance;
     }
     
+    /**
+     * Enum of the different possible user accounts backing an Event.
+     */
     public enum UserType {
     	ANONYMOUS(0),
     	GPLUS(1),
@@ -227,19 +231,29 @@ public class Event implements Parcelable {
     	}
     }
     
-    protected UserType user_type;
+
+    /**
+     * Represents what type of user account the Event was created with.
+     */
+    protected UserType userType;
     public UserType getUserType() {
-    	return this.user_type;
+    	return this.userType;
     }
     
-    protected String user_name;
+    /**
+     * The name of the user who made the Event. Empty if the account was anonymous.
+     */
+    protected String userName;
     public String getUserName() {
-    	return this.user_name;
+    	return this.userName;
     }
     
-    protected String user_picture;
+    /**
+     * A url pointing to a profile picture for the user who made the Event.
+     */
+    protected String userPicture;
     public String getUserPicture() {
-    	return this.user_picture;
+    	return this.userPicture;
     }
 
     /**
@@ -257,6 +271,9 @@ public class Event implements Parcelable {
 			event.put("latitude", this.location.latitude);
 			event.put("longitude", this.location.longitude);
 			event.put("attending", this.attendance);
+			event.put("user_type", this.userType.getValue());
+			event.put("user_name", this.userName);
+			event.put("user_picture", this.userPicture);
 		} catch (JSONException e) {
 			Log.e(Event.class.toString(), "Could not stringify existing Event object!");
 			e.printStackTrace();
@@ -337,9 +354,10 @@ public class Event implements Parcelable {
 		dest.writeLong(this.startDate.getTime());
 		dest.writeLong(this.endDate.getTime());
 		dest.writeInt(this.attendance);
-		dest.writeInt(this.user_type.getValue());
-		dest.writeString(this.user_name);
-		dest.writeString(this.user_picture);
+		dest.writeInt(this.userType.getValue());
+		dest.writeString(this.userName);
+		dest.writeString(this.userPicture);
+
 	}
 	
 	/**
@@ -369,9 +387,9 @@ public class Event implements Parcelable {
     	this.startDate = new Date(pc.readLong());
     	this.endDate = new Date(pc.readLong());
     	this.attendance = pc.readInt();
-    	this.user_type = UserType.indicies[pc.readInt()];
-    	this.user_name = pc.readString();
-    	this.user_picture = pc.readString();
+    	this.userType = UserType.values()[pc.readInt()];
+    	this.userName = pc.readString();
+    	this.userPicture = pc.readString();
+
     }
-    
 }

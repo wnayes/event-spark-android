@@ -20,9 +20,9 @@ public class LocalEvent extends Event {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.attendance = attendance;
-		this.user_type = user_type;
-		this.user_name = user_name;
-		this.user_picture = user_picture;
+		this.userType = user_type;
+		this.userName = user_name;
+		this.userPicture = user_picture;
 	}
 
 	LocalEvent(Event e) {
@@ -35,9 +35,9 @@ public class LocalEvent extends Event {
 		this.startDate = e.startDate;
 		this.endDate = e.endDate;
 		this.attendance = e.attendance;
-		this.user_type = e.user_type;
-		this.user_name = e.user_name;
-		this.user_picture = e.user_picture;
+		this.userType = e.userType;
+		this.userName = e.userName;
+		this.userPicture = e.userPicture;
 	}
 
 	LocalEvent() {
@@ -77,14 +77,14 @@ public class LocalEvent extends Event {
     }
     
     public void setUserType(UserType userType) {
-    	this.user_type = userType;
+    	this.userType = userType;
     }
     
     public void setUserName(String userName) {
-    	this.user_name = userName;
+    	this.userName = userName;
     }
     
     public void setUserPicture(String picture) {
-    	this.user_picture = picture;
+    	this.userPicture = picture;
     }
 }

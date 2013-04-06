@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    
+<!-- This shows the event type color as an actionbar border.
+     A separate LinearLayout is needed to have the border expand
+     over the padding. -->
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <View android:id="@+id/event_details_colorbar"
+        android:layout_width="fill_parent"
+        android:layout_height="4dp"
+        android:background="#ea9d38" />
+</LinearLayout>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
+
+    <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp">
+        android:padding="16dp">
         
         <!-- Event Title -->
         <TextView
@@ -18,6 +33,47 @@
             android:layout_height="wrap_content"
             android:textSize="21sp"
             android:paddingBottom="8dp"/>
+
+        <!-- Anonymous user info -->
+        <TextView
+            android:id="@+id/event_details_anonymous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableLeft="@drawable/person"
+            android:textSize="14sp"
+            android:text="@string/anonymous_posting"/>
+
+        <!-- Holds the layout for the user name and picture.
+             Set visible if user information exists. -->
+        <LinearLayout android:id="@+id/event_details_userinfo"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp"
+            android:visibility="gone">
+            <!-- Placeholder image -->
+            <ImageView android:id="@+id/event_details_userpicture"
+                android:src="@drawable/person"
+                android:contentDescription="@string/posted_by"
+                android:layout_height="58dp"
+                android:layout_width="58dp">
+            </ImageView>
+            <LinearLayout android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginLeft="8dp">
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/posted_by" />
+                <TextView android:id="@+id/event_details_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </LinearLayout>
         
         <!-- Date Description -->
 	    <TextView
@@ -27,7 +83,7 @@
 	        android:textSize="14sp"
 	        android:drawableLeft="@drawable/clock"
 	        android:gravity="center"/>
-        
+
         <!-- Attendance Details -->
 	    <TextView
 	        android:id="@+id/event_details_attendance"
@@ -47,3 +103,5 @@
 
     </LinearLayout>
 </ScrollView>
+
+</LinearLayout>

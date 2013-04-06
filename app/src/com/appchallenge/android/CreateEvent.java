@@ -1,5 +1,6 @@
 package com.appchallenge.android;
 
+import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -107,7 +108,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	}
 	
 	public void setUserType(UserType userType) {
-		newEvent.user_type = userType;
+		newEvent.userType = userType;
 	}
 	
 	public UserType getUserType() {
@@ -115,7 +116,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	}
 	
 	public void setUserName(String name) {
-		newEvent.user_name = name;
+		newEvent.userName = name;
 	}
 	
 	public String getUserName() {
@@ -123,11 +124,11 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	}
 	
 	public void setUserPicture(String picture) {
-		newEvent.user_picture = picture;
+		newEvent.userPicture = picture;
 	}
 	
 	public String getUserPicture() {
-		return newEvent.user_picture;
+		return newEvent.userPicture;
 	}
 
 	public MarkerOptions getMarker() {
@@ -291,6 +292,13 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         super.onBackPressed(); 
     }
 
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
+            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+            Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
+        }
+    }
+
     /**
 	 * Determines if the device has internet connectivity.
 	 * @return Whether a data connection is available.
@@ -303,11 +311,10 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
     }
 	
-    public void connectFacebook(View view) {
-    	this.setUserType(UserType.FACEBOOK);
-    	Facebook.startSession(view.getContext());
-    	Button facebook = (Button)view.findViewById(R.id.create_event_login);
-    	facebook.setText("Connected");
+    public void connectToSocialNetwork(View view) {
+    
+    	// TODO Set up Social Networking Logic
+    	
     }
 
     /**
