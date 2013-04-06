@@ -33,6 +33,47 @@
             android:layout_height="wrap_content"
             android:textSize="21sp"
             android:paddingBottom="8dp"/>
+
+        <!-- Anonymous user info -->
+        <TextView
+            android:id="@+id/event_details_anonymous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableLeft="@drawable/person"
+            android:textSize="14sp"
+            android:text="@string/anonymous_posting"/>
+
+        <!-- Holds the layout for the user name and picture.
+             Set visible if user information exists. -->
+        <LinearLayout android:id="@+id/event_details_userinfo"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp"
+            android:visibility="gone">
+            <!-- Placeholder image -->
+            <ImageView android:id="@+id/event_details_userpicture"
+                android:src="@drawable/person"
+                android:contentDescription="@string/posted_by"
+                android:layout_height="58dp"
+                android:layout_width="58dp">
+            </ImageView>
+            <LinearLayout android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginLeft="8dp">
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/posted_by" />
+                <TextView android:id="@+id/event_details_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </LinearLayout>
         
         <!-- Date Description -->
 	    <TextView

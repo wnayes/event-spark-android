@@ -71,6 +71,8 @@
     <string name="event_report">Report Event</string>
     <string name="event_share_dialog">Please log into Facebook to share this event.</string>
     <string name="log_in_to_facebook">Sign Into Facebook</string>
+    <string name="anonymous_posting">Posted by an anonymous user.</string>
+    <string name="posted_by">Posted by</string>
     
     <!-- Fcebook Integration -->
         <string name="app_id">631935130155263</string>

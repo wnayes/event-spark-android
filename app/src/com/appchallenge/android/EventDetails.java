@@ -1,11 +1,20 @@
 package com.appchallenge.android;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -22,6 +31,15 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -29,6 +47,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +61,12 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	 * Indicates whether we have attended the event already.
 	 */
 	private Boolean attended;
+
+	/**
+	 * The user's profile picture, which is loaded async and preserved through
+	 * configuration changes.
+	 */
+	private Bitmap profilePic;
 
     /**
      * Provides access to our local sqlite database.
@@ -126,6 +152,27 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	    else {
 	    	descBox.setText(this.event.getDescription());
 	    	descBox.setTypeface(null, Typeface.NORMAL);
+	    }
+
+	    // Update user information.
+	    if (this.event.getUserType().getValue() != 0) {
+	    	if (this.event.getUserName().trim().length() == 0)
+	    		Log.e("EventDetails.updateEventDetails", "Invalid user name.");
+	    	
+	    	((TextView)findViewById(R.id.event_details_user_name)).setText(this.event.getUserName());
+	    	findViewById(R.id.event_details_userinfo).setVisibility(View.VISIBLE);
+	    	findViewById(R.id.event_details_anonymous).setVisibility(View.GONE);
+	    }
+	    else {
+	    	findViewById(R.id.event_details_userinfo).setVisibility(View.GONE);
+	    	findViewById(R.id.event_details_anonymous).setVisibility(View.VISIBLE);
+	    }
+
+	    // Set profile picture, or initiate its download.
+	    if (this.profilePic != null)
+	    	((ImageView)findViewById(R.id.event_details_userpicture)).setImageBitmap(profilePic);
+	    else {
+	    	new loadUserPicture().execute(this.event.getUserPictureURL());
 	    }
 	    
 	    // Inform how many users have attended the event using our app.
@@ -491,9 +538,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	}
 	
 	private class shareEventAPICaller extends AsyncTask<Integer, Void, Boolean> {
-		/**
-		 * Quick access to the refresh button in the actionbar.
-		 */
 		String token;
 		ProgressDialog shareDialog;
 
@@ -527,6 +571,60 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			return;
 
 		}
+	}
+
+	/**
+	 * Downloads the user's profile picture asynchronously.
+	 */
+	private class loadUserPicture extends AsyncTask<String, Void, Bitmap> {
+		protected void onPreExecute() {
+			// Establish progress UI changes.
+		}
+
+		protected Bitmap doInBackground(String... url) {
+			HttpGet httpRequest = null;
+
+			try {
+			    httpRequest = new HttpGet(url[0]);
+			    HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse response = (HttpResponse) httpclient.execute(httpRequest);
+                HttpEntity entity = response.getEntity();
+                BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+                InputStream instream = bufHttpEntity.getContent();
+                return BitmapFactory.decodeStream(instream);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            return null;
+		}
+
+
+		protected void onPostExecute(Bitmap result) {
+            if (result != null) {
+            	profilePic = getRoundedCornerBitmap(result, 4);
+            	((ImageView)findViewById(R.id.event_details_userpicture)).setImageBitmap(profilePic);
+            }
+		}
+
+		private Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
+	        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
+	        Canvas canvas = new Canvas(output);
+
+	        final int color = 0xff424242;
+	        final Paint paint = new Paint();
+	        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+	        final RectF rectF = new RectF(rect);
+	        final float roundPx = pixels;
+
+	        paint.setAntiAlias(true);
+	        canvas.drawARGB(0, 0, 0, 0);
+	        paint.setColor(color);
+	        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+	        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+	        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+	        return output;
+	    }
 	}  
-	
 }
