@@ -606,6 +606,10 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
             }
 		}
 
+		/** 
+		 * Rounds the edges of a bitmap.
+		 * @author http://ruibm.com/?p=184
+		 */
 		private Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
 	        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
 	        Canvas canvas = new Canvas(output);
