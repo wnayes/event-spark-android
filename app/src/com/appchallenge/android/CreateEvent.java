@@ -266,7 +266,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     }
 
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS && resultCode == RESULT_OK) {
+        if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
             String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
             Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
         }

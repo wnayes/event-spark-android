@@ -171,7 +171,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	    // Set profile picture, or initiate its download.
 	    if (this.profilePic != null)
 	    	((ImageView)findViewById(R.id.event_details_userpicture)).setImageBitmap(profilePic);
-	    else {
+	    else if (this.event.getUserPictureURL().trim().length() != 0) {
 	    	new loadUserPicture().execute(this.event.getUserPictureURL());
 	    }
 	    
