@@ -281,7 +281,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                     		   Log.d("Is is", "Yes");
            					   new shareEventAPICaller().execute(event.getId());
                     	   }
-                    	   connectFacebook();
+                    	   //connectFacebook();
                     	   dialog.dismiss();
                     	   
                        }

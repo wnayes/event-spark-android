@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Can be built either from a JSONObject containing event details or from scratch.
  */
 public class Event implements Parcelable {
+	
 	/**
 	 * Basic constructor initializing fields to some (invalid) defaults.
 	 */
@@ -32,6 +33,9 @@ public class Event implements Parcelable {
     	this.attendance = 0;
     	this.startDate = null;
     	this.endDate = null;
+    	this.user_type = UserType.indicies[0];
+    	this.user_name = "";
+        this.user_picture = "";
     }
 
     /**
@@ -54,6 +58,9 @@ public class Event implements Parcelable {
 			double lng = jsonObject.getDouble("longitude");
 			this.location = new LatLng(lat, lng);
 			this.attendance = jsonObject.getInt("attending");
+			this.user_type = UserType.indicies[jsonObject.getInt("user_type")];
+			this.user_name = jsonObject.getString("user_name");
+			this.user_picture = jsonObject.getString("user_picture");
 		} catch (JSONException e) {
 			Log.e(Event.class.toString(), "Failed parsing eventJSON in Event constructor.");
 			e.printStackTrace();
@@ -203,6 +210,37 @@ public class Event implements Parcelable {
     public int getAttendance() {
     	return this.attendance;
     }
+    
+    public enum UserType {
+    	ANONYMOUS(0),
+    	GPLUS(1),
+    	FACEBOOK(2);
+    	
+    	public static UserType[] indicies = new UserType[]{ANONYMOUS, GPLUS, FACEBOOK};
+    	
+    	private int value;
+    	public int getValue() {
+    		return value;
+    	}
+    	UserType(int value) {
+    		this.value = value;
+    	}
+    }
+    
+    protected UserType user_type;
+    public UserType getUserType() {
+    	return this.user_type;
+    }
+    
+    protected String user_name;
+    public String getUserName() {
+    	return this.user_name;
+    }
+    
+    protected String user_picture;
+    public String getUserPicture() {
+    	return this.user_picture;
+    }
 
     /**
      * @return The Event stringified into a JSON object.
@@ -299,6 +337,9 @@ public class Event implements Parcelable {
 		dest.writeLong(this.startDate.getTime());
 		dest.writeLong(this.endDate.getTime());
 		dest.writeInt(this.attendance);
+		dest.writeInt(this.user_type.getValue());
+		dest.writeString(this.user_name);
+		dest.writeString(this.user_picture);
 	}
 	
 	/**
@@ -328,6 +369,9 @@ public class Event implements Parcelable {
     	this.startDate = new Date(pc.readLong());
     	this.endDate = new Date(pc.readLong());
     	this.attendance = pc.readInt();
+    	this.user_type = UserType.indicies[pc.readInt()];
+    	this.user_name = pc.readString();
+    	this.user_picture = pc.readString();
     }
     
 }

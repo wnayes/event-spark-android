@@ -1,18 +1,32 @@
 package com.appchallenge.android;
 
-import com.appchallenge.android.Event.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import com.appchallenge.android.Event.Type;
+import com.appchallenge.android.Event.UserType;
+import com.facebook.Session;
+import com.facebook.SessionState;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 
@@ -21,6 +35,25 @@ import android.widget.AdapterView.OnItemSelectedListener;
  * the event from the user.
  */
 public class CreateEventPage1EventName extends Fragment {
+	
+	private List<String> permissions = new ArrayList<String>();
+	Session.StatusCallback callBack = new Session.StatusCallback() {
+		@SuppressWarnings("unchecked")
+		@Override
+		public void call(Session session, SessionState state, Exception exception) {
+
+			if (state.isOpened() && (state.equals(SessionState.OPENED_TOKEN_UPDATED) || state.equals(SessionState.OPENED))) {
+				if (!Arrays.asList(session.getPermissions()).contains("publish_actions")) {
+					permissions.clear();
+				    permissions.add("publish_actions");
+				    permissions.add("user_photos");
+				    session.requestNewPublishPermissions(new Session.NewPermissionsRequest(getActivity(), permissions));
+				    Log.d("ShareDialogFragment", "Requesting Share Permissions");
+				}
+			}
+		}
+	};
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,4 +112,5 @@ public class CreateEventPage1EventName extends Fragment {
 
         return rootView;
     }
+        
 }

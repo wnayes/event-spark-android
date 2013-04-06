@@ -126,9 +126,10 @@ public class APICalls {
     /**
      * Sends information to the REST API for creation of a new event.
      */
-    public static Event createEvent(Event newEvent, String userId) {
+    public static Event createEvent(Event newEvent, String userId, String user_token) {
     	String createEventUrl = "http://saypoint.dreamhosters.com/api/events";
         RestClient client = new RestClient(createEventUrl);
+        
 
         client.AddParam("title", newEvent.getTitle());
         client.AddParam("description", newEvent.getDescription());
@@ -139,6 +140,7 @@ public class APICalls {
         client.AddParam("latitude", ((Double)location.latitude).toString());
         client.AddParam("longitude", ((Double)location.longitude).toString());
         client.AddParam("user_id", userId);
+        client.AddParam("user_token", user_token);
 
         try {
             client.Execute(RestClient.RequestMethod.POST);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.appchallenge.android.Event.Type;
+import com.appchallenge.android.Event.UserType;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.content.ContentValues;
@@ -22,7 +23,7 @@ import android.util.Log;
  */
 public class LocalDatabase extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     /** Name of the database we use to store our tables. */
     private static final String DATABASE_NAME = "eventLocalDatabase";
@@ -52,6 +53,9 @@ public class LocalDatabase extends SQLiteOpenHelper {
     private static final String KEY_TYPE = "type";
     private static final String KEY_ATTENDING = "attending";
     private static final String KEY_SECRETID = "secret_id";
+    private static final String KEY_USER_TYPE = "user_type";
+    private static final String KEY_USER_NAME = "user_name";
+    private static final String KEY_USER_PICTURE = "user_picture";
 
     /** SQLITE command for creating the event_cache table. */
     private static final String EVENT_CACHE_TABLE_CREATE = "CREATE TABLE " + EVENT_CACHE_TABLE_NAME + " (" +
@@ -64,7 +68,10 @@ public class LocalDatabase extends SQLiteOpenHelper {
                                                             KEY_ENDDATE + " INTEGER, " +
                                                             KEY_TYPE + " INTEGER, " +
                                                             KEY_ATTENDING + " INTEGER, " +
-                                                            KEY_SECRETID + " TEXT);";
+                                                            KEY_SECRETID + " TEXT, " +
+                                                            KEY_USER_TYPE + " INTEGER, " +
+                                                            KEY_USER_NAME + " STRING, " +
+                                                            KEY_USER_PICTURE + " STRING )";
 
     LocalDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -141,6 +148,9 @@ public class LocalDatabase extends SQLiteOpenHelper {
 			values.put(KEY_TYPE, event.getType().getValue());
 			values.put(KEY_ATTENDING, event.getAttendance());
 			values.put(KEY_SECRETID, event.getSecretId());
+			values.put(KEY_USER_TYPE, event.getUserType().getValue());
+			values.put(KEY_USER_NAME, event.getUserName());
+			values.put(KEY_USER_PICTURE, event.getUserPicture());
 			
 			db.insert(EVENT_CACHE_TABLE_NAME, null, values);
         }
@@ -270,6 +280,10 @@ public class LocalDatabase extends SQLiteOpenHelper {
 			values.put(KEY_ENDDATE, newEvent.getEndDate().getTime() / 1000);
 			values.put(KEY_TYPE, newEvent.getType().getValue());
 			values.put(KEY_ATTENDING, newEvent.getAttendance());
+			values.put(KEY_USER_TYPE, newEvent.getUserType().getValue());
+			values.put(KEY_USER_NAME, newEvent.getUserName());
+			values.put(KEY_USER_PICTURE, newEvent.getUserPicture());
+			
 
 			db.insert(EVENT_CACHE_TABLE_NAME, null, values);
 		}
@@ -299,7 +313,10 @@ public class LocalDatabase extends SQLiteOpenHelper {
                                    new LatLng(result.getDouble(result.getColumnIndex(KEY_LATITUDE)), result.getDouble(result.getColumnIndex(KEY_LONGITUDE))),
                                    new Date(result.getLong(result.getColumnIndex(KEY_STARTDATE)) * 1000),
                                    new Date(result.getLong(result.getColumnIndex(KEY_ENDDATE)) * 1000),
-                                   result.getInt(result.getColumnIndex(KEY_ATTENDING)));
+                                   result.getInt(result.getColumnIndex(KEY_ATTENDING)),
+                                   UserType.indicies[result.getInt(result.getColumnIndex(KEY_USER_TYPE))],
+                                   result.getString(result.getColumnIndex(KEY_USER_NAME)),
+                                   result.getString(result.getColumnIndex(KEY_USER_PICTURE)));
 				myEvents.add(event);
 			} while (result.moveToNext());
 		}

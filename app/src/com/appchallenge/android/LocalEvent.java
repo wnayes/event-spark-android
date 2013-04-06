@@ -9,7 +9,8 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class LocalEvent extends Event {
 	LocalEvent(Integer id, String secretId, String title, String description,
-			   Type type, LatLng location, Date startDate, Date endDate, Integer attendance) {
+			   Type type, LatLng location, Date startDate, Date endDate, Integer attendance,
+			   UserType user_type, String user_name, String user_picture) {
 		this.id = id;
 		this.secretId = secretId;
 		this.title = title;
@@ -19,6 +20,9 @@ public class LocalEvent extends Event {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.attendance = attendance;
+		this.user_type = user_type;
+		this.user_name = user_name;
+		this.user_picture = user_picture;
 	}
 
 	LocalEvent(Event e) {
@@ -31,6 +35,9 @@ public class LocalEvent extends Event {
 		this.startDate = e.startDate;
 		this.endDate = e.endDate;
 		this.attendance = e.attendance;
+		this.user_type = e.user_type;
+		this.user_name = e.user_name;
+		this.user_picture = e.user_picture;
 	}
 
 	LocalEvent() {
@@ -67,5 +74,17 @@ public class LocalEvent extends Event {
 
     public void setAttendance(Integer attendance) {
     	this.attendance = attendance;
+    }
+    
+    public void setUserType(UserType userType) {
+    	this.user_type = userType;
+    }
+    
+    public void setUserName(String userName) {
+    	this.user_name = userName;
+    }
+    
+    public void setUserPicture(String picture) {
+    	this.user_picture = picture;
     }
 }

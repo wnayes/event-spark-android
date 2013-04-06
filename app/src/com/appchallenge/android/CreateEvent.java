@@ -29,10 +29,12 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.android.Event.Type;
+import com.appchallenge.android.Event.UserType;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -55,7 +57,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
      * Provides access to our local sqlite database.
      */
     private LocalDatabase localDB;
-
+    
     /**
      * The local event we are creating.
      */
@@ -103,10 +105,35 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	public LatLng getLocation() {
 		return newEvent.getLocation();
 	}
+	
+	public void setUserType(UserType userType) {
+		newEvent.user_type = userType;
+	}
+	
+	public UserType getUserType() {
+		return newEvent.getUserType();
+	}
+	
+	public void setUserName(String name) {
+		newEvent.user_name = name;
+	}
+	
+	public String getUserName() {
+		return newEvent.getUserName();
+	}
+	
+	public void setUserPicture(String picture) {
+		newEvent.user_picture = picture;
+	}
+	
+	public String getUserPicture() {
+		return newEvent.user_picture;
+	}
 
 	public MarkerOptions getMarker() {
 		return newEvent.toMarker(true);
 	}
+	
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -275,6 +302,13 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
         return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
     }
+	
+    public void connectFacebook(View view) {
+    	this.setUserType(UserType.FACEBOOK);
+    	Facebook.startSession(view.getContext());
+    	Button facebook = (Button)view.findViewById(R.id.create_event_login);
+    	facebook.setText("Connected");
+    }
 
     /**
      * Shows the time picker to allow changing the Event time.
@@ -387,6 +421,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	     * Informs the user that the event is being created.
 	     */
 	    ProgressDialog dialog;
+	    String token = "";
 
 		@Override
 		protected void onPreExecute() {
@@ -396,7 +431,13 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
 		@Override
 		protected Event doInBackground(Event... event) {
-			return APICalls.createEvent(event[0], Identity.getUserId(getApplicationContext()));
+			int type = event[0].getUserType().getValue();
+			if (type == 1) {
+				// TODO Add GPLUS code
+			} else if (type == 2) {
+				token = Facebook.getToken();
+			}
+			return APICalls.createEvent(event[0], Identity.getUserId(getApplicationContext()), token);
 		}
 
 		@Override
