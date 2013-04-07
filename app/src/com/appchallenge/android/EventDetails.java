@@ -99,6 +99,20 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_event_details);
 
+		// The home button takes the user back to the map display.
+		ActionBar bar = getSupportActionBar();
+		bar.setDisplayHomeAsUpEnabled(true);
+
+		// Avoid reloading data we can save between configurations.
+		if (savedInstanceState != null) {
+			this.event = savedInstanceState.getParcelable("event");
+			this.userLocation = savedInstanceState.getParcelable("userLocation");
+			this.attended = savedInstanceState.getBoolean("attended");
+			this.profilePic = savedInstanceState.getParcelable("profilePic");
+			this.updateEventDetails();
+			return;
+		}
+
 		// Receive Event information to display via Intent.
 		Intent intent = getIntent();
 		this.event = intent.getParcelableExtra("event");
@@ -113,10 +127,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			if (secretId != null && !secretId.equals(""))
 				this.event.setSecretId(secretId);
 		}
-
-		// The home button takes the user back to the map display.
-		ActionBar bar = getSupportActionBar();
-		bar.setDisplayHomeAsUpEnabled(true);
 
 		// Learn whether we have already attended this event.
 		if (attended == null)
@@ -133,8 +143,16 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
     	if (localDB != null)
             localDB.close();
     }
-	
 
+	protected void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+
+		// Save member variables.
+		savedInstanceState.putParcelable("event", this.event);
+		savedInstanceState.putParcelable("userLocation", this.userLocation);
+		savedInstanceState.putBoolean("attended", this.attended);
+		savedInstanceState.putParcelable("profilePic", this.profilePic);
+	}
 	/**
 	 * Updates the UI with the latest copy of the Event we have.
 	 */
@@ -660,7 +678,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 
 		protected void onPostExecute(Bitmap result) {
             if (result != null) {
-            	profilePic = getRoundedCornerBitmap(result, 4);
+            	profilePic = getRoundedCornerBitmap(result, (int)(result.getHeight() / 10));
             	((ImageView)findViewById(R.id.event_details_userpicture)).setImageBitmap(profilePic);
             }
 		}
