@@ -45,7 +45,7 @@ public class MyEvents extends SherlockListActivity {
      */
 	LocalDatabase localDB;
 	
-	private final int MY_EVENTS_REQUEST_CODE = 1;
+	static final int REQUEST_CODE_MY_EVENTS = 102;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -174,7 +174,7 @@ public class MyEvents extends SherlockListActivity {
 	    	// Pass the event to the Edit Event activity.
 	    	Intent editEvent = new Intent(MyEvents.this, EditEvent.class);
 	    	editEvent.putExtra("event", selectedEvent);
-	    	startActivityForResult(editEvent, MY_EVENTS_REQUEST_CODE);
+	    	startActivityForResult(editEvent, EditEvent.REQUEST_CODE_EDIT_EVENT);
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_repost) {
@@ -182,7 +182,7 @@ public class MyEvents extends SherlockListActivity {
 	    	// with the old event's information pre-filled.
 	    	Intent createEvent = new Intent(MyEvents.this, CreateEvent.class);
 			createEvent.putExtra("event", selectedEvent);
-			startActivityForResult(createEvent, 0);
+			startActivityForResult(createEvent, CreateEvent.REQUEST_CODE_CREATE_EVENT);
 	    	return true;
 	    }
 	    else if (item.getItemId() == R.id.my_events_forget) {
@@ -234,15 +234,16 @@ public class MyEvents extends SherlockListActivity {
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	Log.d("MyEvents.onActivityResult", "Received activity result intent.");
-    	if (resultCode != RESULT_OK)
-    		return;
 
     	// Received result from creation wizard.
-    	if (requestCode == 0) {
+    	if (requestCode == CreateEvent.REQUEST_CODE_CREATE_EVENT && resultCode == RESULT_OK) {
     		Log.d("MyEvents.onActivityResult", "CreateEvent sent info back to MyEvents.");
     		this.refreshMyEventsList();
     	}
-    	
+    	// Received a positive result from the edit event activity.
+    	else if (requestCode == EditEvent.REQUEST_CODE_EDIT_EVENT && resultCode == RESULT_OK) {
+    		this.refreshMyEventsList();
+    	}
     }
 
 	private void refreshMyEventsList() {

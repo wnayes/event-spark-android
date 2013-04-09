@@ -229,9 +229,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	Log.d("EventViewer.onActivityResult", "Received intent back from creation wizard.");
-    	if (resultCode != RESULT_OK)
-    		return;
-    	if (requestCode == 0) {
+    	if (requestCode == CreateEvent.REQUEST_CODE_CREATE_EVENT && resultCode == RESULT_OK) {
         	// Show the user the newly created event.
     	    Event event = data.getParcelableExtra("event");
     	    if (event == null)
@@ -255,10 +253,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	    // Show the info window for the new event.
     	    m.showInfoWindow();
     	}
-    	if (requestCode == 1 && resultCode == RESULT_OK){
-    		if (!isOnline())
-				this.displayConnectivityMessage();
-			else if (currentLocation != null)
+    	if (requestCode == MyEvents.REQUEST_CODE_MY_EVENTS && resultCode == RESULT_OK){
+			if (currentLocation != null && isOnline())
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
     	}
     }
@@ -297,10 +293,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
         	}
 
 			Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
-			// Pass the current location to the wizard so the maps appear synced.
 			createEvent.putExtra("location", this.currentLocation);
-			// Launch the wizard for creating a new event.
-			startActivityForResult(createEvent, 0);
+			startActivityForResult(createEvent, CreateEvent.REQUEST_CODE_CREATE_EVENT);
 			return true;
 		} else if (currentId == R.id.menu_refresh_events) {
 			// Refresh the event listing.

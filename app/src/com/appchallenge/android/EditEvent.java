@@ -46,6 +46,9 @@ public class EditEvent extends SherlockFragmentActivity {
      * The event we are creating from the changes.
      */
 	private Event localEvent;
+
+	/** Used to indicate that EditEvent is returning to another Activity. */
+	static final int REQUEST_CODE_EDIT_EVENT = 103;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -81,7 +84,9 @@ public class EditEvent extends SherlockFragmentActivity {
         doneDiscardView.findViewById(R.id.actionbar_discard).setOnClickListener(
             new View.OnClickListener() {
                 public void onClick(View v) {
-                    finish();
+        			Intent intent = new Intent(EditEvent.this, MyEvents.class);
+        			setResult(RESULT_CANCELED, intent);
+        			finish();
                 }
             });
 

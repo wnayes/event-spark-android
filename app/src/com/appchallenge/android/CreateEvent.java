@@ -59,6 +59,9 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
      * Provides access to our local sqlite database.
      */
     private LocalDatabase localDB;
+
+    /** Used to indicate to EventViewer that the wizard has been submitted. */
+    final static int REQUEST_CODE_CREATE_EVENT = 101;
     
     /**
      * The local event we are creating.
