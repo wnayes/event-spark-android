@@ -19,6 +19,7 @@ public class Settings extends PreferenceActivity {
 	// Preferences for the help dialogs.
 	final static String HELP_FILE = "Help";
 	final static String HELP_VIEWER_SEEN = "HELP_VIEWER_SEEN";
+	final static String HELP_MYEVENTS_SEEN = "HELP_MYEVENTS_SEEN";
 
     @SuppressWarnings("deprecation")
 	@Override

@@ -5,10 +5,12 @@ import java.util.Date;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -35,6 +37,9 @@ public class MyEvents extends SherlockListActivity {
 	 */
 	boolean contextMenuOpen = false;
 
+	/** Keeps track of the help view state, used to keep it open / closed as necessary. */
+    private Boolean helpOpen;
+
 	/**
      * Provides access to our local sqlite database.
      */
@@ -58,6 +63,16 @@ public class MyEvents extends SherlockListActivity {
         	this.deletionEvent = savedInstanceState.getParcelable("deletionEvent");
         }
 
+        // Restore the help dialog if the user has not yet acknowledged it.
+        SharedPreferences helpPrefs = getSharedPreferences(Settings.HELP_FILE, 0);
+        this.helpOpen = savedInstanceState != null ? savedInstanceState.getBoolean("helpOpen", false) : false;
+        if (!helpPrefs.getBoolean(Settings.HELP_MYEVENTS_SEEN, false) || this.helpOpen) {
+        	this.helpOpen = true;
+        	findViewById(R.id.help_myevents).setVisibility(View.VISIBLE);
+        }
+        else
+        	findViewById(R.id.help_myevents).setVisibility(View.GONE);
+
     	// Build the list of events.
         this.refreshMyEventsList();
         registerForContextMenu(getListView());
@@ -78,6 +93,10 @@ public class MyEvents extends SherlockListActivity {
 		savedInstanceState.putBoolean("contextMenuOpen", this.contextMenuOpen);
 		savedInstanceState.putParcelable("selectedEvent", this.selectedEvent);
 		savedInstanceState.putParcelable("deletionEvent", this.deletionEvent);
+
+		// Save the state of the help view.
+    	savedInstanceState.putBoolean("helpOpen", this.helpOpen);
+
 		super.onSaveInstanceState(savedInstanceState);
 	}
 
@@ -106,6 +125,12 @@ public class MyEvents extends SherlockListActivity {
 	    this.selectedEvent = null;
 	}
 
+	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.activity_myevents, menu);
+		return true;
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -118,6 +143,11 @@ public class MyEvents extends SherlockListActivity {
                 } else
                     finish();
                 return true;
+	        case R.id.menu_help:
+	        	// Show the help information view overlay.
+				this.helpOpen = true;
+	            findViewById(R.id.help_myevents).setVisibility(View.VISIBLE);
+	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -252,6 +282,19 @@ public class MyEvents extends SherlockListActivity {
 		}
         setListAdapter(adapter);  
 	}
+
+	/** Closes the help information view. */
+    public void onCloseHelpClick(View v) {
+    	assert this.helpOpen;
+
+    	// Ensure that we remember we have already seen this help.
+    	SharedPreferences helpPrefs = getSharedPreferences(Settings.HELP_FILE, 0);
+        helpPrefs.edit().putBoolean(Settings.HELP_MYEVENTS_SEEN, true).commit();
+
+        // Hide the help view.
+        findViewById(R.id.help_myevents).setVisibility(View.GONE);
+        this.helpOpen = false;
+    }
 
 	private class deleteEventAPICaller extends AsyncTask<Event, Void, Boolean> {
 		/**

@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+<!-- Help Button -->
+<item android:id="@+id/menu_help"
+     android:title="Help"
+     android:showAsAction="never"/>
+
+</menu>

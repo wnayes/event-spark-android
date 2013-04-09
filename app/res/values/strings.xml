@@ -21,7 +21,11 @@
     <string name="help_viewer_overview">Events near you are pinned on the map when your location is found.\n\nTapping on the events will bring up a title bubble, and more details can be found by tapping that bubble.</string>
     <string name="help_viewer_create">Create Event</string>
     <string name="help_viewer_refresh">Refresh Events</string>
-    <string name="help_viewer_menuoptions">Menu Options</string>
+    <string name="help_myevents_overview">From this page you can access your active and past events.\n\nTapping any event brings up its details. Long pressing brings up additional options.</string>
+    <string name="help_myevents_updatedelete"><b>Update</b> and <b>delete</b> your active events.</string>
+    <string name="help_myevents_resubmitforget"><b>Resubmit</b> your expired events or <b>forget</b> they ever existed.</string>
+    <string name="help_menuoptions">Menu Options</string>
+    <string name="help_additionaloptions">Additional Options</string>
     <string name="OK">OK</string>
 
     <!-- Create Event wizard -->
@@ -77,7 +81,7 @@
     <string name="anonymous_posting">Posted by an anonymous user.</string>
     <string name="posted_by">Posted by</string>
     
-    <!-- Fcebook Integration -->
+    <!-- Facebook Integration -->
         <string name="app_id">631935130155263</string>
     <plurals name="users_attending">
         <item quantity="one">1 user is attending.</item>

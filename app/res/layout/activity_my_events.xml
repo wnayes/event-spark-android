@@ -1,35 +1,103 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewerLayout"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
-    
-    <TextView
-        android:id="@+id/my_events_header"
-        android:text="@string/my_events_header"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:layout_margin="8dp" />
-    
-    <ListView 
-        android:id="@android:id/list"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content"
-        android:divider="#DDDDDD"
-        android:dividerHeight="1sp" />
-    <!-- Adds a bottom divider to the list. -->
-    <View
-	    android:background="#DDDDDD"
+    android:layout_height="fill_parent">
+
+    <!-- The My Events page contents -->
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:layout_width="fill_parent"
-	    android:layout_height="1sp"/>
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical">
+	    <ListView
+	        android:id="@android:id/list"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:divider="#DDDDDD"
+	        android:dividerHeight="1sp" />
+	    <!-- Adds a bottom divider to the list. -->
+	    <View
+		    android:background="#DDDDDD"
+		    android:layout_width="fill_parent"
+		    android:layout_height="1sp"/>
+	
+	    <TextView android:id="@+id/my_events_empty"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="16dp"
+	        android:gravity="center"
+	        android:text="@string/my_events_no_events"
+	        android:visibility="gone" />
+	</LinearLayout>
 
-    <TextView android:id="@+id/my_events_empty"
+    <!-- Help/Tutorial content -->
+    <LinearLayout
+        android:id="@+id/help_myevents"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:text="@string/my_events_no_events"
-        android:visibility="gone" />
+        android:layout_height="fill_parent"
+        android:background="#EE5A5A5A"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:clickable="true">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_weight="1" >
+            <TextView
+                android:id="@+id/help_myevents_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:layout_marginBottom="32dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="@string/help_myevents_overview"
+                android:textColor="#d9d9d9" />
 
-</LinearLayout>
+            <!-- 'Additional Options' -->
+            <TextView
+                    android:id="@+id/help_myevents_additionaloptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/help_additionaloptions"
+                    android:textColor="#d9d9d9"
+                    android:textSize="18sp"/>
+
+            <!-- Explanation of updating and deleting. -->
+            <TextView
+                android:id="@+id/help_myevents_updatedelete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"
+                android:text="@string/help_myevents_updatedelete"
+                android:textColor="#d9d9d9"
+                android:textSize="14sp"/>
+
+            <!-- Explanation of resubmitting and forgetting. -->
+            <TextView
+                android:id="@+id/help_myevents_resubmitforget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/help_myevents_resubmitforget"
+                android:textColor="#d9d9d9"
+                android:textSize="14sp"/>
+
+        </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="0"
+            android:layout_marginBottom="30dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:onClick="onCloseHelpClick"
+            android:text="@string/OK"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+</RelativeLayout>
