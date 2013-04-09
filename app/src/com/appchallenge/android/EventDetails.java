@@ -677,7 +677,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
             return null;
 		}
 
-
 		protected void onPostExecute(Bitmap result) {
             if (result != null) {
             	profilePic = getRoundedCornerBitmap(result, (int)(result.getHeight() / 10));

@@ -20,9 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class Event implements Parcelable {
 	
-	/**
-	 * Basic constructor initializing fields to some (invalid) defaults.
-	 */
+	/** Basic constructor initializing fields to some (invalid) defaults. */
     public Event() {
     	this.id = -1;
     	this.secretId = "";
@@ -36,12 +34,25 @@ public class Event implements Parcelable {
     	this.attendance = 0;
     	this.startDate = null;
     	this.endDate = null;
-
     }
 
-    /**
-     * Create an Event from API-generated JSON.
-     */
+    /** Constructor creating another Event from an existing Event. */
+    public Event(Event e) {
+		this.id = e.id;
+		this.secretId = e.secretId;
+		this.title = e.title;
+		this.description = e.description;
+		this.type = e.type;
+		this.location = e.location;
+		this.startDate = e.startDate;
+		this.endDate = e.endDate;
+		this.attendance = e.attendance;
+		this.userType = e.userType;
+		this.userName = e.userName;
+		this.userPicture = e.userPicture;
+	}
+
+    /** Create an Event from API-generated JSON. */
     public Event(String eventJSON) {
     	this();
         try {
@@ -75,6 +86,9 @@ public class Event implements Parcelable {
     public int getId() {
     	return this.id;
     }
+    public void setId(Integer id) {
+    	this.id = id;
+    }
     
     /**
      * @return The secret owner id of an Event. Only exists for events a user has made themselves.
@@ -93,6 +107,9 @@ public class Event implements Parcelable {
     protected String title;
     public String getTitle() {
     	return this.title;
+    }
+    public void setTitle(String title) {
+    	this.title = title;
     }
     
     /**
@@ -170,6 +187,9 @@ public class Event implements Parcelable {
     public Type getType() {
 		return this.type;
 	}
+    public void setType(Type type) {
+    	this.type = type;
+    }
 
     /**
      * @return The description of the Event.
@@ -177,6 +197,9 @@ public class Event implements Parcelable {
     protected String description;
     public String getDescription() {
     	return this.description;
+    }
+    public void setDescription(String description) {
+    	this.description = description;
     }
 
     /**
@@ -186,6 +209,9 @@ public class Event implements Parcelable {
     public LatLng getLocation() {
     	return this.location;
     }
+    public void setLocation(LatLng location) {
+    	this.location = location;
+    }
 
     /**
      *  @return The start date and time of the event.
@@ -193,6 +219,9 @@ public class Event implements Parcelable {
     protected Date startDate;
     public Date getStartDate() {
     	return this.startDate;
+    }
+    public void setStartDate(Date startDate) {
+    	this.startDate = startDate;
     }
 
     /**
@@ -202,6 +231,9 @@ public class Event implements Parcelable {
     public Date getEndDate() {
     	return this.endDate;
     }
+    public void setEndDate(Date endDate) {
+    	this.endDate = endDate;
+    }
     
     /**
      * @return The number of users that have claimed they will attend
@@ -210,6 +242,9 @@ public class Event implements Parcelable {
     protected int attendance;
     public int getAttendance() {
     	return this.attendance;
+    }
+    public void setAttendance(Integer attendance) {
+    	this.attendance = attendance;
     }
     
     /**
@@ -237,6 +272,9 @@ public class Event implements Parcelable {
     public UserType getUserType() {
     	return this.userType;
     }
+    public void setUserType(UserType userType) {
+    	this.userType = userType;
+    }
     
     /**
      * The name of the user who made the Event. Empty if the account was anonymous.
@@ -245,6 +283,9 @@ public class Event implements Parcelable {
     public String getUserName() {
     	return this.userName;
     }
+    public void setUserName(String userName) {
+    	this.userName = userName;
+    }
     
     /**
      * A url pointing to a profile picture for the user who made the Event.
@@ -252,6 +293,9 @@ public class Event implements Parcelable {
     protected String userPicture;
     public String getUserPicture() {
     	return this.userPicture;
+    }
+    public void setUserPicture(String picture) {
+    	this.userPicture = picture;
     }
 
     /**
@@ -388,6 +432,5 @@ public class Event implements Parcelable {
     	this.userType = UserType.values()[pc.readInt()];
     	this.userName = pc.readString();
     	this.userPicture = pc.readString();
-
     }
 }

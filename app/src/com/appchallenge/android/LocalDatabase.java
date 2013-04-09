@@ -321,19 +321,19 @@ public class LocalDatabase extends SQLiteOpenHelper {
 		// Parse the events from the database query.
 		if (result.moveToFirst()) {
 			do {
-				LocalEvent event
-                  = new LocalEvent(result.getInt(result.getColumnIndex(KEY_ID)),
-                		           result.getString(result.getColumnIndex(KEY_SECRETID)),
-                		           result.getString(result.getColumnIndex(KEY_TITLE)),
-                		           result.getString(result.getColumnIndex(KEY_DESCRIPTION)), 
-                                   Type.typeIndices[result.getInt(result.getColumnIndex(KEY_TYPE))], 
-                                   new LatLng(result.getDouble(result.getColumnIndex(KEY_LATITUDE)), result.getDouble(result.getColumnIndex(KEY_LONGITUDE))),
-                                   new Date(result.getLong(result.getColumnIndex(KEY_STARTDATE)) * 1000),
-                                   new Date(result.getLong(result.getColumnIndex(KEY_ENDDATE)) * 1000),
-                                   result.getInt(result.getColumnIndex(KEY_ATTENDING)),
-                                   UserType.values()[result.getInt(result.getColumnIndex(KEY_USER_TYPE))],
-                                   result.getString(result.getColumnIndex(KEY_USER_NAME)),
-                                   result.getString(result.getColumnIndex(KEY_USER_PICTURE)));
+				Event event = new Event();
+                event.setId(result.getInt(result.getColumnIndex(KEY_ID)));
+                event.setSecretId(result.getString(result.getColumnIndex(KEY_SECRETID)));
+                event.setTitle(result.getString(result.getColumnIndex(KEY_TITLE)));
+                event.setDescription(result.getString(result.getColumnIndex(KEY_DESCRIPTION)));
+                event.setType(Type.typeIndices[result.getInt(result.getColumnIndex(KEY_TYPE))]);
+                event.setLocation(new LatLng(result.getDouble(result.getColumnIndex(KEY_LATITUDE)), result.getDouble(result.getColumnIndex(KEY_LONGITUDE))));
+                event.setStartDate(new Date(result.getLong(result.getColumnIndex(KEY_STARTDATE)) * 1000));
+                event.setEndDate(new Date(result.getLong(result.getColumnIndex(KEY_ENDDATE)) * 1000));
+                event.setAttendance(result.getInt(result.getColumnIndex(KEY_ATTENDING)));
+                event.setUserType(UserType.values()[result.getInt(result.getColumnIndex(KEY_USER_TYPE))]);
+                event.setUserName(result.getString(result.getColumnIndex(KEY_USER_NAME)));
+                event.setUserPicture(result.getString(result.getColumnIndex(KEY_USER_PICTURE)));
 				myEvents.add(event);
 			} while (result.moveToNext());
 		}

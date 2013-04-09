@@ -45,7 +45,7 @@ public class EditEvent extends SherlockFragmentActivity {
     /**
      * The event we are creating from the changes.
      */
-	private LocalEvent localEvent;
+	private Event localEvent;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -96,7 +96,7 @@ public class EditEvent extends SherlockFragmentActivity {
 
 		// Establish the LocalEvent if this is the initial activity load.
 		if (localEvent == null)
-		    localEvent = new LocalEvent(event);
+		    localEvent = new Event(event);
 
 	    // Set the title and description
 		EditText eventTitle = (EditText)findViewById(R.id.edit_event_title);

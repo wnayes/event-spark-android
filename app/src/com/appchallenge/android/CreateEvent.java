@@ -63,7 +63,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     /**
      * The local event we are creating.
      */
-    private LocalEvent newEvent;
+    private Event newEvent;
 
     // Method implementations for CreateEventInterface.
 	public void setTitle(String title) {
@@ -155,7 +155,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         else {
         	// See if an event was passed in.
         	if (receivedIntent.hasExtra("event")) {
-        		this.newEvent = new LocalEvent((Event)receivedIntent.getParcelableExtra("event"));
+        		this.newEvent = new Event((Event)receivedIntent.getParcelableExtra("event"));
 
         		// Establish proper relative time intervals.
         		Calendar today = Calendar.getInstance();
@@ -169,7 +169,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         		
         	}
         	else
-        	    this.newEvent = new LocalEvent();
+        	    this.newEvent = new Event();
         }
 
         if (this.getStartDate() == null && this.getEndDate() == null) {
