@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.appchallenge.android.Event.Type;
+import com.appchallenge.android.Event.UserType;
 import com.facebook.Session;
 import com.facebook.SessionState;
 
@@ -53,8 +54,7 @@ public class CreateEventPage1EventName extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         int layoutId = R.layout.fragment_create_event_page_1;
         ViewGroup rootView = (ViewGroup)inflater.inflate(layoutId, container, false);
         
@@ -66,6 +66,15 @@ public class CreateEventPage1EventName extends Fragment {
                                                                              android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(adapter);
+
+        // Establish the UserType spinner for selecting a form of authentication.
+        Spinner userTypeSpinner = (Spinner)rootView.findViewById(R.id.event_usertype_spinner);
+        ArrayList<UserType> userTypes = new ArrayList<UserType>();
+        userTypes.add(UserType.ANONYMOUS);
+        userTypes.add(UserType.GPLUS);
+        userTypes.add(UserType.FACEBOOK);
+        UserTypeAdapter userTypeAdapter = new UserTypeAdapter(getActivity(), 0, userTypes);
+        userTypeSpinner.setAdapter(userTypeAdapter);
 
         // Read saved data from the parent Activity.
         titleBox.setText(((CreateEventInterface)getActivity()).getEventTitle());
