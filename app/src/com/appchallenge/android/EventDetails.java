@@ -671,6 +671,8 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                 return BitmapFactory.decodeStream(instream);
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
             return null;
 		}

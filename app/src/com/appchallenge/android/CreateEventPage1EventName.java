@@ -112,6 +112,15 @@ public class CreateEventPage1EventName extends Fragment {
             public void onNothingSelected(AdapterView<?> parentView) {}
         });
 
+        userTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            	// Grab the enum by matching the indices of this spinner to the enumerated types.
+            	((CreateEventInterface)getActivity()).setUserType(UserType.values()[position]);
+            }
+            // Interface requirements
+            public void onNothingSelected(AdapterView<?> parentView) {}
+        });
+
         return rootView;
     }
         

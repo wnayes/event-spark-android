@@ -37,6 +37,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.android.Event.Type;
 import com.appchallenge.android.Event.UserType;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -109,14 +110,26 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	
 	public void setUserType(UserType userType) {
 		newEvent.userType = userType;
+
+		// Receive a token if necessary
+		if (userType == UserType.ANONYMOUS)
+			this.token = null;
+		else if (userType == UserType.GPLUS) {
+			startActivityForResult(GoogleAuth.getAccountPickerIntent(), GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME);
+		}
+		else if (userType == UserType.FACEBOOK) {
+			// TODO: Receive Facebook token.
+		}
 	}
 	
 	public UserType getUserType() {
 		return newEvent.getUserType();
 	}
 
+	private String token;
 	public void setToken(String token) {
-		// TODO: Act on receiving a token from our auth classes.
+		Log.d("CreateEvent.setToken", "Received token: " + token);
+		this.token = token;
 	}
 
 	public MarkerOptions getMarker() {
@@ -283,6 +296,10 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
             String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
             Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
+
+            // Request a token from Google+.
+            GoogleAuth gAuth = new GoogleAuth(this);
+            gAuth.getToken(accountName);
         }
     }
 
@@ -415,7 +432,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	     * Informs the user that the event is being created.
 	     */
 	    ProgressDialog dialog;
-	    String token = "";
 
 		@Override
 		protected void onPreExecute() {
@@ -425,12 +441,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
 		@Override
 		protected Event doInBackground(Event... event) {
-			int type = event[0].getUserType().getValue();
-			if (type == 1) {
-				// TODO Add GPLUS code
-			} else if (type == 2) {
-				token = Facebook.getToken();
-			}
 			return APICalls.createEvent(event[0], Identity.getUserId(getApplicationContext()), token);
 		}
 

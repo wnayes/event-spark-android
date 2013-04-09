@@ -31,7 +31,7 @@ public class GoogleAuth {
 	 * Returns an intent to load a picker for Google+ accounts.
 	 * The calling Activity should use this with startActivityForResult.
 	 */
-	public Intent getAccountPickerIntent() {
+	static public Intent getAccountPickerIntent() {
 		return AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
 		                                            false, null, null, null, null);
 	}
@@ -73,6 +73,7 @@ public class GoogleAuth {
 
 		protected void onPostExecute(String result) {
             // Call method on waiting activity.
+			((CreateEventInterface)mActivity).setToken(result);
 		}
 	}
 }

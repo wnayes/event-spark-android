@@ -42,7 +42,7 @@ public class UserTypeAdapter extends ArrayAdapter<UserType> {
             		text.setText("Post using Google+ identity");
             	}
             	else if (type == UserType.FACEBOOK) {
-            		icon.setImageResource(R.drawable.person); // TODO: Facebook Icon.
+            		icon.setImageResource(R.drawable.facebook);
             		text.setText("Post using Facebook identity");
             	}
             }
