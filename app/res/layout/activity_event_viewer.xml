@@ -58,7 +58,7 @@
                 android:paddingBottom="16dp">
 
                 <ImageView android:src="@drawable/ic_action_new"
-                    android:contentDescription="+"
+                    android:contentDescription="@string/ic_new"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingRight="16dp"/>
@@ -84,7 +84,7 @@
                 android:paddingBottom="16dp">
 
                 <ImageView android:src="@drawable/refresh"
-                    android:contentDescription="refresh"
+                    android:contentDescription="@string/refresh"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingRight="16dp"/>
@@ -111,7 +111,8 @@
             android:gravity="center_vertical|center_horizontal"
             android:onClick="onCloseHelpClick"
             android:text="@string/OK"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:background="@drawable/custom_button" />
     </LinearLayout>
 
     <!-- Initial Screen -->
@@ -168,14 +169,16 @@
                 android:textColor="#FFFFFF"
                 android:minWidth="180sp"
                 android:layout_marginBottom="16dp"
-                android:onClick="onEnableSourcesClick"/>
+                android:onClick="onEnableSourcesClick"
+                android:background="@drawable/custom_button"/>
             <Button android:id="@+id/retryLoadButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/retry"
                 android:textColor="#FFFFFF"
                 android:minWidth="180sp"
-                android:onClick="onRetryLoadClick"/>
+                android:onClick="onRetryLoadClick"
+                android:background="@drawable/custom_button"/>
         </LinearLayout>
 
         <!-- The main action buttons. -->
@@ -192,7 +195,8 @@
                 android:text="@string/view_events"
                 android:textColor="#FFFFFF"
                 android:minWidth="180sp"
-                android:onClick="onViewEventsClick"/>
+                android:onClick="onViewEventsClick"
+                android:background="@drawable/custom_button"/>
 	        <Button android:id="@+id/createEventButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -200,7 +204,8 @@
                 android:textColor="#FFFFFF"
                 android:minWidth="180sp"
                 android:onClick="onCreateEventClick"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:background="@drawable/custom_button"/>
 	    </LinearLayout>
 
         <!-- Holds the location searching progress indication. -->
