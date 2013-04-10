@@ -14,9 +14,9 @@
 
     <!-- Share event details. -->
     <item android:id="@+id/share"
+          android:icon="@drawable/ic_social_share"
           android:title="@string/share"
-          android:showAsAction="ifRoom"
-          android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider"/>
+          android:showAsAction="ifRoom"/>
 
     <!-- Retrieve directions to event. -->
     <item android:id="@+id/menu_get_directions"
