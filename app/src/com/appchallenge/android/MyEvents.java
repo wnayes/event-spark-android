@@ -47,6 +47,9 @@ public class MyEvents extends SherlockListActivity {
 	
 	static final int REQUEST_CODE_MY_EVENTS = 102;
 
+	/** Indicates whether and events have been modified. */
+	private Boolean eventsUpdated = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -59,6 +62,7 @@ public class MyEvents extends SherlockListActivity {
         // Restore bundle contents.
         if (savedInstanceState != null) {
         	this.contextMenuOpen = savedInstanceState.getBoolean("contextMenuOpen");
+        	this.eventsUpdated = savedInstanceState.getBoolean("eventsUpdated");
         	this.selectedEvent = savedInstanceState.getParcelable("selectedEvent");
         	this.deletionEvent = savedInstanceState.getParcelable("deletionEvent");
         }
@@ -96,6 +100,9 @@ public class MyEvents extends SherlockListActivity {
 
 		// Save the state of the help view.
     	savedInstanceState.putBoolean("helpOpen", this.helpOpen);
+
+    	// Ensure we remember we have updated some events.
+    	savedInstanceState.putBoolean("eventsUpdated", this.eventsUpdated);
 
 		super.onSaveInstanceState(savedInstanceState);
 	}
@@ -135,10 +142,14 @@ public class MyEvents extends SherlockListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
-	        	// Handle going back to the EventViewer without recreating it.
-                Intent viewerIntent = new Intent(this, EventViewer.class);
-                if (NavUtils.shouldUpRecreateTask(this, viewerIntent)) {
-                    NavUtils.navigateUpTo(this, viewerIntent);
+                // Ensure that a proper result is passed to the waiting activity.
+        		// If we have modified any events, the listener should be notified.
+        		Intent intent = new Intent(MyEvents.this, EventViewer.class);
+        		setResult(this.eventsUpdated ? RESULT_OK : RESULT_CANCELED, intent);
+
+        		// Handle going back to the EventViewer without recreating it.
+                if (NavUtils.shouldUpRecreateTask(this, intent)) {
+                    NavUtils.navigateUpTo(this, intent);
                     finish();
                 } else
                     finish();
@@ -229,20 +240,30 @@ public class MyEvents extends SherlockListActivity {
 		closeContextMenu();
 	}
 
+	public void onBackPressed() {
+		// Ensure that a proper result is passed to the waiting activity.
+		// If we have modified any events, the listener should be notified.
+		Intent intent = new Intent(MyEvents.this, EventViewer.class);
+		setResult(this.eventsUpdated ? RESULT_OK : RESULT_CANCELED, intent);
+	    super.onBackPressed();
+	}
+
 	/**
      * Receives the result of the event creation wizard.
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	Log.d("MyEvents.onActivityResult", "Received activity result intent.");
+    	Log.d("MyEvents.onActivityResult", "Received result intent. resultCode: " + resultCode);
 
     	// Received result from creation wizard.
     	if (requestCode == CreateEvent.REQUEST_CODE_CREATE_EVENT && resultCode == RESULT_OK) {
     		Log.d("MyEvents.onActivityResult", "CreateEvent sent info back to MyEvents.");
     		this.refreshMyEventsList();
+    		this.eventsUpdated = true;
     	}
     	// Received a positive result from the edit event activity.
     	else if (requestCode == EditEvent.REQUEST_CODE_EDIT_EVENT && resultCode == RESULT_OK) {
     		this.refreshMyEventsList();
+    		this.eventsUpdated = true;
     	}
     }
 
@@ -336,6 +357,7 @@ public class MyEvents extends SherlockListActivity {
 			// Update the list view and internal events list.
 			deletionEvent = null;
 			refreshMyEventsList();
+			eventsUpdated = true;
 		}
 	}
 }

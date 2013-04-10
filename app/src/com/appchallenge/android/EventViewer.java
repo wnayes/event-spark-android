@@ -228,7 +228,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
      * Receives the result of the event creation wizard.
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	Log.d("EventViewer.onActivityResult", "Received intent back from creation wizard.");
+    	Log.d("EventViewer.onActivityResult", "Received result intent. resultCode: " + resultCode);
     	if (requestCode == CreateEvent.REQUEST_CODE_CREATE_EVENT && resultCode == RESULT_OK) {
         	// Show the user the newly created event.
     	    Event event = data.getParcelableExtra("event");
@@ -320,7 +320,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		} else if (currentId == R.id.menu_my_events) {
 			// Show a listing of the events we have made.
 		    Intent myEvents = new Intent(EventViewer.this, MyEvents.class);
-			startActivityForResult(myEvents, 1);
+			startActivityForResult(myEvents, MyEvents.REQUEST_CODE_MY_EVENTS);
 			return true;
 		}
 
@@ -391,7 +391,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
 		Intent createEvent = new Intent(EventViewer.this, CreateEvent.class);
 		createEvent.putExtra("location", this.currentLocation);
-		startActivityForResult(createEvent, 0);
+		startActivityForResult(createEvent, CreateEvent.REQUEST_CODE_CREATE_EVENT);
 
 		Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
