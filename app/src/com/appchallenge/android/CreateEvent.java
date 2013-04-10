@@ -37,7 +37,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.android.Event.Type;
 import com.appchallenge.android.Event.UserType;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -115,13 +114,17 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		newEvent.userType = userType;
 
 		// Receive a token if necessary
-		if (userType == UserType.ANONYMOUS)
+		if (userType == UserType.ANONYMOUS) {
 			this.token = null;
+		    findViewById(R.id.connect_message).setVisibility(View.GONE);
+		}
 		else if (userType == UserType.GPLUS) {
 			startActivityForResult(GoogleAuth.getAccountPickerIntent(), GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME);
+			findViewById(R.id.connect_message).setVisibility(View.VISIBLE);
 		}
 		else if (userType == UserType.FACEBOOK) {
-			// TODO: Receive Facebook token.
+			Facebook.startSession(this);
+			findViewById(R.id.connect_message).setVisibility(View.VISIBLE);
 		}
 	}
 	
