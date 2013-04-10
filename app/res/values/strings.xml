@@ -42,7 +42,7 @@
     <string name="event_type">Type:</string>
     <string name="event_description_hint">Any more details?</string>
     <string name="link_with_facebook">Connect this event with Facebook.</string>
-    <string name="connect_message">By connecting this event with Facebook or Google, we will post your name and profile picture on the details page for this event.</string>
+    <string name="connect_message">Your name and picture will be publicly visible.</string>
     <string name="connect_facebook">Connect with Facebook</string>
     <string name="event_time_page_title">Event Time</string>
     <string name="event_time_start">Start Time:</string>

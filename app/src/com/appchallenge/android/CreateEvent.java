@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import java.text.DateFormat;
@@ -111,21 +112,24 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 	}
 	
 	public void setUserType(UserType userType) {
+		// Show a cautionary message about public information visibility.
+		findViewById(R.id.connect_message).setVisibility(userType == UserType.ANONYMOUS ? View.GONE : View.VISIBLE);
+
+		// If the type is the same, we are changing configurations and should already have handled token grabbing.
+		if (newEvent.userType == userType)
+			return;
 		newEvent.userType = userType;
 
 		// Receive a token if necessary
 		if (userType == UserType.ANONYMOUS) {
 			this.token = null;
-		    findViewById(R.id.connect_message).setVisibility(View.GONE);
 		}
 		else if (userType == UserType.GPLUS) {
 			startActivityForResult(GoogleAuth.getAccountPickerIntent(), GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME);
-			findViewById(R.id.connect_message).setVisibility(View.VISIBLE);
 		}
 		else if (userType == UserType.FACEBOOK) {
 			Facebook.startSession(this);
-			findViewById(R.id.connect_message).setVisibility(View.VISIBLE);
-		}
+		}	
 	}
 	
 	public UserType getUserType() {
@@ -299,13 +303,29 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     }
 
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
-            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
-
-            // Request a token from Google+.
-            GoogleAuth gAuth = new GoogleAuth(this);
-            gAuth.getToken(accountName);
+    	Log.d("CreateEvent.onActivityResult", "Received result intent. requestCode: " + requestCode + " resultCode: " + resultCode);
+        if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME) {
+        	if (resultCode == RESULT_OK) {
+        		// Determine the account name and request a token.
+	            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+	            Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
+	
+	            // Request a token from Google+.
+	            GoogleAuth gAuth = new GoogleAuth(this);
+	            gAuth.getToken(accountName);
+        	}
+        	else if (resultCode == RESULT_CANCELED) {
+        		// Revert the UserType spinner selection to Anonymous as the user cancelled selection.
+        		if (mPager.getCurrentItem() != 0) {
+        			Log.e("CreateEvent.onActivityResult", "Child fragment is not the first page.");
+        		    return;
+        		}
+        		Spinner userTypeSpinner = (Spinner)findViewById(R.id.event_usertype_spinner);
+        		if (userTypeSpinner != null)
+        		    userTypeSpinner.setSelection(0);
+        		else
+        			Log.e("CreateEvent.onActivityResult", "UserType spinner could not be referenced.");
+        	}
         }
     }
 
