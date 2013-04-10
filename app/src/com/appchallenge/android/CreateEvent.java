@@ -304,29 +304,36 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
     	Log.d("CreateEvent.onActivityResult", "Received result intent. requestCode: " + requestCode + " resultCode: " + resultCode);
-        if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME) {
-        	if (resultCode == RESULT_OK) {
-        		// Determine the account name and request a token.
-	            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-	            Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
-	
-	            // Request a token from Google+.
-	            GoogleAuth gAuth = new GoogleAuth(this);
-	            gAuth.getToken(accountName);
-        	}
-        	else if (resultCode == RESULT_CANCELED) {
-        		// Revert the UserType spinner selection to Anonymous as the user cancelled selection.
-        		if (mPager.getCurrentItem() != 0) {
-        			Log.e("CreateEvent.onActivityResult", "Child fragment is not the first page.");
-        		    return;
-        		}
-        		Spinner userTypeSpinner = (Spinner)findViewById(R.id.event_usertype_spinner);
-        		if (userTypeSpinner != null)
-        		    userTypeSpinner.setSelection(0);
-        		else
-        			Log.e("CreateEvent.onActivityResult", "UserType spinner could not be referenced.");
-        	}
+        if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
+        	// Determine the account name and request a token.
+            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+            Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
+
+            // Request a token from Google+.
+            GoogleAuth gAuth = new GoogleAuth(this);
+            gAuth.getToken(accountName);
         }
+        else if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_TOKEN && resultCode == RESULT_OK) {
+        	Log.d("CreateEvent.onActivityResult", "Google+ permissions should have been given, so time to retry.");
+        	String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+            Log.d("CreateEvent.onActivityResult", "Got account name: " + accountName);
+            GoogleAuth gAuth = new GoogleAuth(this);
+            gAuth.getToken(accountName);
+        }
+    	else if ((requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_CANCELED) ||
+    			 (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_TOKEN && resultCode == RESULT_CANCELED)) {
+    		// Revert the UserType spinner selection to Anonymous as the user cancelled selection.
+    		if (mPager.getCurrentItem() != 0) {
+    			Log.e("CreateEvent.onActivityResult", "Child fragment is not the first page.");
+    		    return;
+    		}
+
+    		Spinner userTypeSpinner = (Spinner)findViewById(R.id.event_usertype_spinner);
+    		if (userTypeSpinner != null)
+    		    userTypeSpinner.setSelection(0);
+    		else
+    			Log.e("CreateEvent.onActivityResult", "UserType spinner could not be referenced.");
+    	}
     }
 
     /**

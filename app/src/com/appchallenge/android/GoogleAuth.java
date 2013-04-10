@@ -8,6 +8,7 @@ import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -57,9 +58,8 @@ public class GoogleAuth {
 		        // GooglePlayServices.apk is either old, disabled, or not present.
 		        Log.e("GoogleAuth.getTokenTask", ((Integer)playEx.getConnectionStatusCode()).toString());
 		    } catch (UserRecoverableAuthException userRecoverableException) {
-		        // Unable to authenticate, but the user can fix this.
-		        // Forward the user to the appropriate activity.
-		        //mActivity.startActivityForResult(userRecoverableException.getIntent(), REQUEST_CODE_GOOGLE_PLUS_TOKEN);
+		        // Forward the user to the appropriate activity, this can be due to .
+		        ((Activity)mActivity).startActivityForResult(userRecoverableException.getIntent(), REQUEST_CODE_GOOGLE_PLUS_TOKEN);
 		    	Log.e("GoogleAuth.getTokenTask", "Unable to authenticate, but the user can fix this.");
 		    } catch (GoogleAuthException fatalException) {
 		        Log.e("GoogleAuth.getTokenTask", "Unrecoverable error " + fatalException.getMessage(), fatalException);
