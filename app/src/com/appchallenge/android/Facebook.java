@@ -39,7 +39,6 @@ public class Facebook {
 		permissions.clear();
 		permissions.add("publish_actions");
 		permissions.add("user_photos");
-		permissions.add("read_friendlists");
 	}
 	
 	public static String getToken() {
@@ -50,7 +49,12 @@ public class Facebook {
 		return "";
 	}
 	
-	public Session getSession() {
-		return Session.getActiveSession();
+	public Session getSession(Context context) {
+		Session session = Session.getActiveSession();
+		if (session == null) {
+			startSession(context);
+		}
+		session = Session.getActiveSession();
+		return session;
 	}
 }

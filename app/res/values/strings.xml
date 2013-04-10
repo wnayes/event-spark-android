@@ -7,6 +7,7 @@
     <string name="title_activity_event_viewer">Arrow</string>
     <string name="menu_create_event">Create Event</string>
     <string name="refresh">Refresh</string>
+    <string name="ic_new">+</string>
     <string name="menu_settings">Settings</string>
     <string name="view_details">View Details</string>
     <string name="loading_blurb">Arrow connects you to the latest\nevents happening near you.</string>
@@ -38,9 +39,10 @@
     
     <string name="title_activity_create_event">Create Event</string>
     <string name="event_name_hint">What is it called?</string>
+    <string name="event_type">Type:</string>
     <string name="event_description_hint">Any more details?</string>
     <string name="link_with_facebook">Connect this event with Facebook.</string>
-    <string name="facebook_message">By connecting this event with Facebook, we will post your name and profile picture on the details page for this event.</string>
+    <string name="connect_message">By connecting this event with Facebook or Google, we will post your name and profile picture on the details page for this event.</string>
     <string name="connect_facebook">Connect with Facebook</string>
     <string name="event_time_page_title">Event Time</string>
     <string name="event_time_start">Start Time:</string>
