@@ -129,6 +129,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 		}
 		else if (userType == UserType.FACEBOOK) {
 			Facebook.startSession(this);
+			this.setToken(Facebook.getToken());
 		}	
 	}
 	
@@ -347,12 +348,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
         return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
     }
-	
-    public void connectToSocialNetwork(View view) {
-    
-    	// TODO Set up Social Networking Logic
-    	
-    }
 
     /**
      * Shows the time picker to allow changing the Event time.
@@ -474,6 +469,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
 		@Override
 		protected Event doInBackground(Event... event) {
+			Log.d("APICaller for Create Event", token);
 			return APICalls.createEvent(event[0], Identity.getUserId(getApplicationContext()), token);
 		}
 

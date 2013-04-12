@@ -3,12 +3,8 @@ package com.appchallenge.android;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -24,7 +20,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
 import com.appchallenge.android.ReportDialogFragment.ReportReason;
 import com.facebook.Session;
-import com.facebook.SessionState;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.AlertDialog;
@@ -73,25 +68,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
      */
     private LocalDatabase localDB;
     
-    /**
-     * Used to provide the sharing feature with Facebook.
-     */
-    private List<String> writePermissions = new ArrayList<String>();
-    Session.StatusCallback callBack = new Session.StatusCallback() {
-		@SuppressWarnings("unchecked")
-		@Override
-		public void call(Session session, SessionState state, Exception exception) {
 
-			if (state.isOpened() && (state.equals(SessionState.OPENED_TOKEN_UPDATED) || state.equals(SessionState.OPENED))) {
-				if (!Arrays.asList(session.getPermissions()).contains("publish_actions")) {
-					writePermissions.clear();
-				    writePermissions.add("publish_actions");
-				    session.requestNewPublishPermissions(new Session.NewPermissionsRequest(EventDetails.this, writePermissions));
-				    Log.d("ShareDialogFragment", "Requesting Share Permissions");
-				}
-			}
-		}
-	};
 
 
 	@Override
@@ -341,22 +318,15 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
      *  Checks if the person is signed into facebook and posts to their wall if they are else
      *  makes them connect through a Dialog.
      */
+	
     public void connectFacebook() {
         Session session = Session.getActiveSession();
-        if (session == null) {
+        if (session == null || session.isClosed()) {
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(R.string.event_share_dialog)
                    .setPositiveButton(R.string.log_in_to_facebook, new DialogInterface.OnClickListener() {
                        public void onClick(DialogInterface dialog, int id) {
-                    	   Session session = Session.getActiveSession();
-                    	   if (session == null) {
-                    		   session = Session.openActiveSession(EventDetails.this, true, callBack);
-                    	   }
-                    	   if (session != null) {
-                    		   Log.d("Is is", "Yes");
-           					   new shareEventAPICaller().execute(event.getId());
-                    	   }
-                    	   //connectFacebook();
+                    	   Facebook.startSession(EventDetails.this);
                     	   dialog.dismiss();
                     	   
                        }
@@ -368,8 +338,21 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                    });
             AlertDialog dialog = builder.create();
             dialog.show();
+        } else if (session.isOpened()){
+        	new shareEventAPICaller().execute(event.getId());
         }
     }
+    
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	Log.d("EventDetails.onActivityResult", "requestCode: "+Integer.toString(requestCode)+" resultCode: "+Integer.toString(resultCode));
+	if (resultCode == 0 && requestCode == 64206) {
+		Session session = Session.getActiveSession();
+		session.closeAndClearTokenInformation();
+		Session.setActiveSession(null);
+	} else if (resultCode == -1 && requestCode == 64206) {
+		new shareEventAPICaller().execute(event.getId());
+	}
+}
 
 	/**
 	 * Receives the ReportReason from the report dialog and submits the report.
@@ -617,10 +600,10 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	private class shareEventAPICaller extends AsyncTask<Integer, Void, Boolean> {
 		String token;
 		ProgressDialog shareDialog;
-
+		Session session = Session.getActiveSession();
 		protected void onPreExecute() {
 			// Establish progress UI changes.
-			Session session = Session.getActiveSession();
+			
 			if (session != null) {
 			    token = session.getAccessToken();
 			}

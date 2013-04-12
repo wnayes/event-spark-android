@@ -410,6 +410,7 @@ public class APICalls {
 	public static Boolean shareEvent(Integer id, String token) {
 		String facebookURL = "https://graph.facebook.com/me/appchallenge_arrows:join";
 		String eventURL = "http://saypoint.dreamhosters.com/facebook/" + id + ".html";
+		Log.d("Just some checks", "in the API for share event");
 
 		RestClient client = new RestClient(facebookURL);
 
