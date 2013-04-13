@@ -67,9 +67,12 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
      * Provides access to our local sqlite database.
      */
     private LocalDatabase localDB;
-    
 
+    /** Used to indicate to other activities that EventDetails is returning a result. */
+    final static int REQUEST_CODE_EVENT_DETAILS = 105;
 
+    /** Keeps track of whether we have made any modifications to the event. */
+    private Boolean eventUpdated = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			this.event = savedInstanceState.getParcelable("event");
 			this.userLocation = savedInstanceState.getParcelable("userLocation");
 			this.attended = savedInstanceState.getBoolean("attended");
+			this.eventUpdated = savedInstanceState.getBoolean("eventUpdated");
 			this.profilePic = savedInstanceState.getParcelable("profilePic");
 			this.updateEventDetails();
 			return;
@@ -121,6 +125,13 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
             localDB.close();
     }
 
+	public void onBackPressed() {
+		// Ensure that a proper result is passed to the waiting activity.
+		// If we have modified the event, the listener should be notified.
+		setResult(this.eventUpdated ? RESULT_OK : RESULT_CANCELED);
+	    super.onBackPressed();
+	}
+
 	protected void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 
@@ -128,6 +139,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		savedInstanceState.putParcelable("event", this.event);
 		savedInstanceState.putParcelable("userLocation", this.userLocation);
 		savedInstanceState.putBoolean("attended", this.attended);
+		savedInstanceState.putBoolean("eventUpdated", this.eventUpdated);
 		savedInstanceState.putParcelable("profilePic", this.profilePic);
 	}
 	/**
@@ -262,12 +274,14 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
-	    	    // Return to the EventViewer.
+	    	    // Returning OK indicates the event has been modified, CANCELED indicates no change.
+	        	// The activity requesting this result can choose to update information as needed.
+	        	setResult(this.eventUpdated ? RESULT_OK : RESULT_CANCELED);
 	            finish();
 	            return true;
 	        case R.id.menu_refresh_event:
 	        	// Grab a new copy of the event.
-	        	new updateEventDetailsAPICaller().execute(this.event.getId());
+	        	new refreshEventDetailsAPICaller().execute(this.event.getId());
 	        	return true;
 	        case R.id.menu_get_directions:
 	        	// Prevent null exceptions if we did not receive a location.
@@ -300,7 +314,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                 // Open the activity for updating the event.
             	Intent editEvent = new Intent(EventDetails.this, EditEvent.class);
     	    	editEvent.putExtra("event", this.event);
-    	    	startActivity(editEvent);
+    	    	startActivityForResult(editEvent, EditEvent.REQUEST_CODE_EDIT_EVENT);
     	    	return true;
             case R.id.menu_delete_event:
                 // Remove the event from the backend.
@@ -318,20 +332,19 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
      *  Checks if the person is signed into facebook and posts to their wall if they are else
      *  makes them connect through a Dialog.
      */
-	
     public void connectFacebook() {
         Session session = Session.getActiveSession();
         if (session == null || session.isClosed()) {
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(R.string.event_share_dialog)
-                   .setPositiveButton(R.string.log_in_to_facebook, new DialogInterface.OnClickListener() {
+            builder.setMessage(R.string.event_share_dialog);
+            builder.setPositiveButton(R.string.log_in_to_facebook, new DialogInterface.OnClickListener() {
                        public void onClick(DialogInterface dialog, int id) {
                     	   Facebook.startSession(EventDetails.this);
                     	   dialog.dismiss();
                     	   
                        }
-                   })
-                   .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                   });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                        public void onClick(DialogInterface dialog, int id) {
                            dialog.dismiss();
                        }
@@ -342,17 +355,23 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
         	new shareEventAPICaller().execute(event.getId());
         }
     }
-    
-protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	Log.d("EventDetails.onActivityResult", "requestCode: "+Integer.toString(requestCode)+" resultCode: "+Integer.toString(resultCode));
-	if (resultCode == 0 && requestCode == 64206) {
-		Session session = Session.getActiveSession();
-		session.closeAndClearTokenInformation();
-		Session.setActiveSession(null);
-	} else if (resultCode == -1 && requestCode == 64206) {
-		new shareEventAPICaller().execute(event.getId());
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.d("EventDetails.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
+		if (resultCode == RESULT_CANCELED && requestCode == 64206) {
+			Session session = Session.getActiveSession();
+			session.closeAndClearTokenInformation();
+			Session.setActiveSession(null);
+		}
+		else if (resultCode == RESULT_OK && requestCode == 64206) {
+			new shareEventAPICaller().execute(event.getId());
+		}
+		else if (requestCode == EditEvent.REQUEST_CODE_EDIT_EVENT && resultCode == RESULT_OK) {
+			// The event was edited in some manner by the user.
+			new refreshEventDetailsAPICaller().execute(this.event.getId());
+			this.eventUpdated = true;
+		}
 	}
-}
 
 	/**
 	 * Receives the ReportReason from the report dialog and submits the report.
@@ -548,6 +567,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 			// Exit the details page as the event no longer exists.
 			Toast.makeText(getApplicationContext(), "The event has been deleted.", Toast.LENGTH_LONG).show();
+			EventDetails.this.setResult(RESULT_OK);
 			EventDetails.this.finish();
 		}
 	}
@@ -555,7 +575,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	/**
 	 * Performs an asynchronous API call receive any updates of the event we are viewing.
 	 */
-	private class updateEventDetailsAPICaller extends AsyncTask<Integer, Void, Event> {
+	private class refreshEventDetailsAPICaller extends AsyncTask<Integer, Void, Event> {
 		/**
 		 * Quick access to the refresh button in the actionbar.
 		 */
@@ -589,7 +609,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 			}
 
 			event = result;
-			
+
 			// Invalidate the options menu to account for any needed visibility changes.
 			invalidateOptionsMenu();
 

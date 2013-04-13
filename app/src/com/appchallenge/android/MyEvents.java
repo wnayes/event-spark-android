@@ -223,7 +223,7 @@ public class MyEvents extends SherlockListActivity {
         // Pass information about the event to the details activity.
         Intent eventDetails = new Intent(MyEvents.this, EventDetails.class);
      	eventDetails.putExtra("event", event);
-     	startActivity(eventDetails);
+     	startActivityForResult(eventDetails, EventDetails.REQUEST_CODE_EVENT_DETAILS);
 	}
 
 	@Override
@@ -254,14 +254,10 @@ public class MyEvents extends SherlockListActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	Log.d("MyEvents.onActivityResult", "Received result intent. resultCode: " + resultCode);
 
-    	// Received result from creation wizard.
-    	if (requestCode == CreateEvent.REQUEST_CODE_CREATE_EVENT && resultCode == RESULT_OK) {
-    		Log.d("MyEvents.onActivityResult", "CreateEvent sent info back to MyEvents.");
-    		this.refreshMyEventsList();
-    		this.eventsUpdated = true;
-    	}
-    	// Received a positive result from the edit event activity.
-    	else if (requestCode == EditEvent.REQUEST_CODE_EDIT_EVENT && resultCode == RESULT_OK) {
+    	// Received a result indicating some event(s) have been updated.
+    	if ((requestCode == CreateEvent.REQUEST_CODE_CREATE_EVENT && resultCode == RESULT_OK) ||
+    		(requestCode == EditEvent.REQUEST_CODE_EDIT_EVENT && resultCode == RESULT_OK) ||
+    		(requestCode == EventDetails.REQUEST_CODE_EVENT_DETAILS && resultCode == RESULT_OK)) {
     		this.refreshMyEventsList();
     		this.eventsUpdated = true;
     	}

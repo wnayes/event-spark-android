@@ -253,7 +253,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	    // Show the info window for the new event.
     	    m.showInfoWindow();
     	}
-    	if (requestCode == MyEvents.REQUEST_CODE_MY_EVENTS && resultCode == RESULT_OK){
+    	if (requestCode == MyEvents.REQUEST_CODE_MY_EVENTS && resultCode == RESULT_OK) {
+			if (currentLocation != null && isOnline())
+			    new getEventsNearLocationAPICaller().execute(currentLocation);
+    	}
+    	if (requestCode == EventDetails.REQUEST_CODE_EVENT_DETAILS && resultCode == RESULT_OK) {
 			if (currentLocation != null && isOnline())
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
     	}
@@ -521,7 +525,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		Intent eventDetails = new Intent(EventViewer.this, EventDetails.class);
 		eventDetails.putExtra("event", selectedEvent);
 		eventDetails.putExtra("userLocation", this.currentLocation);
-		startActivity(eventDetails);
+		startActivityForResult(eventDetails, EventDetails.REQUEST_CODE_EVENT_DETAILS);
 	}
 
     /**

@@ -324,7 +324,7 @@ public class APICalls {
             client.AddParam("end_date", ((Long)(updatedEvent.getEndDate().getTime() / 1000)).toString());
 
         // Ensure that we are passing at least one parameter besides the basic identifiers.
-        if (client.getParamCount() <= 3)
+        if (client.getParamCount() < 3)
         	return null;
 
         try {

@@ -469,7 +469,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
 		@Override
 		protected Event doInBackground(Event... event) {
-			Log.d("APICaller for Create Event", token);
 			return APICalls.createEvent(event[0], Identity.getUserId(getApplicationContext()), token);
 		}
 
