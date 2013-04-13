@@ -177,6 +177,11 @@ public class MyEvents extends SherlockListActivity {
 	     	startActivity(eventDetails);
 		}
 		else if (item.getItemId() == R.id.my_events_delete) {
+			if (!APICalls.isOnline(this)) {
+        		APICalls.displayConnectivityMessage(this);
+        		return true;
+        	}
+
 	    	this.deletionEvent = selectedEvent;
 	    	new deleteEventAPICaller().execute(selectedEvent);
 	    	return true;

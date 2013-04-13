@@ -66,6 +66,7 @@ public class EditEvent extends SherlockFragmentActivity {
         doneDiscardView.findViewById(R.id.actionbar_done).setOnClickListener(
             new View.OnClickListener() {
                 public void onClick(View v) {
+                	// Verify that the inputs are valid.
                 	if (localEvent.getTitle().trim().length() == 0) {
         				Toast.makeText(getBaseContext(), "Please enter a title!", Toast.LENGTH_SHORT).show();
         				return;
@@ -74,6 +75,12 @@ public class EditEvent extends SherlockFragmentActivity {
         				Toast.makeText(getBaseContext(), "Please enter a valid timespan!", Toast.LENGTH_SHORT).show();
         				return;
         			}
+
+        			// Verify there is an internet connection.
+        			if (!APICalls.isOnline(getBaseContext())) {
+    	        		APICalls.displayConnectivityMessage(getBaseContext());
+    	        		return;
+    	        	}
         
         			Log.d("EventEdit.onOptionsItemSelected", "Submitting updated event: " + localEvent.toJSON());
         			new updateEventAPICaller().execute(event, localEvent);

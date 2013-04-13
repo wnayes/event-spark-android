@@ -19,14 +19,11 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -254,11 +251,11 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     	    m.showInfoWindow();
     	}
     	if (requestCode == MyEvents.REQUEST_CODE_MY_EVENTS && resultCode == RESULT_OK) {
-			if (currentLocation != null && isOnline())
+			if (currentLocation != null && APICalls.isOnline(this))
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
     	}
     	if (requestCode == EventDetails.REQUEST_CODE_EVENT_DETAILS && resultCode == RESULT_OK) {
-			if (currentLocation != null && isOnline())
+			if (currentLocation != null && APICalls.isOnline(this))
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
     	}
     }
@@ -302,8 +299,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			return true;
 		} else if (currentId == R.id.menu_refresh_events) {
 			// Refresh the event listing.
-			if (!isOnline())
-				this.displayConnectivityMessage();
+			if (!APICalls.isOnline(this))
+				APICalls.displayConnectivityMessage(this);
 			else if (currentLocation != null)
 			    new getEventsNearLocationAPICaller().execute(currentLocation);
 			return true;
@@ -624,9 +621,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 				findViewById(R.id.initialProgressLayout).setVisibility(View.GONE);
 			}
 
-        	if (isOnline()) {
+        	if (APICalls.isOnline(this))
         	    new getEventsNearLocationAPICaller().execute(currentLocation);
-        	}
 
         	// Invalidate the action bar menu to enable location-based actions.
         	invalidateOptionsMenu();
@@ -646,27 +642,6 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	@Override
 	public void deactivate() {
 		mListener = null;
-	}
-
-	/**
-	 * Determines if the device has internet connectivity.
-	 * @return Whether a data connection is available.
-	 */
-	public boolean isOnline() {
-        ConnectivityManager connectivityManager =
-          (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
-    }
-
-	/**
-	 * Shows a message informing the user that an internet connection is not available.
-	 */
-	public void displayConnectivityMessage() {
-        Toast.makeText(getApplicationContext(),
-                       "Please connect to the Internet and try again!", 
-                       Toast.LENGTH_SHORT).show();
 	}
 
 	/**

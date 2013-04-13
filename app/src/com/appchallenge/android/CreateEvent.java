@@ -7,8 +7,6 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -279,8 +277,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			return true;
 		} else if (item.getItemId() == R.id.action_submit) {
 			// Prevent being offline from losing entered data.
-			if (!isOnline()) {
-				Toast.makeText(this, "Please connect to a network and try again.", duration).show();
+			if (!APICalls.isOnline(this)) {
+				APICalls.displayConnectivityMessage(this);
 				return true;
 			}
 
@@ -335,18 +333,6 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     		else
     			Log.e("CreateEvent.onActivityResult", "UserType spinner could not be referenced.");
     	}
-    }
-
-    /**
-	 * Determines if the device has internet connectivity.
-	 * @return Whether a data connection is available.
-	 */
-	public boolean isOnline() {
-        ConnectivityManager connectivityManager =
-          (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
     }
 
     /**

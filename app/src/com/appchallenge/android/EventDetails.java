@@ -281,7 +281,10 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	            return true;
 	        case R.id.menu_refresh_event:
 	        	// Grab a new copy of the event.
-	        	new refreshEventDetailsAPICaller().execute(this.event.getId());
+	        	if (APICalls.isOnline(this))
+	        	    new refreshEventDetailsAPICaller().execute(this.event.getId());
+	        	else
+	        		APICalls.displayConnectivityMessage(this);
 	        	return true;
 	        case R.id.menu_get_directions:
 	        	// Prevent null exceptions if we did not receive a location.
@@ -299,11 +302,21 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
                 startActivity(intent);
                 return true;
 	        case R.id.menu_report_event:
+	        	if (!APICalls.isOnline(this)) {
+	        		APICalls.displayConnectivityMessage(this);
+	        		return true;
+	        	}
+
 	        	// Show dialog allowing the user to report an event.
 				DialogFragment reportDialog = new ReportDialogFragment();
 				reportDialog.show(getSupportFragmentManager(), "reportDialog");
 	        	return true;
             case R.id.menu_attend_event:
+            	if (!APICalls.isOnline(this)) {
+	        		APICalls.displayConnectivityMessage(this);
+	        		return true;
+	        	}
+
                 // Attend or unattend the event.
             	if (!this.attended)
             	    new attendEventAPICaller().execute(this.event.getId());
@@ -317,6 +330,11 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
     	    	startActivityForResult(editEvent, EditEvent.REQUEST_CODE_EDIT_EVENT);
     	    	return true;
             case R.id.menu_delete_event:
+            	if (!APICalls.isOnline(this)) {
+	        		APICalls.displayConnectivityMessage(this);
+	        		return true;
+	        	}
+
                 // Remove the event from the backend.
             	new deleteEventAPICaller().execute(event);
     	    	return true;
@@ -377,7 +395,10 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	 * Receives the ReportReason from the report dialog and submits the report.
 	 */
 	public void onReportDialogOKClick(DialogFragment dialog, ReportReason reason) {
-        new reportEventAPICaller().execute(this.event.getId(), reason.ordinal());
+	    if (APICalls.isOnline(this))
+            new reportEventAPICaller().execute(this.event.getId(), reason.ordinal());
+	    else
+	    	APICalls.displayConnectivityMessage(this);
 	}
 	
 	/**
