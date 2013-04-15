@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -44,6 +45,7 @@ import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,8 +70,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
      */
     private LocalDatabase localDB;
     
-
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -151,22 +151,26 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 
 	    // Update user information.
 	    if (this.event.getUserType().getValue() != 0) {
-	    	if (this.event.getUserName().trim().length() == 0)
+	    	if (this.event.getUserName().trim().length() == 0) {
 	    		Log.e("EventDetails.updateEventDetails", "Invalid user name.");
+	    	    findViewById(R.id.event_details_userinfo).setVisibility(View.GONE);
+	    	} else {
 	    	
-	    	((TextView)findViewById(R.id.event_details_user_name)).setText(this.event.getUserName());
-	    	findViewById(R.id.event_details_userinfo).setVisibility(View.VISIBLE);
-	    	findViewById(R.id.event_details_anonymous).setVisibility(View.GONE);
+	    	    ((TextView)findViewById(R.id.event_details_user_name)).setText(this.event.getUserName());
+	    	    findViewById(R.id.event_details_userinfo).setVisibility(View.VISIBLE);
+	    	    findViewById(R.id.event_details_anonymous).setVisibility(View.GONE);
+	    	}
 	    }
 	    else {
 	    	findViewById(R.id.event_details_userinfo).setVisibility(View.GONE);
-	    	findViewById(R.id.event_details_anonymous).setVisibility(View.VISIBLE);
+	    	findViewById(R.id.event_details_anonymous).setVisibility(View.GONE);
 	    }
 
 	    // Set profile picture, or initiate its download.
-	    if (this.profilePic != null)
+	    if (this.profilePic != null) {
+	    	((LinearLayout)findViewById(R.id.event_details_userinfo)).setVisibility(View.VISIBLE);
 	    	((ImageView)findViewById(R.id.event_details_userpicture)).setImageBitmap(profilePic);
-	    else if (this.event.getUserPicture().trim().length() != 0) {
+	    } else if (this.event.getUserPicture().trim().length() != 0) {
 	    	new loadUserPicture().execute(this.event.getUserPicture());
 	    }
 	    
@@ -321,12 +325,14 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	
     public void connectFacebook() {
         Session session = Session.getActiveSession();
+        final Context context = this;
         if (session == null || session.isClosed()) {
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(R.string.event_share_dialog)
                    .setPositiveButton(R.string.log_in_to_facebook, new DialogInterface.OnClickListener() {
                        public void onClick(DialogInterface dialog, int id) {
-                    	   Facebook.startSession(EventDetails.this);
+                    	   FacebookAuth facebook = new FacebookAuth();
+                    	   facebook.startSession(context);
                     	   dialog.dismiss();
                     	   
                        }
@@ -344,11 +350,13 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
     }
     
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	super.onActivityResult(requestCode, resultCode, data);
+	Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
 	Log.d("EventDetails.onActivityResult", "requestCode: "+Integer.toString(requestCode)+" resultCode: "+Integer.toString(resultCode));
 	if (resultCode == 0 && requestCode == 64206) {
 		Session session = Session.getActiveSession();
 		session.closeAndClearTokenInformation();
-		Session.setActiveSession(null);
+		//Session.setActiveSession(null);
 	} else if (resultCode == -1 && requestCode == 64206) {
 		new shareEventAPICaller().execute(event.getId());
 	}
@@ -612,7 +620,8 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 		protected Boolean doInBackground(Integer... id) {
 			if (token != null){
-			return APICalls.shareEvent(id[0], token);
+				Log.d("Event Details", "Access Token: " + token);
+			    return APICalls.shareEvent(id[0], token);
 			}
 			return false;
 		}

@@ -35,14 +35,16 @@
             android:paddingBottom="8dp"/>
 
         <!-- Anonymous user info -->
+
         <TextView
             android:id="@+id/event_details_anonymous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:drawableLeft="@drawable/person"
+            android:gravity="center"
+            android:text="@string/anonymous_posting"
             android:textSize="14sp"
-            android:text="@string/anonymous_posting"/>
+            android:visibility="gone" />
 
         <!-- Holds the layout for the user name and picture.
              Set visible if user information exists. -->
