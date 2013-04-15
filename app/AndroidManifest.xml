@@ -31,7 +31,8 @@
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
         <activity
             android:name="com.appchallenge.android.EventViewer"
-            android:label="@string/title_activity_event_viewer" >
+            android:label="@string/title_activity_event_viewer"
+            android:theme="@style/Theme.Viewer" >
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

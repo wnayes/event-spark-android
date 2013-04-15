@@ -1,5 +1,12 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Matches the background of the (usually white) loading screen
+         to the initial title screen to ease app loading.
+         http://cyrilmottier.com/2013/01/23/android-app-launching-made-gorgeous/ -->
+    <style name="Theme.Viewer" parent="@style/Theme.Sherlock.Light.DarkActionBar">
+        <item name="android:windowBackground">@color/background</item>
+    </style>
+
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
