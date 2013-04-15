@@ -171,7 +171,6 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	    		Log.e("EventDetails.updateEventDetails", "Invalid user name.");
 	    	    findViewById(R.id.event_details_userinfo).setVisibility(View.GONE);
 	    	} else {
-	    	
 	    	    ((TextView)findViewById(R.id.event_details_user_name)).setText(this.event.getUserName());
 	    	    findViewById(R.id.event_details_userinfo).setVisibility(View.VISIBLE);
 	    	    findViewById(R.id.event_details_anonymous).setVisibility(View.GONE);
@@ -179,7 +178,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	    }
 	    else {
 	    	findViewById(R.id.event_details_userinfo).setVisibility(View.GONE);
-	    	findViewById(R.id.event_details_anonymous).setVisibility(View.GONE);
+	    	findViewById(R.id.event_details_anonymous).setVisibility(View.VISIBLE);
 	    }
 
 	    // Set profile picture, or initiate its download.
