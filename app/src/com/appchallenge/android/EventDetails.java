@@ -384,7 +384,8 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
     }
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+		// NullPointerException
+		// Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
 		Log.d("EventDetails.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
 		if (resultCode == RESULT_CANCELED && requestCode == 64206) {
 			Session session = Session.getActiveSession();
