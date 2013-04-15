@@ -24,18 +24,18 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
 import java.text.DateFormat;
 
 import java.util.Calendar;
 import java.util.Date;
-
-
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.android.Event.Type;
 import com.appchallenge.android.Event.UserType;
 
+import com.facebook.Session;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -126,10 +126,15 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 			startActivityForResult(GoogleAuth.getAccountPickerIntent(), GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME);
 		}
 		else if (userType == UserType.FACEBOOK) {
-			Facebook.startSession(this);
-			this.setToken(Facebook.getToken());
+			Session session = Session.getActiveSession();
+			if (session == null || session.isClosed()) {
+			    FacebookAuth facebook = new FacebookAuth();
+			    facebook.startSession(this);
+			} else {
+			    this.setToken(session.getAccessToken());	
+			}
 		}	
-	}
+	}	
 	
 	public UserType getUserType() {
 		return newEvent.getUserType();
@@ -302,6 +307,8 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     }
 
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+    	super.onActivityResult(requestCode, resultCode, data);
+    	Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
     	Log.d("CreateEvent.onActivityResult", "Received result intent. requestCode: " + requestCode + " resultCode: " + resultCode);
         if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
         	// Determine the account name and request a token.
@@ -332,6 +339,15 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     		    userTypeSpinner.setSelection(0);
     		else
     			Log.e("CreateEvent.onActivityResult", "UserType spinner could not be referenced.");
+    	}
+    	else if (resultCode == 0 && requestCode == 64206) {
+    		Session session = Session.getActiveSession();
+    		session.closeAndClearTokenInformation();
+    	} else if (resultCode == -1 && requestCode == 64206) {
+    		Session session = Session.getActiveSession();
+    		this.setToken(session.getAccessToken());
+    		//this.setToken(FacebookAuth.getToken());
+    		Log.d("CreateEvent.onActivityResult", "Successfully Authenticated");
     	}
     }
 
