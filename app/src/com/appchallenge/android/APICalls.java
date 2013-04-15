@@ -11,7 +11,11 @@ import org.json.JSONObject;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Holds static methods for calling the REST API functions.
@@ -324,7 +328,7 @@ public class APICalls {
             client.AddParam("end_date", ((Long)(updatedEvent.getEndDate().getTime() / 1000)).toString());
 
         // Ensure that we are passing at least one parameter besides the basic identifiers.
-        if (client.getParamCount() <= 3)
+        if (client.getParamCount() < 3)
         	return null;
 
         try {
@@ -404,8 +408,7 @@ public class APICalls {
 
         return true;
 	}
-	
-	
+
 	// This is the API to share events with Facebook
 	public static Boolean shareEvent(Integer id, String token) {
 		String facebookURL = "https://graph.facebook.com/me/appchallenge_arrows:join";
@@ -444,6 +447,25 @@ public class APICalls {
 		} 
 
 		return false;
+	}
 
+	/**
+	 * Determines if the device has internet connectivity.
+	 * @return Whether a data connection is available.
+	 */
+	public static boolean isOnline(Context context) {
+        ConnectivityManager connectivityManager =
+          (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        return (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable());
+    }
+
+	/**
+	 * Shows a message informing the user that an internet connection is not available.
+	 */
+	public static void displayConnectivityMessage(Context context) {
+        Toast.makeText(context, "Please connect to the Internet and try again!", Toast.LENGTH_SHORT)
+             .show();
 	}
 }
