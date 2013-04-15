@@ -6,11 +6,11 @@
     android:layout_height="fill_parent">
 
     <!-- The main map view -->
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="com.google.android.gms.maps.SupportMapFragment" xmlns:tools="http://schemas.android.com/tools"/>
+        class="com.google.android.gms.maps.SupportMapFragment" />
 
     <!-- Help/Tutorial content -->
     <LinearLayout
@@ -116,16 +116,16 @@
     </LinearLayout>
 
     <!-- Initial Screen -->
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/initialScreen"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#25650B"
+        android:background="#333333"
         android:orientation="vertical"
         android:clickable="true">
 
         <!-- Logo and small welcome text. -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:id="@+id/initialHeader"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -140,15 +140,14 @@
 	            style="@style/eventHoundTheme.sentence"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:drawableTop="@drawable/biglogo"
+	            android:drawableTop="@drawable/banner"
 	            android:gravity="center"
 	            android:text="@string/loading_blurb"
 	            android:textColor="#FFFFFF" />
-
 	    </LinearLayout>
 
         <!-- Holds the location source error UI -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:id="@+id/initialNoSources"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -182,7 +181,7 @@
         </LinearLayout>
 
         <!-- The main action buttons. -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:id="@+id/initialMainActions"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -209,7 +208,7 @@
 	    </LinearLayout>
 
         <!-- Holds the location searching progress indication. -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:id="@+id/initialProgressLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

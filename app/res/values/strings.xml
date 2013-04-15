@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Arrow</string>
+    <string name="app_name">Event Spark</string>
 
     <!-- Event Viewer -->
-    <string name="title_activity_event_viewer">Arrow</string>
+    <string name="title_activity_event_viewer">Event Spark</string>
     <string name="menu_create_event">Create Event</string>
     <string name="refresh">Refresh</string>
     <string name="ic_new">+</string>
     <string name="menu_settings">Settings</string>
     <string name="view_details">View Details</string>
-    <string name="loading_blurb">Arrow connects you to the latest\nevents happening near you.</string>
+    <string name="loading_blurb">Event Spark connects you to the latest\nevents happening near you.</string>
     <string name="finding_location">Finding your location&#8230;</string>
     <string name="finished_loading">Ready to start!</string>
-    <string name="no_location_sources">Arrow requires your location to operate.\nPlease enable a location source and retry loading.</string>
+    <string name="no_location_sources">Event Spark requires your location to operate.\nPlease enable a location source and retry loading.</string>
     <string name="enable_source">Enable Source</string>
     <string name="retry">Retry</string>
     <string name="view_events">View Events</string>
