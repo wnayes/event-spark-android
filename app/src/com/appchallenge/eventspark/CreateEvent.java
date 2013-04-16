@@ -307,10 +307,12 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     }
 
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-    	super.onActivityResult(requestCode, resultCode, data);
-    	// Causes NullPointerException...
-    	//Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
     	Log.d("CreateEvent.onActivityResult", "Received result intent. requestCode: " + requestCode + " resultCode: " + resultCode);
+
+    	super.onActivityResult(requestCode, resultCode, data);
+
+    	Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+    	
         if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
         	// Determine the account name and request a token.
             String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
