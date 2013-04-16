@@ -1,4 +1,4 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +17,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.appchallenge.android.ReportDialogFragment.ReportDialogListener;
-import com.appchallenge.android.ReportDialogFragment.ReportReason;
+import com.appchallenge.eventspark.ReportDialogFragment.ReportDialogListener;
+import com.appchallenge.eventspark.ReportDialogFragment.ReportReason;
 import com.facebook.Session;
 import com.google.android.gms.maps.model.LatLng;
 

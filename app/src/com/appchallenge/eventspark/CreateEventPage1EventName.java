@@ -1,11 +1,11 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.appchallenge.android.Event.Type;
-import com.appchallenge.android.Event.UserType;
+import com.appchallenge.eventspark.Event.Type;
+import com.appchallenge.eventspark.Event.UserType;
 import com.facebook.Session;
 import com.facebook.SessionState;
 

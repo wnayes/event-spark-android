@@ -1,4 +1,4 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
-import com.appchallenge.android.Event.Type;
+import com.appchallenge.eventspark.Event.Type;
 
 public class TypeFilterDialogFragment extends DialogFragment {
 	/**

@@ -1,10 +1,10 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.appchallenge.android.Event.Type;
-import com.appchallenge.android.Event.UserType;
+import com.appchallenge.eventspark.Event.Type;
+import com.appchallenge.eventspark.Event.UserType;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.content.ContentValues;

@@ -1,8 +1,8 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.util.ArrayList;
 
-import com.appchallenge.android.Event.UserType;
+import com.appchallenge.eventspark.Event.UserType;
 
 import android.content.Context;
 import android.view.LayoutInflater;

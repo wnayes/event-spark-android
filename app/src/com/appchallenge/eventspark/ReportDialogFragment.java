@@ -1,4 +1,4 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import android.app.Activity;
 import android.app.AlertDialog;

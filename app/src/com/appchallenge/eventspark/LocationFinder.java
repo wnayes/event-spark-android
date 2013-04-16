@@ -1,4 +1,4 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.util.Timer;
 import java.util.TimerTask;

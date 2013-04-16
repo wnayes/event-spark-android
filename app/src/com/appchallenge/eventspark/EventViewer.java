@@ -1,4 +1,4 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.appchallenge.android.Event.Type;
-import com.appchallenge.android.TypeFilterDialogFragment.TypeFilterDialogListener;
+import com.appchallenge.eventspark.Event.Type;
+import com.appchallenge.eventspark.TypeFilterDialogFragment.TypeFilterDialogListener;
 
 /**
  * Displays a user's location and surrounding events.

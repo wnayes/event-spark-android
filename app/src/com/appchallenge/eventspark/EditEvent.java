@@ -1,4 +1,4 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.appchallenge.android.Event.Type;
+import com.appchallenge.eventspark.Event.Type;
 
 @SuppressLint("ValidFragment")
 public class EditEvent extends SherlockFragmentActivity {

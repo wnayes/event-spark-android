@@ -1,4 +1,4 @@
-package com.appchallenge.android;
+package com.appchallenge.eventspark;
 
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
@@ -32,8 +32,8 @@ import java.util.Date;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.appchallenge.android.Event.Type;
-import com.appchallenge.android.Event.UserType;
+import com.appchallenge.eventspark.Event.Type;
+import com.appchallenge.eventspark.Event.UserType;
 
 import com.facebook.Session;
 import com.google.android.gms.maps.model.LatLng;
