@@ -134,13 +134,20 @@
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible">
+            <!-- These need to be seperate for the image 
+            to not go off screen on smaller resolutions -->
+            <ImageView
+                android:id="@+id/banner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/banner"
+                android:contentDescription="@string/app_name" /> 
 
 	        <TextView
 	            android:id="@+id/text"
 	            style="@style/eventHoundTheme.sentence"
-	            android:layout_width="wrap_content"
+	            android:layout_width="fill_parent"
 	            android:layout_height="wrap_content"
-	            android:drawableTop="@drawable/banner"
 	            android:gravity="center"
 	            android:text="@string/loading_blurb"
 	            android:textColor="#FFFFFF" />
@@ -229,6 +236,19 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginLeft="2dp"/>
         </LinearLayout>
+        <TextView 
+            android:id="@+id/tos"
+            android:text="@string/tos"
+            android:textColor="#FFFFFF"
+            style="@style/eventHoundTheme.sentence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:clickable="true"
+            android:onClick="displayTOS" />
     </LinearLayout>
 
 </RelativeLayout>

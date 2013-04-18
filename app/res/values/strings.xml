@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name">Event Spark</string>
+    
+    <string name="tos">By using this app you agree to our Terms of Service. (Click to view.)</string>
 
     <!-- Event Viewer -->
     <string name="title_activity_event_viewer">Event Spark</string>
