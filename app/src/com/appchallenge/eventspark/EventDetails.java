@@ -114,8 +114,8 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		}
 
 		// Learn whether we have already attended this event.
-		//if (attended == null)
-		attended = localDB.getAttendanceStatus(event.getId());
+		if (attended == null)
+		    attended = localDB.getAttendanceStatus(event.getId());
 
 		this.updateEventDetails();
 	}
