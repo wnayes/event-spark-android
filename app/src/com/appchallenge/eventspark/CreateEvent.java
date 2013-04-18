@@ -311,7 +311,12 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
 
     	super.onActivityResult(requestCode, resultCode, data);
 
-    	Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+		// TODO: Figure out the conditions that cause this to crash.
+		try {
+		    Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+		} catch (Exception e) {
+			Log.e("EventDetails.onActivityResult", "Facebook session code caused crash.");
+		}
     	
         if (requestCode == GoogleAuth.REQUEST_CODE_GOOGLE_PLUS_ACCOUNTNAME && resultCode == RESULT_OK) {
         	// Determine the account name and request a token.

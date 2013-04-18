@@ -386,7 +386,12 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.d("EventDetails.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
 
-		Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+		// TODO: Figure out the conditions that cause this to crash.
+		try {
+		    Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+		} catch (Exception e) {
+			Log.e("EventDetails.onActivityResult", "Facebook session code caused crash.");
+		}
 		if (resultCode == RESULT_CANCELED && requestCode == 64206) {
 			Session session = Session.getActiveSession();
 			session.closeAndClearTokenInformation();
