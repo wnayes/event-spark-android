@@ -318,6 +318,9 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 			this.helpOpen = true;
             findViewById(R.id.help_viewer).setVisibility(View.VISIBLE);
 			return true;
+		} else if (currentId == R.id.menu_viewer_tos) {
+			displayTOS();
+			return true;
 		} else if (currentId == R.id.menu_my_events) {
 			// Show a listing of the events we have made.
 		    Intent myEvents = new Intent(EventViewer.this, MyEvents.class);
@@ -644,16 +647,16 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 		mListener = null;
 	}
 	
-	public void displayTOS(View view) {
+	private void displayTOS() {
 		AlertDialog.Builder tos = new AlertDialog.Builder(EventViewer.this);
 		tos.setTitle("Terms of Service");
-		tos.setMessage("By using this app you agree to release Event Spark " +
-				"and the people who made Event Spark from all claims, demands, " +
-				"and damages of every kind of nature arising out of or related " +
-				"to Event Spark or the content on Event Spark. You also agree " +
-				"to use Event Spark for activities that are legal in your current " +
-				"cell service area. This information is subject to change.");
-		tos.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        tos.setMessage("By using this app you agree to release Event Spark " +
+                       "and the people who made Event Spark from all claims, demands, " +
+                       "and damages of every kind of nature arising out of or related " +
+                       "to Event Spark or the content on Event Spark. You also agree " +
+                       "to use Event Spark for activities that are legal in your current " +
+                       "cell service area. This information is subject to change.");
+		tos.setPositiveButton(getResources().getString(R.string.OK), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();

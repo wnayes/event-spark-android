@@ -236,16 +236,6 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginLeft="2dp"/>
         </LinearLayout>
-        <TextView 
-            android:id="@+id/tos"
-            android:text="@string/tos"
-            android:textColor="#FFFFFF"
-            style="@style/eventHoundTheme.sentence"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:clickable="true"
-            android:onClick="displayTOS" />
     </LinearLayout>
 
 </RelativeLayout>

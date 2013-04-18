@@ -31,6 +31,11 @@
     <item android:id="@+id/menu_viewer_help"
           android:title="Help"
           android:showAsAction="never"/>
+    
+    <!-- TOS Button -->
+    <item android:id="@+id/menu_viewer_tos"
+          android:title="Terms of Service"
+          android:showAsAction="never"/>
 
     <!-- Settings menu -->
     <item android:id="@+id/menu_settings"
