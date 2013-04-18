@@ -114,8 +114,8 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		}
 
 		// Learn whether we have already attended this event.
-		if (attended == null)
-			attended = localDB.getAttendanceStatus(event.getId());
+		//if (attended == null)
+		attended = localDB.getAttendanceStatus(event.getId());
 
 		this.updateEventDetails();
 	}
@@ -189,7 +189,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 	    	new loadUserPicture().execute(this.event.getUserPicture());
 	    }
 	    
-	    // Inform how many users have attended the event using our app.
+	    // Inform how many users have attended the event using our app.)
 	    this.updateAttendingText(this.event.getAttendance());
 	    
 	    // Display different date strings based on the time of the event.
@@ -238,7 +238,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 		Drawable icon;
 		if (this.attended) {
 			// Prevent the count from going negative.
-			int count = attendingCount - 1 < 0 ? 0 : attendingCount - 1;
+			int count = attendingCount - 1 <= 0 ? 0 : attendingCount - 1;
 
 			attending = getResources().getQuantityString(R.plurals.users_you_attending, count, count);
 			icon = getResources().getDrawable(R.drawable.people);
@@ -506,6 +506,8 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 				updateAttendingText(event.getAttendance());
 				(Toast.makeText(getApplicationContext(), "You have already indicated you will attend.", Toast.LENGTH_LONG)).show();
 			}
+			//Need to refresh the event to get an accurate attendance count
+			new refreshEventDetailsAPICaller().execute(event.getId());
 		}
 	}
 
@@ -560,6 +562,8 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 			else if (result.equals("NO_ATTENDANCE_RECORD")) {
 				(Toast.makeText(getApplicationContext(), "You have not attended this event yet.", Toast.LENGTH_LONG)).show();
 			}
+			//Need to refresh the event to get an accurate attendance count
+			new refreshEventDetailsAPICaller().execute(event.getId());
 		}
 	}
 

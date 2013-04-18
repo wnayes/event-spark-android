@@ -643,6 +643,25 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 	public void deactivate() {
 		mListener = null;
 	}
+	
+	public void displayTOS(View view) {
+		AlertDialog.Builder tos = new AlertDialog.Builder(EventViewer.this);
+		tos.setTitle("Terms of Service");
+		tos.setMessage("By using this app you agree to release Event Spark " +
+				"and the people who made Event Spark from all claims, demands, " +
+				"and damages of every kind of nature arising out of or related " +
+				"to Event Spark or the content on Event Spark. You also agree " +
+				"to use Event Spark for activities that are legal in your current " +
+				"cell service area. This information is subject to change.");
+		tos.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		AlertDialog tosAlert = tos.create();
+		tosAlert.show();
+	}
 
 	/**
 	 * Performs an asynchronous API call to find nearby events.
@@ -690,6 +709,8 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 				return;
 			
 			if (result.size() == 0 && !initialScreenVisible()) {
+				//Clears map if no events found
+				mMap.clear();
                 Toast.makeText(getApplicationContext(), "No events found near you!", Toast.LENGTH_LONG)
 			         .show();
                 return;
