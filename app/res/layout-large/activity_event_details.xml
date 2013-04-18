@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    
+<!-- This shows the event type color as an actionbar border.
+     A separate LinearLayout is needed to have the border expand
+     over the padding. -->
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <View android:id="@+id/event_details_colorbar"
+        android:layout_width="fill_parent"
+        android:layout_height="4dp"
+        android:background="#ea9d38" />
+</LinearLayout>
+
+<ScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        
+        <!-- Event Title -->
+        <TextView
+            android:id="@+id/event_details_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:paddingBottom="8dp"/>
+
+        <!-- Anonymous user info -->
+        <TextView
+            android:id="@+id/event_details_anonymous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/person"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:text="@string/anonymous_posting"
+            android:textSize="18sp"
+            android:visibility="gone" />
+
+        <!-- Holds the layout for the user name and picture.
+             Set visible if user information exists. -->
+        <LinearLayout android:id="@+id/event_details_userinfo"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+            <!-- Placeholder image -->
+            <ImageView android:id="@+id/event_details_userpicture"
+                android:src="@drawable/person"
+                android:contentDescription="@string/posted_by"
+                android:layout_height="72dp"
+                android:layout_width="72dp">
+            </ImageView>
+            <LinearLayout android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginLeft="8dp">
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:text="@string/posted_by" />
+                <TextView android:id="@+id/event_details_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="26sp" />
+            </LinearLayout>
+        </LinearLayout>
+        
+        <!-- Date Description -->
+	    <TextView
+	        android:id="@+id/event_details_date_description"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="16sp"
+	        android:drawableLeft="@drawable/clock"
+	        android:drawablePadding="4dp"
+	        android:gravity="center"/>
+
+        <!-- Attendance Details -->
+	    <TextView
+	        android:id="@+id/event_details_attendance"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="16sp"
+	        android:drawableLeft="@drawable/person"
+	        android:drawablePadding="4dp"
+            android:gravity="center"/>
+
+        <!-- Event Description -->
+        <TextView
+            android:id="@+id/event_details_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="19sp"
+            android:paddingTop="16dp"/>
+
+    </LinearLayout>
+</ScrollView>
+
+</LinearLayout>

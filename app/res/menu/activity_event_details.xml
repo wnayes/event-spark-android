@@ -15,12 +15,12 @@
     <!-- Share event details. -->
     <item android:id="@+id/share"
           android:title="@string/share"
-          android:showAsAction="ifRoom"/>
+          android:showAsAction="never"/>
 
     <!-- Retrieve directions to event. -->
     <item android:id="@+id/menu_get_directions"
           android:title="@string/event_get_directions"
-          android:showAsAction="ifRoom"/>
+          android:showAsAction="never"/>
 
     <!-- Edit details of the event. -->
     <item android:id="@+id/menu_update_event"
