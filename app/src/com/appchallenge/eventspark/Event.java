@@ -146,16 +146,16 @@ public class Event implements Parcelable {
 			    case 1:
 				    return Color.parseColor("#275fac");
 			    case 2:
-			    	return Color.parseColor("#690e0d");
+			    	return Color.parseColor("#ac1f23");
 			    case 3:
 			    	return Color.parseColor("#8b288d");
 			    case 4:
 			    	return Color.parseColor("#1f9045");
 			    case 5:
-			    	return Color.parseColor("#d52e30");
+			    	return Color.parseColor("#ec7524");
 			    case 0:
 			    default:
-			    	return Color.parseColor("#ea9d38");
+			    	return Color.parseColor("#656566");
 		    }
 		}
 
@@ -331,18 +331,19 @@ public class Event implements Parcelable {
     public MarkerOptions toMarker() {
     	// Determine which icon resource we use based on event type.
     	int markerIcon;
+    	boolean isGhost = new Date().before(startDate);
     	if (this.type == Type.ACADEMICS)
-    		markerIcon = R.drawable.academics;
+    		markerIcon = isGhost ? R.drawable.academics_ghost : R.drawable.academics;
     	else if (this.type == Type.ATHLETICS)
-    		markerIcon = R.drawable.athletics;
+    		markerIcon = isGhost ? R.drawable.athletics_ghost : R.drawable.athletics;
     	else if (this.type == Type.ENTERTAINMENT)
-    		markerIcon = R.drawable.entertainment;
+    		markerIcon = isGhost ? R.drawable.entertainment_ghost : R.drawable.entertainment;
     	else if (this.type == Type.PROMOTIONS)
-    		markerIcon = R.drawable.promotions;
+    		markerIcon = isGhost ? R.drawable.promotions_ghost : R.drawable.promotions;
     	else if (this.type == Type.SOCIAL)
-    		markerIcon = R.drawable.social;
+    		markerIcon = isGhost ? R.drawable.social_ghost : R.drawable.social;
     	else
-    		markerIcon = R.drawable.other;
+    		markerIcon = isGhost ? R.drawable.other_ghost : R.drawable.other;
 
         return new MarkerOptions().title(this.title)
                                   .snippet("Click to view more info.")
