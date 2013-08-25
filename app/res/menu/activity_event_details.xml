@@ -1,40 +1,41 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:yourapp="http://schemas.android.com/apk/res-auto">
     
     <!-- Attend the event. -->
     <item android:id="@+id/menu_attend_event"
           android:icon="@drawable/attend"
           android:title="@string/attend_event"
-          android:showAsAction="always"/>
+          yourapp:showAsAction="always"/>
 
     <!-- Refresh event information. -->
     <item android:id="@+id/menu_refresh_event"
           android:icon="@drawable/refresh"
           android:title="@string/refresh"
-          android:showAsAction="ifRoom"/>
+          yourapp:showAsAction="ifRoom"/>
 
     <!-- Share event details. -->
     <item android:id="@+id/share"
           android:title="@string/share"
-          android:showAsAction="never"/>
+          yourapp:showAsAction="never"/>
 
     <!-- Retrieve directions to event. -->
     <item android:id="@+id/menu_get_directions"
           android:title="@string/event_get_directions"
-          android:showAsAction="never"/>
+          yourapp:showAsAction="never"/>
 
     <!-- Edit details of the event. -->
     <item android:id="@+id/menu_update_event"
           android:title="@string/update"
-          android:showAsAction="never"/>
+          yourapp:showAsAction="never"/>
 
     <!-- Delete event from server. -->
     <item android:id="@+id/menu_delete_event"
           android:title="@string/delete"
-          android:showAsAction="never"/>
+          yourapp:showAsAction="never"/>
 
     <!-- Report event item. -->
     <item android:id="@+id/menu_report_event"
           android:title="@string/event_report"
-          android:showAsAction="never"/>
+          yourapp:showAsAction="never"/>
 
 </menu>

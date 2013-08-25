@@ -1,4 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:yourapp="http://schemas.android.com/apk/res-auto">
 
 <!-- This group lets us hide/show the visible actions easily.  -->
 <group android:id="@+id/group_viewer_menuitems">
@@ -7,39 +8,39 @@
     <item android:id="@+id/menu_create_event"
           android:icon="@drawable/ic_action_new"
           android:title="@string/menu_create_event"
-          android:showAsAction="always" />
+          yourapp:showAsAction="always" />
     
     <!-- Refresh event listing. -->
     <item android:id="@+id/menu_refresh_events"
           android:icon="@drawable/refresh"
           android:title="@string/refresh"
-          android:showAsAction="always" />
+          yourapp:showAsAction="always" />
     
 </group>
     
     <!-- Show the event type filter dialog. -->
     <item android:id="@+id/menu_type_filter"
           android:title="Filter By Type"
-          android:showAsAction="never" />
+          yourapp:showAsAction="never" />
 
     <!-- Edit Your Events -->
     <item android:id="@+id/menu_my_events"
           android:title="My Events"
-          android:showAsAction="never" />
+          yourapp:showAsAction="never" />
     
     <!-- Help Button -->
     <item android:id="@+id/menu_viewer_help"
           android:title="Help"
-          android:showAsAction="never"/>
+          yourapp:showAsAction="never"/>
     
     <!-- TOS Button -->
     <item android:id="@+id/menu_viewer_tos"
           android:title="Terms of Service"
-          android:showAsAction="never"/>
+          yourapp:showAsAction="never"/>
 
     <!-- Settings menu -->
     <item android:id="@+id/menu_settings"
-          android:showAsAction="never"
-          android:title="@string/menu_settings"/>
+          android:title="@string/menu_settings"
+          yourapp:showAsAction="never"/>
 
 </menu>

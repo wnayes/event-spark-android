@@ -28,27 +28,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.eventspark.Event.Type;
 import com.appchallenge.eventspark.TypeFilterDialogFragment.TypeFilterDialogListener;
 
 /**
  * Displays a user's location and surrounding events.
  */
-public class EventViewer extends SherlockFragmentActivity implements LocationListener,
-                                                                     LocationSource,
-                                                                     OnInfoWindowClickListener,
-                                                                     TypeFilterDialogListener {
+public class EventViewer extends ActionBarActivity implements LocationListener,
+                                                              LocationSource,
+                                                              OnInfoWindowClickListener,
+                                                              TypeFilterDialogListener {
     /**
      * Object representing the Google Map display of our Events.
      * Note that this may be null if the Google Play services APK is not available.
@@ -262,7 +262,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
 
     private Menu _menu;
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_event_viewer, menu);
 
         menu.setGroupVisible(R.id.group_viewer_menuitems, !this.initialScreenVisible());
@@ -279,7 +279,7 @@ public class EventViewer extends SherlockFragmentActivity implements LocationLis
     }
 
     @Override
-    public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
     	// Close the help menu if it is open as an action is being taken.
     	// Like the USA Today app, this does not mean we remember it has been seen.
     	if (this.helpOpen)

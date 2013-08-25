@@ -1,8 +1,9 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:yourapp="http://schemas.android.com/apk/res-auto">
 
     <!-- View event details. -->
     <item android:id="@+id/menu_view_event_details"
           android:title="@string/view_details"
-          android:showAsAction="always|withText"/>
+          yourapp:showAsAction="always|withText"/>
    
 </menu>

@@ -12,11 +12,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.eventspark.ReportDialogFragment.ReportDialogListener;
 import com.appchallenge.eventspark.ReportDialogFragment.ReportReason;
 import com.facebook.Session;
@@ -42,14 +37,19 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EventDetails extends SherlockFragmentActivity implements ReportDialogListener {
+public class EventDetails extends ActionBarActivity implements ReportDialogListener {
 	// Private members containing the Event information.
 	private Event event;
 	private LatLng userLocation;
@@ -253,7 +253,7 @@ public class EventDetails extends SherlockFragmentActivity implements ReportDial
 
 	private Menu _menu;
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_event_details, menu);
 
 		// Change the attend actionbar icon depending on whether we have attended or not.

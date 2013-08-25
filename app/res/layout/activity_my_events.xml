@@ -5,30 +5,11 @@
     android:layout_height="fill_parent">
 
     <!-- The My Events page contents -->
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:orientation="vertical">
-	    <ListView
-	        android:id="@android:id/list"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:divider="#DDDDDD"
-	        android:dividerHeight="1sp" />
-	    <!-- Adds a bottom divider to the list. -->
-	    <View
-		    android:background="#DDDDDD"
-		    android:layout_width="fill_parent"
-		    android:layout_height="1sp"/>
-	
-	    <TextView android:id="@+id/my_events_empty"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="16dp"
-	        android:gravity="center"
-	        android:text="@string/my_events_no_events"
-	        android:visibility="gone" />
-	</LinearLayout>
+	<fragment
+        android:id="@+id/fragment_myevents_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.appchallenge.eventspark.MyEventsListFragment" />
 
     <!-- Help/Tutorial content -->
     <LinearLayout
@@ -58,14 +39,14 @@
 
             <!-- 'Additional Options' -->
             <TextView
-                    android:id="@+id/help_myevents_additionaloptions"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_marginBottom="16dp"
-                    android:text="@string/help_additionaloptions"
-                    android:textColor="#d9d9d9"
-                    android:textSize="18sp"/>
+                android:id="@+id/help_myevents_additionaloptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"
+                android:text="@string/help_additionaloptions"
+                android:textColor="#d9d9d9"
+                android:textSize="18sp"/>
 
             <!-- Explanation of updating and deleting. -->
             <TextView

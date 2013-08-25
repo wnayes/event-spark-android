@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -29,12 +31,10 @@ import android.widget.TimePicker;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.appchallenge.eventspark.Event.Type;
 
 @SuppressLint("ValidFragment")
-public class EditEvent extends SherlockFragmentActivity {
+public class EditEvent extends ActionBarActivity {
 	LocalDatabase localDB;
 
 	/**

@@ -14,9 +14,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
@@ -29,9 +33,6 @@ import java.text.DateFormat;
 
 import java.util.Calendar;
 import java.util.Date;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.appchallenge.eventspark.Event.Type;
 import com.appchallenge.eventspark.Event.UserType;
 
@@ -42,7 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /**
  * Wizard activity for creating new events.
  */
-public class CreateEvent extends SherlockFragmentActivity implements CreateEventInterface {
+public class CreateEvent extends ActionBarActivity implements CreateEventInterface {
     /**
      * A pager widget that controls animating between fragments.
      */
@@ -221,7 +222,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getSupportMenuInflater().inflate(R.menu.activity_create_event, menu);
+        getMenuInflater().inflate(R.menu.activity_create_event, menu);
 
         menu.findItem(R.id.action_back).setEnabled(mPager.getCurrentItem() > 0);
 
@@ -234,7 +235,7 @@ public class CreateEvent extends SherlockFragmentActivity implements CreateEvent
         }
 
         MenuItem item = menu.add(Menu.NONE, id, Menu.NONE, action);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         return true;
     }
 

@@ -1,12 +1,6 @@
 package com.appchallenge.eventspark;
 
-import java.util.ArrayList;
 import java.util.Date;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -14,16 +8,19 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.ListView;
 import android.widget.Toast;
 
-public class MyEvents extends SherlockListActivity {
+public class MyEvents extends ActionBarActivity implements MyEventsListFragment.ActivityInterface {
 	/**
 	 * The selected event from the list.
 	 */
@@ -51,7 +48,7 @@ public class MyEvents extends SherlockListActivity {
 	private Boolean eventsUpdated = false;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState){
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_my_events);
 
@@ -77,17 +74,12 @@ public class MyEvents extends SherlockListActivity {
         else
         	findViewById(R.id.help_myevents).setVisibility(View.GONE);
 
-    	// Build the list of events.
-        this.refreshMyEventsList();
-        registerForContextMenu(getListView());
-
         // Persist the context menu state. This required a Runnable to overcome issues
         // with the Activity window not being ready during calls to openContextMenu().
         findViewById(android.R.id.list).post(new Runnable() {
             public void run() {
-                // Reopen the context menu on configuration changes.
-                if (contextMenuOpen)
-                    openContextMenu(getListView());
+        		if (contextMenuOpen)
+        			openContextMenu(findViewById(android.R.id.list));
             }
         });
     }
@@ -107,33 +99,8 @@ public class MyEvents extends SherlockListActivity {
 		super.onSaveInstanceState(savedInstanceState);
 	}
 
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		Log.d("MyEvents.onCreateContextMenu", "Context menu created.");
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        // Retrieve the Event that was selected.
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        if (this.selectedEvent == null)
-            this.selectedEvent = (Event)getListAdapter().getItem(info.position);
-
-        // Determine the available actions based on event list section.
-        if (this.selectedEvent.getEndDate().before(new Date()))
-        	getMenuInflater().inflate(R.menu.my_events_past_context, menu);
-        else
-            getMenuInflater().inflate(R.menu.my_events_active_context, menu);
-
-        this.contextMenuOpen = true;
-    }
-
-	public void onContextMenuClosed(Menu menu) {
-		Log.d("MyEvents.onContextMenuClosed", "Context menu closed.");
-	    super.onContextMenuClosed(menu);
-	    this.contextMenuOpen = false;
-	    this.selectedEvent = null;
-	}
-
-	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_myevents, menu);
 		return true;
 	}
@@ -163,7 +130,35 @@ public class MyEvents extends SherlockListActivity {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
+	
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		Log.d("MyEvents.onCreateContextMenu", "Context menu created.");
+        super.onCreateContextMenu(menu, v, menuInfo);
+        
+        // Retrieve the Event that was selected.
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+        if (this.selectedEvent == null) {
+            this.selectedEvent = (Event)(((MyEventsListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_myevents_list))
+            		                                                                       .getListAdapter()
+            		                                                                       .getItem(info.position));
+        }
 
+        // Determine the available actions based on event list section.
+        if (this.selectedEvent.getEndDate().before(new Date()))
+        	getMenuInflater().inflate(R.menu.my_events_past_context, menu);
+        else
+            getMenuInflater().inflate(R.menu.my_events_active_context, menu);
+
+        this.contextMenuOpen = true;
+    }
+
+	public void onContextMenuClosed(Menu menu) {
+		Log.d("MyEvents.onContextMenuClosed", "Context menu closed.");
+	    super.onContextMenuClosed(menu);
+	    this.contextMenuOpen = false;
+	    this.selectedEvent = null;
+	}
+	
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		// Ensure we have selected an item.
 		if (selectedEvent == null) {
@@ -211,24 +206,25 @@ public class MyEvents extends SherlockListActivity {
 			else
 			    Toast.makeText(this, "Event removed from list.", Toast.LENGTH_SHORT).show();
 
-			this.refreshMyEventsList();
+			((MyEventsListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_myevents_list)).refreshList();
 	    	return true;
 	    }
 	    return super.onContextItemSelected((android.view.MenuItem) item);
 	}
-
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        Log.d("MyEvents.onListItemClick", "List item has been clicked.");
-
-        Event event = (Event)l.getItemAtPosition(position);
-        if (event == null)
-        	return;
-
+	
+	/** React to an event being selected from the event list fragment. */
+	public void onEventSelected(Event event) {
         // Pass information about the event to the details activity.
         Intent eventDetails = new Intent(MyEvents.this, EventDetails.class);
      	eventDetails.putExtra("event", event);
      	startActivityForResult(eventDetails, EventDetails.REQUEST_CODE_EVENT_DETAILS);
+	}
+	
+	/** Gives Fragments access to the activities database reference. */
+	public LocalDatabase getDatabase() {
+		if (localDB == null)
+            localDB = new LocalDatabase(this);
+		return localDB;
 	}
 
 	@Override
@@ -263,48 +259,10 @@ public class MyEvents extends SherlockListActivity {
     	if ((requestCode == CreateEvent.REQUEST_CODE_CREATE_EVENT && resultCode == RESULT_OK) ||
     		(requestCode == EditEvent.REQUEST_CODE_EDIT_EVENT && resultCode == RESULT_OK) ||
     		(requestCode == EventDetails.REQUEST_CODE_EVENT_DETAILS && resultCode == RESULT_OK)) {
-    		this.refreshMyEventsList();
+    		((MyEventsListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_myevents_list)).refreshList();
     		this.eventsUpdated = true;
     	}
     }
-
-	private void refreshMyEventsList() {
-		if (localDB == null)
-            localDB = new LocalDatabase(getApplicationContext());
-
-		// Get a list of the events we have created over time.
-    	ArrayList<Event> allMyEvents = localDB.getMyEvents();
-    	if (allMyEvents.size() < 1) {
-    		findViewById(R.id.my_events_empty).setVisibility(View.VISIBLE);
-    		findViewById(android.R.id.list).setVisibility(View.GONE);
-    		return;
-    	}
-
-    	findViewById(R.id.my_events_empty).setVisibility(View.GONE);
-    	findViewById(android.R.id.list).setVisibility(View.VISIBLE);
-
-    	// Partition the events into active and past lists.
-    	ArrayList<Event> activeEvents = new ArrayList<Event>();
-    	ArrayList<Event> pastEvents = new ArrayList<Event>();
-    	for (Event e : allMyEvents) {
-    		if (e.getEndDate().before(new Date()))
-    			pastEvents.add(e);
-    		else
-    			activeEvents.add(e);
-    	}
-
-    	// Build the list adapter and sections.
-		SeparatedListAdapter adapter = new SeparatedListAdapter(this);
-        if (activeEvents.size() > 0) {
-		    EventAdapter active = new EventAdapter(this, R.layout.list_event, activeEvents);
-			adapter.addSection(getResources().getString(R.string.active), active);
-		}
-        if (pastEvents.size() > 0) {
-		    EventAdapter past = new EventAdapter(this, R.layout.list_event, pastEvents);
-			adapter.addSection(getResources().getString(R.string.past), past);
-		}
-        setListAdapter(adapter);  
-	}
 
 	/** Closes the help information view. */
     public void onCloseHelpClick(View v) {
@@ -357,7 +315,7 @@ public class MyEvents extends SherlockListActivity {
 
 			// Update the list view and internal events list.
 			deletionEvent = null;
-			refreshMyEventsList();
+			((MyEventsListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_myevents_list)).refreshList();
 			eventsUpdated = true;
 		}
 	}

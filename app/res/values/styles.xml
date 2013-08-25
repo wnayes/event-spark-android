@@ -3,7 +3,7 @@
     <!-- Matches the background of the (usually white) loading screen
          to the initial title screen to ease app loading.
          http://cyrilmottier.com/2013/01/23/android-app-launching-made-gorgeous/ -->
-    <style name="Theme.Viewer" parent="@style/Theme.Sherlock.Light.DarkActionBar">
+    <style name="Theme.Viewer" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowBackground">@color/background</item>
     </style>
 
@@ -11,7 +11,7 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
+    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
