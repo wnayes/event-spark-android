@@ -36,9 +36,12 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.internal.view.menu.MenuBuilder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -230,7 +233,8 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 	 */
 	private void updateAttendingText(int attendingCount) {
 		// Invalidate the options menu to ensure the value of attending is applied to the icon.
-		invalidateOptionsMenu();
+		if (!ActivityCompat.invalidateOptionsMenu(this))
+			this.onCreateOptionsMenu(_menu);
 
 		// Change the string and image based on whether we are attending.
 		TextView attendingTextBox = ((TextView)findViewById(R.id.event_details_attendance));
@@ -253,8 +257,10 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 
 	private Menu _menu;
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.activity_event_details, menu);
+		if (menu == null)
+			menu = new MenuBuilder(getApplicationContext());
+        menu.clear();
+		getMenuInflater().inflate(R.menu.activity_event_details, menu);
 
 		// Change the attend actionbar icon depending on whether we have attended or not.
 		menu.findItem(R.id.menu_attend_event).setIcon(!this.attended ? R.drawable.attend : R.drawable.unattend);
@@ -472,7 +478,7 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 			if (_menu != null) {
 				attendItem = _menu.findItem(R.id.menu_attend_event);
 				if (attendItem != null)
-					attendItem.setActionView(R.layout.actionbar_refresh_progress);
+					MenuItemCompat.setActionView(attendItem, R.layout.actionbar_refresh_progress);
 			}
 		}
 
@@ -485,7 +491,7 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 		protected void onPostExecute(String result) {
 			// Remove progress UI.
 			if (attendItem != null)
-				attendItem.setActionView(null);
+				MenuItemCompat.setActionView(attendItem, null);
 			attendItem = null;
 
 			// Some sort of error occurred during the request.
@@ -529,7 +535,7 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 			if (_menu != null) {
 				attendItem = _menu.findItem(R.id.menu_attend_event);
 				if (attendItem != null)
-					attendItem.setActionView(R.layout.actionbar_refresh_progress);
+					MenuItemCompat.setActionView(attendItem, R.layout.actionbar_refresh_progress);
 			}
 		}
 
@@ -542,7 +548,7 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 		protected void onPostExecute(String result) {
 			// Remove progress UI.
 			if (attendItem != null)
-				attendItem.setActionView(null);
+				MenuItemCompat.setActionView(attendItem, null);
 			attendItem = null;
 
 			// Some sort of error occurred during the request.
@@ -627,7 +633,7 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 			if (_menu != null) {
 		        refreshItem = _menu.findItem(R.id.menu_refresh_event);
 		        if (refreshItem != null)
-			        refreshItem.setActionView(R.layout.actionbar_refresh_progress);
+			        MenuItemCompat.setActionView(refreshItem, R.layout.actionbar_refresh_progress);
 			}
 		}
 
@@ -638,7 +644,7 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 		protected void onPostExecute(Event result) {
 			// Remove progress UI.
 			if (refreshItem != null)
-			    refreshItem.setActionView(null);
+			    MenuItemCompat.setActionView(refreshItem, null);
 			refreshItem = null;
 
 			// If the event can't be found, no UI refresh should occur.
@@ -652,7 +658,8 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 			event = result;
 
 			// Invalidate the options menu to account for any needed visibility changes.
-			invalidateOptionsMenu();
+			if (!ActivityCompat.invalidateOptionsMenu(EventDetails.this))
+				EventDetails.this.onCreateOptionsMenu(_menu);
 
 			updateEventDetails();
 		}
@@ -663,9 +670,7 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 		ProgressDialog shareDialog;
 		Session session = Session.getActiveSession();
 		protected void onPreExecute() {
-			// Establish progress UI changes.
-			
-			if (session != null) {
+    		if (session != null) {
 			    token = session.getAccessToken();
 			}
 			shareDialog = ProgressDialog.show(EventDetails.this, "Sharing...", "");
@@ -679,7 +684,6 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 			return false;
 		}
 
-
 		protected void onPostExecute(Boolean result) {
             shareDialog.dismiss();
 			if (result == false) {
@@ -691,7 +695,6 @@ public class EventDetails extends ActionBarActivity implements ReportDialogListe
 			}
 			Toast.makeText(getApplicationContext(), "The Event has been shared.", Toast.LENGTH_LONG).show();
 			return;
-
 		}
 	}
 

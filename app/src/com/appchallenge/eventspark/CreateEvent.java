@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -209,7 +210,8 @@ public class CreateEvent extends ActionBarActivity implements CreateEventInterfa
                 // on which page is currently active. An alternative approach is to have each
                 // fragment expose actions itself (rather than the activity exposing actions),
                 // but for simplicity, the activity provides the actions.
-                invalidateOptionsMenu();
+                if (!ActivityCompat.invalidateOptionsMenu(CreateEvent.this))
+                	CreateEvent.this.onCreateOptionsMenu(CreateEvent.this._menu);
             }
         });
     }
@@ -219,9 +221,9 @@ public class CreateEvent extends ActionBarActivity implements CreateEventInterfa
     	super.onSaveInstanceState(savedInstanceState);
     }
 
-    @Override
+    private Menu _menu;
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
+        menu.clear();
         getMenuInflater().inflate(R.menu.activity_create_event, menu);
 
         menu.findItem(R.id.action_back).setEnabled(mPager.getCurrentItem() > 0);
@@ -235,7 +237,11 @@ public class CreateEvent extends ActionBarActivity implements CreateEventInterfa
         }
 
         MenuItem item = menu.add(Menu.NONE, id, Menu.NONE, action);
-        MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
+        
+        // Keep a reference to the menu for manual calls to onCreateOptionsMenu.
+        this._menu = menu;
+        
         return true;
     }
 
@@ -254,11 +260,9 @@ public class CreateEvent extends ActionBarActivity implements CreateEventInterfa
         if (item.getItemId() == android.R.id.home) {
 			// Handle navigating back to the EventViewer on Home press.
         	Intent viewerIntent = new Intent(this, EventViewer.class);
-            if (NavUtils.shouldUpRecreateTask(this, viewerIntent)) {
+            if (NavUtils.shouldUpRecreateTask(this, viewerIntent))
                 NavUtils.navigateUpTo(this, viewerIntent);
-                finish();
-            } else
-                finish();
+            finish();
             return true;
 		} else if (item.getItemId() == R.id.action_back) {
 			// Go to the previous step in the wizard. If there is no previous step,

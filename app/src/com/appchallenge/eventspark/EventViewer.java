@@ -27,11 +27,12 @@ import android.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -199,7 +200,9 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-        mMap.setMyLocationEnabled(true);
+        
+        if (mMap != null)
+            mMap.setMyLocationEnabled(true);
     }
     
     @Override
@@ -262,8 +265,10 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
 
     private Menu _menu;
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_event_viewer, menu);
+    	Log.d("EventViewer.onCreateOptionsMenu", "Recreating viewer actionbar items.");
+
+    	menu.clear();
+        getMenuInflater().inflate(R.menu.activity_event_viewer, menu);
 
         menu.setGroupVisible(R.id.group_viewer_menuitems, !this.initialScreenVisible());
 
@@ -339,11 +344,13 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
      * the savedInstanceState Bundle.
      */
     public void onSaveInstanceState(Bundle savedInstanceState) {
-    	savedInstanceState.putParcelable("currentMapLocation", mMap.getCameraPosition().target);
-    	savedInstanceState.putFloat("currentMapZoom", mMap.getCameraPosition().zoom);
-    	if (currentLocation != null) {
-    	    savedInstanceState.putParcelable("currentUserLocation", this.currentLocation);
-    	    savedInstanceState.putFloat("currentUserLocationAccuracy", mMap.getMyLocation().getAccuracy());
+    	if (mMap != null) {
+        	savedInstanceState.putParcelable("currentMapLocation", mMap.getCameraPosition().target);
+        	savedInstanceState.putFloat("currentMapZoom", mMap.getCameraPosition().zoom);
+        	if (currentLocation != null) {
+        	    savedInstanceState.putParcelable("currentUserLocation", this.currentLocation);
+    	        savedInstanceState.putFloat("currentUserLocationAccuracy", mMap.getMyLocation().getAccuracy());
+    	    }
     	}
 
     	// Keep the collection of Events when changing configuration.
@@ -422,7 +429,9 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
     	findViewById(R.id.initialScreen).setVisibility(View.GONE);
 
     	// Prompt the options menu to become visible again.
-    	invalidateOptionsMenu();
+    	// invalidateOptionsMenu is available without support in API version 11+.
+    	if (!ActivityCompat.invalidateOptionsMenu(this))
+    		this.onCreateOptionsMenu(_menu);
     }
 
     private boolean initialScreenVisible() {
@@ -466,12 +475,13 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
 
-            // Register the LocationSource
-            mMap.setLocationSource(this);
-
             // Check if we were successful in obtaining the map.
-            if (mMap != null)
+            if (mMap != null) {
+                // Register the LocationSource
+                mMap.setLocationSource(this);
+
                 setUpMap();
+            }
         }
     }
 
@@ -536,6 +546,9 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
     		return;
 
     	setUpMapIfNeeded();
+    	if (mMap == null)
+    		return;
+
     	mMap.clear();
         eventMarkerMap.clear();
         for (Event event : this.currentEvents) {
@@ -614,7 +627,7 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
 	        mListener.onLocationChanged(location);
 
 		// Act based on the new location.
-        if (location != null) {
+        if (location != null && mMap != null) {
         	currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         	if (!this.atSpecifiedLocation)
         	    mMap.animateCamera(CameraUpdateFactory.newLatLng(currentLocation));
@@ -628,7 +641,8 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
         	    new getEventsNearLocationAPICaller().execute(currentLocation);
 
         	// Invalidate the action bar menu to enable location-based actions.
-        	invalidateOptionsMenu();
+        	if (!ActivityCompat.invalidateOptionsMenu(this))
+        		this.onCreateOptionsMenu(_menu);
         }
 	}
 
@@ -680,7 +694,7 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
 			if (_menu != null) {
 		        refreshItem = _menu.findItem(R.id.menu_refresh_events);
 		        if (refreshItem != null)
-			        refreshItem.setActionView(R.layout.actionbar_refresh_progress);
+		        	MenuItemCompat.setActionView(refreshItem, R.layout.actionbar_refresh_progress);
 			}
 		}
 
@@ -704,7 +718,7 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
 		protected void onPostExecute(ArrayList<Event> result) {
 			// Remove progress UI.
 			if (refreshItem != null)
-			    refreshItem.setActionView(null);
+				MenuItemCompat.setActionView(refreshItem, null);
 			refreshItem = null;
 
 			// Keep track of these events and populate the map.
@@ -712,8 +726,9 @@ public class EventViewer extends ActionBarActivity implements LocationListener,
 				return;
 			
 			if (result.size() == 0 && !initialScreenVisible()) {
-				//Clears map if no events found
-				mMap.clear();
+				// Clears map if no events found
+				if (mMap != null)
+				    mMap.clear();
                 Toast.makeText(getApplicationContext(), "No events found near you!", Toast.LENGTH_LONG)
 			         .show();
                 return;
