@@ -9,6 +9,7 @@ import com.appchallenge.eventspark.Event.UserType;
 import com.facebook.Session;
 import com.facebook.SessionState;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -72,7 +73,14 @@ public class CreateEventPage1EventName extends Fragment {
         ArrayList<UserType> userTypes = new ArrayList<UserType>();
         userTypes.add(UserType.ANONYMOUS);
         userTypes.add(UserType.GPLUS);
-        userTypes.add(UserType.FACEBOOK);
+        
+        // The Facebook SDK API is built with minSdkVersion of 8, so we should
+        // hide the Facebook option on devices with SDK 7. Everything will still
+        // work in the spinner since Facebook is at the end, but check how
+        // userTypeSpinner.setOnItemSelectedListener does indexing with future changes.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+            userTypes.add(UserType.FACEBOOK);
+
         UserTypeAdapter userTypeAdapter = new UserTypeAdapter(getActivity(), 0, userTypes);
         userTypeSpinner.setAdapter(userTypeAdapter);
 
