@@ -22,13 +22,22 @@ import android.widget.Toast;
  * These should be called asynchronously.
  */
 public class APICalls {
+	/** Where the API is being hosted. */
+	private static String API_DOMAIN = "saypoint.dreamhosters.com";
+
+	/** Directory of the API. */
+	private static String API_DIR = "api";
+
+	/** Whether the API is using HTTPS for connections. */
+	private static Boolean API_SECURE = false;
+
     /**
 	 * Performs the HTTP REST API request for a JSON listing of the
      * events nearest to the user's location.
      * @throws ConnectTimeoutException 
      */
     public static ArrayList<Event> getEventsNearLocation(LatLng location) throws SocketTimeoutException, ConnectTimeoutException {
-        String getEventsUrl = "http://saypoint.dreamhosters.com/api/events/search/";
+        String getEventsUrl = getAPIURL() + "/events/search/";
         RestClient client = new RestClient(getEventsUrl);
 
         // Add parameters
@@ -86,7 +95,7 @@ public class APICalls {
 	 * Retrieves an Event from its ID.
      */
     public static Event getEvent(int id) {
-        String getEventUrl = "http://saypoint.dreamhosters.com/api/events/" + id;
+        String getEventUrl = getAPIURL() + "/events/" + id;
         RestClient client = new RestClient(getEventUrl);
 
     	try {
@@ -131,7 +140,7 @@ public class APICalls {
      * Sends information to the REST API for creation of a new event.
      */
     public static Event createEvent(Event newEvent, String userId, String userToken) {
-    	String createEventUrl = "http://saypoint.dreamhosters.com/api/events";
+        String createEventUrl = getAPIURL() + "/events";
         RestClient client = new RestClient(createEventUrl);
 
         client.AddParam("title", newEvent.getTitle());
@@ -172,7 +181,7 @@ public class APICalls {
     }
 
 	public static int getAttendance(int id) {
-		String getAttendUrl = "http://saypoint.dreamhosters.com/api/events/attend/" + id;
+		String getAttendUrl = getAPIURL() + "/events/attend/" + id;
 		RestClient client = new RestClient(getAttendUrl);
 
 		try {
@@ -203,7 +212,7 @@ public class APICalls {
 	}
 
 	public static String attendEvent(Integer eventId, String userId) {
-		String attendUrl = "http://saypoint.dreamhosters.com/api/events/attend/" + eventId;
+		String attendUrl = getAPIURL() + "/events/attend/" + eventId;
 		RestClient client = new RestClient(attendUrl);
 
 		client.AddParam("user_id", userId);
@@ -236,7 +245,7 @@ public class APICalls {
 	}
 
 	public static String unattendEvent(Integer eventId, String userId) {
-		String unattendUrl = "http://saypoint.dreamhosters.com/api/events/attend/" + eventId;
+		String unattendUrl = getAPIURL() + "/events/attend/" + eventId;
 		RestClient client = new RestClient(unattendUrl);
 
 		client.AddParam("user_id", userId);
@@ -269,7 +278,7 @@ public class APICalls {
 	}
 
 	public static String reportEvent(Integer eventId, Integer reasonCode, String userId) {
-		String getReportUrl = "http://saypoint.dreamhosters.com/api/events/report/" + eventId;
+		String getReportUrl = getAPIURL() + "/events/report/" + eventId;
 		RestClient client = new RestClient(getReportUrl);
 
 		client.AddParam("user_id", userId);
@@ -309,7 +318,7 @@ public class APICalls {
 	 * @return A mapping from the mutable event member names to their new values.
 	 */
 	public static TreeMap<String, String> updateEvent(Event existingEvent, Event updatedEvent, String userId) {
-    	String updateEventUrl = "http://saypoint.dreamhosters.com/api/events/" + existingEvent.getId();
+        String updateEventUrl = getAPIURL() + "/events/" + existingEvent.getId();
         RestClient client = new RestClient(updateEventUrl);
 
         client.AddParam("user_id", userId);
@@ -377,7 +386,7 @@ public class APICalls {
 	}
 	
 	public static Boolean deleteEvent(Event event, String userId) {
-    	String deleteEventUrl = "http://saypoint.dreamhosters.com/api/events/" + event.getId();
+        String deleteEventUrl = getAPIURL() + "/events/" + event.getId();
         RestClient client = new RestClient(deleteEventUrl);
 
         client.AddParam("secret_id", event.getSecretId());
@@ -412,8 +421,7 @@ public class APICalls {
 	// This is the API to share events with Facebook
 	public static Boolean shareEvent(Integer id, String token) {
 		String facebookURL = "https://graph.facebook.com/me/appchallenge_arrows:join";
-		String eventURL = "http://saypoint.dreamhosters.com/facebook/" + id + ".html";
-		Log.d("Just some checks", "in the API for share event");
+		String eventURL = (API_SECURE ? "https://" : "http://") + API_DOMAIN + "/facebook/" + id + ".html";
 
 		RestClient client = new RestClient(facebookURL);
 
@@ -447,6 +455,13 @@ public class APICalls {
 		} 
 
 		return false;
+	}
+
+	/**
+	 * @return The full URL for the events REST API.
+	 */
+	private static String getAPIURL() {
+		return (API_SECURE ? "https://" : "http://") + API_DOMAIN + "/" + API_DIR;
 	}
 
 	/**
