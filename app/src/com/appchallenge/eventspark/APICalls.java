@@ -23,7 +23,7 @@ import android.widget.Toast;
  */
 public class APICalls {
 	/** Where the API is being hosted. */
-	private static String API_DOMAIN = "saypoint.dreamhosters.com";
+	private static String API_DOMAIN = "eventspark.atspace.cc";
 
 	/** Directory of the API. */
 	private static String API_DIR = "api";
