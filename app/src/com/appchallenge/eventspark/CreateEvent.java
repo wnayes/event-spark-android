@@ -144,7 +144,7 @@ public class CreateEvent extends ActionBarActivity implements CreateEventInterfa
 
 	private String token;
 	public void setToken(String token) {
-		Log.d("CreateEvent.setToken", "Received token: " + token);
+		Log.d("CreateEvent.setToken", "Received token: " + token.substring(0, token.length() / 10) + "...");
 		this.token = token;
 	}
 
