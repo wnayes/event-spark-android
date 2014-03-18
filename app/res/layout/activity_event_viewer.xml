@@ -24,6 +24,7 @@
         <LinearLayout
 	        android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
+	        android:gravity="center"
 	        android:orientation="vertical"
 	        android:layout_weight="1" >
 	        <TextView
@@ -49,58 +50,64 @@
                     android:textColor="#d9d9d9"
                     android:textSize="18sp"/>
 
-	        <!-- Explanation of the create '+' menu item. -->
+	        <!-- Explanation of action bar icons. -->
 	        <LinearLayout
-	            android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="72dp"
-                android:orientation="horizontal"
-                android:paddingBottom="16dp">
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:orientation="vertical">
+		        <!-- Explanation of the create '+' menu item. -->
+		        <LinearLayout
+		            android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:gravity="center"
+	                android:orientation="horizontal"
+	                android:paddingBottom="16dp">
 
-                <ImageView android:src="@drawable/ic_action_new"
-                    android:contentDescription="@string/ic_new"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingRight="16dp"/>
-                <View
-			        android:layout_width="1dip"
-			        android:layout_height="32dp"
-			        android:background="#44AAAAAA"/>
-	            <TextView
-	                android:id="@+id/help_viewer_create"
+	                <ImageView android:src="@drawable/ic_action_new"
+	                    android:contentDescription="@string/ic_new"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:paddingRight="16dp"/>
+	                <View
+				        android:layout_width="1dip"
+				        android:layout_height="32dp"
+				        android:background="#44AAAAAA"/>
+		            <TextView
+		                android:id="@+id/help_viewer_create"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:paddingLeft="16dp"
+		                android:text="@string/help_viewer_create"
+		                android:textColor="#d9d9d9"
+	                    android:textSize="16sp"/>
+		        </LinearLayout>
+		        <!-- Explanation of the refresh menu item. -->
+	            <LinearLayout
 	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
-	                android:paddingLeft="16dp"
-	                android:text="@string/help_viewer_create"
-	                android:textColor="#d9d9d9"
-                    android:textSize="16sp"/>
-	        </LinearLayout>
-	        <!-- Explanation of the refresh menu item. -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="72dp"
-                android:orientation="horizontal"
-                android:paddingBottom="16dp">
+	                android:gravity="center"
+	                android:orientation="horizontal"
+	                android:paddingBottom="16dp">
 
-                <ImageView android:src="@drawable/refresh"
-                    android:contentDescription="@string/refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingRight="16dp"/>
-                <View
-                    android:layout_width="1dip"
-                    android:layout_height="32dp"
-                    android:background="#44AAAAAA"/>
-                <TextView
-                    android:id="@+id/help_viewer_refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="16dp"
-                    android:text="@string/help_viewer_refresh"
-                    android:textColor="#d9d9d9"
-                    android:textSize="16sp"/>
-            </LinearLayout>
+	                <ImageView android:src="@drawable/refresh"
+	                    android:contentDescription="@string/refresh"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:paddingRight="16dp"/>
+	                <View
+	                    android:layout_width="1dip"
+	                    android:layout_height="32dp"
+	                    android:background="#44AAAAAA"/>
+	                <TextView
+	                    android:id="@+id/help_viewer_refresh"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:paddingLeft="16dp"
+	                    android:text="@string/help_viewer_refresh"
+	                    android:textColor="#d9d9d9"
+	                    android:textSize="16sp"/>
+	            </LinearLayout>
+	        </LinearLayout>
 	    </LinearLayout>
         <Button
             android:layout_width="wrap_content"

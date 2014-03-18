@@ -123,7 +123,7 @@ public class EditEvent extends ActionBarActivity {
                                                                              android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(adapter);
-	    int typeSelection = (localEvent.getType().getValue() > 5) ? 0 : localEvent.getType().getValue() - 1;
+	    int typeSelection = (localEvent.getType().getValue() == 0) ? Type.typeIndices.length - 1 : localEvent.getType().getValue() - 1;
         typeSpinner.setSelection(typeSelection);
 
         // Establish the date strings.
